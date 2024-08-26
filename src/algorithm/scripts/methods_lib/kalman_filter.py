@@ -15,6 +15,8 @@
 '''
 
 # %% class
+
+
 class SingleStateKalmanFilter(object):
 
     def __init__(self, x, P, A, B, C, Q, R):
@@ -47,6 +49,7 @@ class SingleStateKalmanFilter(object):
 
         return self.current_state_estimate
         # 将 current_state()函数合并到此
+
 
 '''
     import numpy as np

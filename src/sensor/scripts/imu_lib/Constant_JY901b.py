@@ -4,12 +4,12 @@
 # %%
 DEFAULT_ADDRESS = 0x50
 # 寄存器地址表
-SAVE = 0x00 # 保存当前配置
-CALSW = 0x01 # 校准
+SAVE = 0x00  # 保存当前配置
+CALSW = 0x01  # 校准
 
 # %%
-RSW = 0x02 # 回传数据内容
-RATE = 0x03 # 回传数据速率
+RSW = 0x02  # 回传数据内容
+RATE = 0x03  # 回传数据速率
 # 7.2.9 设置回传速率
 # 0xFF 0xAA 0x03 RATE 0x00
 # RATE：回传速率
@@ -26,7 +26,7 @@ RATE = 0x03 # 回传数据速率
 # 0x0b：200Hz
 # 0x0c：单次输出
 # 设置完成以后需要点保存配置按钮，再给模块重新上电后生效
-BAUD = 0x04 # 串口波特率
+BAUD = 0x04  # 串口波特率
 # 7.2.10 设置串口波特率
 # 0xFF 0xAA 0x04 BAUD 0x00
 # BAUD：波特率设置
@@ -41,74 +41,74 @@ BAUD = 0x04 # 串口波特率
 # 0x08：460800
 # 0x09：921600
 
-AXOFFSET = 0x05 # X 轴加速度零偏
-AYOFFSET = 0x06 # Y 轴加速度零偏
-AZOFFSET = 0x07 # Z 轴加速度零偏
-GXOFFSET = 0x08 # X 轴角速度零偏
-GYOFFSET = 0x09 # Y 轴角速度零偏
-GZOFFSET = 0x0a # Z 轴角速度零偏
-HXOFFSET = 0x0b # X 轴磁场零偏
-HYOFFSET = 0x0c # Y 轴磁场零偏
-HZOFFSET = 0x0d # Z 轴磁场零偏
-D0MODE = 0x0e # D0 模式
-D1MODE = 0x0f # D1 模式
-D2MODE = 0x10 # D2 模式
-D3MODE = 0x11 # D3 模式
-D0PWMH_D0PWM = 0x12 # 高电平宽度
-D1PWMH_D1PWM = 0x13 # 高电平宽度
-D2PWMH_D2PWM = 0x14 # 高电平宽度
-D3PWMH_D3PWM = 0x15 # 高电平宽度
-D0PWMT_D0PWM = 0x16 # 周期
-D1PWMT_D1PWM = 0x17 # 周期
-D2PWMT_D2PWM = 0x18 # 周期
-D3PWMT_D3PWM = 0x19 # 周期
-IICADDR_IIC = 0x1a # 地址
-LEDOFF = 0x1b # 关闭LED 指示灯
-GPSBAUD = 0x1c # GPS 连接波特率
+AXOFFSET = 0x05  # X 轴加速度零偏
+AYOFFSET = 0x06  # Y 轴加速度零偏
+AZOFFSET = 0x07  # Z 轴加速度零偏
+GXOFFSET = 0x08  # X 轴角速度零偏
+GYOFFSET = 0x09  # Y 轴角速度零偏
+GZOFFSET = 0x0a  # Z 轴角速度零偏
+HXOFFSET = 0x0b  # X 轴磁场零偏
+HYOFFSET = 0x0c  # Y 轴磁场零偏
+HZOFFSET = 0x0d  # Z 轴磁场零偏
+D0MODE = 0x0e  # D0 模式
+D1MODE = 0x0f  # D1 模式
+D2MODE = 0x10  # D2 模式
+D3MODE = 0x11  # D3 模式
+D0PWMH_D0PWM = 0x12  # 高电平宽度
+D1PWMH_D1PWM = 0x13  # 高电平宽度
+D2PWMH_D2PWM = 0x14  # 高电平宽度
+D3PWMH_D3PWM = 0x15  # 高电平宽度
+D0PWMT_D0PWM = 0x16  # 周期
+D1PWMT_D1PWM = 0x17  # 周期
+D2PWMT_D2PWM = 0x18  # 周期
+D3PWMT_D3PWM = 0x19  # 周期
+IICADDR_IIC = 0x1a  # 地址
+LEDOFF = 0x1b  # 关闭LED 指示灯
+GPSBAUD = 0x1c  # GPS 连接波特率
 
-YYMM = 0x30 # 年、月
-DDHH = 0x31 # 日、时
-MMSS = 0x32 # 分、秒
-MS = 0x33 # 毫秒
+YYMM = 0x30  # 年、月
+DDHH = 0x31  # 日、时
+MMSS = 0x32  # 分、秒
+MS = 0x33  # 毫秒
 
-AX = 0x34 # X 轴加速度
-AY = 0x35 # Y 轴加速度
-AZ = 0x36 # Z 轴加速度
-GX = 0x37 # X 轴角速度
-GY = 0x38 # Y 轴角速度
-GZ = 0x39 # Z 轴角速度
-HX = 0x3a # X 轴磁场
-HY = 0x3b # Y 轴磁场
-HZ = 0x3c # Z 轴磁场
-ROLL_X = 0x3d # 轴角度
-PITCH_Y = 0x3e # 轴角度
-YAW_Z = 0x3f # 轴角度
+AX = 0x34  # X 轴加速度
+AY = 0x35  # Y 轴加速度
+AZ = 0x36  # Z 轴加速度
+GX = 0x37  # X 轴角速度
+GY = 0x38  # Y 轴角速度
+GZ = 0x39  # Z 轴角速度
+HX = 0x3a  # X 轴磁场
+HY = 0x3b  # Y 轴磁场
+HZ = 0x3c  # Z 轴磁场
+ROLL_X = 0x3d  # 轴角度
+PITCH_Y = 0x3e  # 轴角度
+YAW_Z = 0x3f  # 轴角度
 
-TEMP = 0x40 # 模块温度
+TEMP = 0x40  # 模块温度
 
-D0STATUS = 0x41 # 端口D0 状态
-D1STATUS = 0x42 # 端口D1 状态
-D2STATUS = 0x43 # 端口D2 状态
-D3STATUS = 0x44 # 端口D3 状态
+D0STATUS = 0x41  # 端口D0 状态
+D1STATUS = 0x42  # 端口D1 状态
+D2STATUS = 0x43  # 端口D2 状态
+D3STATUS = 0x44  # 端口D3 状态
 
-PRESSUREL = 0x45 # 气压低字
-PRESSUREH = 0x46 # 气压高字
-HEIGHTL = 0x47 # 高度低字
-HEIGHTH = 0x48 # 高度高字
+PRESSUREL = 0x45  # 气压低字
+PRESSUREH = 0x46  # 气压高字
+HEIGHTL = 0x47  # 高度低字
+HEIGHTH = 0x48  # 高度高字
 
-LONL = 0x49 # 经度低字
-LONH = 0x4a # 经度高字
-LATL = 0x4b # 纬度低字
-LATH = 0x4c # 纬度高字
-GPSHEIGHT_GPS = 0x4d # 高度
-GPSYAW_GPS = 0x4e # 航向角
-GPSVL_GPS = 0x4f # 地速低字
-GPSVH_GPS = 0x50 # 地速高字
+LONL = 0x49  # 经度低字
+LONH = 0x4a  # 经度高字
+LATL = 0x4b  # 纬度低字
+LATH = 0x4c  # 纬度高字
+GPSHEIGHT_GPS = 0x4d  # 高度
+GPSYAW_GPS = 0x4e  # 航向角
+GPSVL_GPS = 0x4f  # 地速低字
+GPSVH_GPS = 0x50  # 地速高字
 
-Q0 = 0x51 # 四元素Q0
-Q1 = 0x52 # 四元素Q1
-Q2 = 0x53 # 四元素Q2
-Q3 = 0x54 # 四元素Q3
+Q0 = 0x51  # 四元素Q0
+Q1 = 0x52  # 四元素Q1
+Q2 = 0x53  # 四元素Q2
+Q3 = 0x54  # 四元素Q3
 
 # 7.2.1 解锁指令
 # 0xFF 0xAA 0x69 0x88 0xB5

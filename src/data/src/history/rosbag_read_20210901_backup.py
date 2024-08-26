@@ -29,7 +29,7 @@ topics = [info_dict['topics'][0]['topic']]
 print(topics, type(topics))
 
 # %% 打印bag中的话题信息
-for topic, msg, t in bag_info.read_messages(topics=topics): # ['chatter', 'numbers']
+for topic, msg, t in bag_info.read_messages(topics=topics):  # ['chatter', 'numbers']
     '''
         - topic: the topic of the message
         - msg: the message

@@ -31,15 +31,18 @@ PublisherNameIMU = 'sensor/imu/data_raw'
 PublisherNameMag = 'sensor/imu/mag'
 
 # %% Class
+
+
 class ImuPublisherNode(BagPathClass):
-# ==================================================
-#                                                初始化
-# ==================================================
+    # ==================================================
+    #                                                初始化
+    # ==================================================
     def __init__(self):
         self.inits_node()
         self.inits_parameter()
+
     def inits_node(self):
-    # Initial Node
+        # Initial Node
         rospy.init_node('Sensor_IMU_Publisher', anonymous=False, log_level=rospy.INFO, disable_signals=False)
     # Advertise Publisher
         self.imu_pub = rospy.Publisher('imu/data_raw', Imu, queue_size=10)
@@ -47,8 +50,9 @@ class ImuPublisherNode(BagPathClass):
     # Bag
         self.bag_imu = self.bag_path(PublisherNameIMU)
         self.bag_mag = self.bag_path(PublisherNameMag)
+
     def inits_parameter(self):
-    # Sample
+        # Sample
         self.rate = rospy.get_param('~rate', 10)
     # Object
         self.imu = mpu6050_lib.MPU6050()
@@ -69,6 +73,7 @@ class ImuPublisherNode(BagPathClass):
 # ==================================================
 #                                             Callback_Func
 # ==================================================
+
     def update_callback_imu(self):
         """
         docstring
@@ -77,9 +82,9 @@ class ImuPublisherNode(BagPathClass):
         self.get_gyro = self.imu.get_gyro_data()
         # 从MPU6050上读到的陀螺仪数据的单位是：°/s，而ROS中处理的数据单位是：rad/s，故需要先`原始数据 / 180 * pi`
         # 之后，采集静置一段时间的陀螺仪三轴数据，计算均值作为偏差，即：
-            # %   x_mean = -0.275967189131500
-            # %   y_mean = -0.091677493946224
-            # %   z_mean = -0.060957140016007
+        # %   x_mean = -0.275967189131500
+        # %   y_mean = -0.091677493946224
+        # %   z_mean = -0.060957140016007
         # self.imu_msg.angular_velocity.x = self.get_gyro['x'] / 180 * math.pi + 0.275967189131500
         # self.imu_msg.angular_velocity.y = self.get_gyro['y'] / 180 * math.pi + 0.091677493946224
         # self.imu_msg.angular_velocity.z = self.get_gyro['z'] / 180 * math.pi + 0.060957140016007
@@ -105,6 +110,7 @@ class ImuPublisherNode(BagPathClass):
         # self.orientation_cov[0] = self.imu_msg.orientation.x * self.imu_msg.orientation.x
         # self.orientation_cov[4] = self.imu_msg.orientation.y * self.imu_msg.orientation.y
         # self.orientation_cov[8] = self.imu_msg.orientation.z * self.imu_msg.orientation.z
+
     def update_callback_mag(self):
         """
         docstring
@@ -113,6 +119,7 @@ class ImuPublisherNode(BagPathClass):
         self.magnetic_field_y = 0
         self.magnetic_field_z = 0
         pass
+
     def update_callback(self):
         self.update_callback_imu()
         self.update_callback_mag()
@@ -121,8 +128,9 @@ class ImuPublisherNode(BagPathClass):
 # ==================================================
     # 根据重力加速度在各个方向上的分量便能求解出物体的姿态，但是水平方向偏航角与重力加速度垂直无法求得
     # 奇怪的是，磁力计的数据给零，效果比不给要好很多
+
     def update_msg_imu(self):
-    # Header
+        # Header
         self.imu_msg.header.stamp = rospy.Time.now()
         self.imu_msg.header.frame_id = self.frame_name
         # self.imu_msg.header.seq = self.seq
@@ -153,8 +161,9 @@ class ImuPublisherNode(BagPathClass):
         # self.seq += 1
     # Bag
         # self.bag.write('imu/data_raw', self.imu_msg)
+
     def update_msg_mag(self):
-    # Header
+        # Header
         self.mag_msg.header.stamp = rospy.Time.now()
         self.mag_msg.header.frame_id = self.frame_name
         # self.mag_msg.header.seq = self.seq
@@ -167,15 +176,18 @@ class ImuPublisherNode(BagPathClass):
         self.mag_pub.publish(self.mag_msg)
     # Bag
         # self.bag.write('imu/mag', self.mag_msg)
+
     def update_msg(self):
         self.update_msg_imu()
         self.update_msg_mag()
+
     def bag_close(self):
         self.bag_imu.close()
         self.bag_mag.close()
 # ==================================================
 #                                              @main
 # ==================================================
+
     def spin(self):
         rospy.loginfo('# Start::%s::%s #', NodeName, time.asctime())
         rate = rospy.Rate(self.rate)
@@ -185,15 +197,19 @@ class ImuPublisherNode(BagPathClass):
             self.update_msg()
             rate.sleep()
         rospy.spin()
+
     def shutdown_node(self):
         rospy.loginfo('# Stop::%s::%s #', NodeName, time.asctime())
         self.bag_close()
         rospy.sleep(1)
 
 # %%
+
+
 def main():
     imu_sensor = ImuPublisherNode()
     imu_sensor.spin()
+
 
 if __name__ == '__main__':
     main()

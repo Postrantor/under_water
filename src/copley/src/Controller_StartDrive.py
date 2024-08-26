@@ -27,9 +27,11 @@ from bag_lib.bag_path import BagPathClass
 NodeName = 'Controller_StartDrive'
 SubscriberNameCmdStart = 'cmd/start'
 # Defain GPIO
-Relay = 5 # 使用第5引脚控制继电器
+Relay = 5  # 使用第5引脚控制继电器
 
 # %% Class
+
+
 class ControlsToMotors(BagPathClass):
     '''
         通过手柄上的一个按键来控制电机的通电断电， 在某些时候也可以用来紧急断电用
@@ -37,11 +39,13 @@ class ControlsToMotors(BagPathClass):
 # ==================================================
 #                                           Initial_Parameters
 # ==================================================
+
     def __init__(self):
         self.inits_node()
         self.inits_parameter()
+
     def inits_node(self):
-    # Initial Node
+        # Initial Node
         rospy.init_node(NodeName, anonymous=False, log_level=rospy.INFO, disable_signals=False)
     # Advertise Subscriber
         rospy.Subscriber(SubscriberNameCmdStart, cmd2start_msg, self.callback_msg)
@@ -50,25 +54,27 @@ class ControlsToMotors(BagPathClass):
         # self.joy_pub = rospy.Publisher('joy_start', joy2start_msg, queue_size=1)
     # Bag
         self.bag = self.bag_path(SubscriberNameCmdStart)
+
     def inits_parameter(self):
-    # Sample
+        # Sample
         # self.rate = rospy.get_param('~rate', 10)
-    # Msg_Subscriber
+        # Msg_Subscriber
         self.rpi_host = 0
         self.copley_motor = 0
     # Msg_Publisher
-        # self.control_msg = 
+        # self.control_msg =
         # self.frame_name = rospy.get_param('~frame_name', 'control_start')
 
-        # self.feedback_msg = 
+        # self.feedback_msg =
         # self.frame_name = rospy.get_param('~frame_name', 'feedback_start')
     # GPIO
-        RPi_GPIO.setmode(RPi_GPIO.BCM) # mode = GPIO.getmode()
+        RPi_GPIO.setmode(RPi_GPIO.BCM)  # mode = GPIO.getmode()
         RPi_GPIO.setwarnings(False)
         RPi_GPIO.setup(Relay, RPi_GPIO.OUT, initial=False)
 # ==================================================
 #                                             Callback_Msg
 # ==================================================
+
     def callback_msg(self, msg):
         '''
         '''
@@ -80,6 +86,7 @@ class ControlsToMotors(BagPathClass):
 # ==================================================
 #                                            Callback_Func
 # ==================================================
+
     def gpio_relay(self):
         """
             set GPIO引脚
@@ -93,15 +100,18 @@ class ControlsToMotors(BagPathClass):
         else:
             RPi_GPIO.output(Relay, False)
             print('断电')
+
     def update_callback(self):
         self.gpio_relay()
+
     def bag_close(self):
         self.bag.close()
 # ==================================================
 #                                          Publisher_Msg
 # ==================================================
+
     def update_msg(self, stop=False):
-    # Header
+        # Header
         self.start_msg.header.stamp = rospy.Time.now()
         self.start_msg.header.frame_id = self.frame_name
         # self.start_msg.header.seq = self.seq
@@ -120,20 +130,25 @@ class ControlsToMotors(BagPathClass):
 # ==================================================
 #                                               @main
 # ==================================================
+
     def spin(self):
         rospy.loginfo('# Start::%s::%s #', NodeName, time.asctime())
         rospy.on_shutdown(self.shutdown_node)
         rospy.spin()
+
     def shutdown_node(self):
         rospy.loginfo('# Stop::%s::%s #', NodeName, time.asctime())
         self.update_msg(stop=True)
-        RPi_GPIO.cleanup(Relay) # clears the pin numbering system in use.
+        RPi_GPIO.cleanup(Relay)  # clears the pin numbering system in use.
         # self.bag_close()
 
 # %%
+
+
 def main():
     start_publisher = ControlsToMotors()
     start_publisher.spin()
+
 
 if __name__ == '__main__':
     main()

@@ -5,10 +5,7 @@
         "databaseFilename": "",
         "limitSymbolsToIncludedHeaders": true
       },
-      "includePath": [
-        "/opt/ros/melodic/include/**",
-        "/usr/include/**"
-      ],
+      "includePath": ["/opt/ros/melodic/include/**", "/usr/include/**"],
       "name": "ROS"
     }
   ],

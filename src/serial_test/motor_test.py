@@ -21,7 +21,7 @@ from constant_lib.Constant_Motor import Maxon_266761, Maxon_305474, Maxon_306090
 # %% main
 def main():
     Motor_UCR = Motor.MotorClass(
-        PortID=PortID_UCR,  # PortID_Wing, 
+        PortID=PortID_UCR,  # PortID_Wing,
         NodeID=0,  # both 0 and 1
         Mode='Speed',  # Position, Speed, Current
         profile=0,
@@ -37,7 +37,7 @@ def main():
     # Motor_UCR.Move(1)
 
     Motor_UCR.write_Velocity(Maxon_306090.Max_Vel, 0)
-    Motor_UCR.write_Velocity(Maxon_306090.Max_Vel/4, 1)
+    Motor_UCR.write_Velocity(Maxon_306090.Max_Vel / 4, 1)
 
 
 if __name__ == '__main__':

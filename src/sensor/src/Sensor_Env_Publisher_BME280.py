@@ -23,21 +23,25 @@ NodeName = 'Sensor_Env_Publisher'
 PublisherNameEnv = 'sensor/env/data_raw'
 
 # %% Class
+
+
 class EnvPublisherNode(BagPathClass):
-# ==================================================
-#                                             Initial_Parameter
-# ==================================================
+    # ==================================================
+    #                                             Initial_Parameter
+    # ==================================================
     def __init__(self):
         self.inits_node()
         self.inits_parameter()
+
     def inits_node(self):
         rospy.init_node(NodeName, anonymous=False, log_level=rospy.INFO, disable_signals=False)
     # Advertise Publisher
         self.env_pub = rospy.Publisher(PublisherNameEnv, bme280_msg, queue_size=1)
     # Bag
         self.bag = self.bag_path(PublisherNameEnv)
+
     def inits_parameter(self):
-    # Object
+        # Object
         self.env = bme280_lib.BME280()
     # Msg_publisher
         self.env_msg = bme280_msg()
@@ -47,8 +51,9 @@ class EnvPublisherNode(BagPathClass):
 # ==================================================
 #                                           Callback_Func
 # ==================================================
+
     def update_callback(self):
-    # Data
+        # Data
         self.get_all = self.env.readBME280All()
     # Temperature
         self.temperature = self.get_all['temp']
@@ -59,8 +64,9 @@ class EnvPublisherNode(BagPathClass):
 # ==================================================
 #                                           Update_Msg
 # ==================================================
+
     def update_msg(self):
-    # Header
+        # Header
         self.env_msg.header.stamp = rospy.Time.now()
         self.env_msg.header.frame_id = self.frame_name
         # self.env_msg.header.seq = self.seq
@@ -75,11 +81,13 @@ class EnvPublisherNode(BagPathClass):
         self.env_pub.publish(self.env_msg)
     # Bag
         self.bag.write(PublisherNameEnv, self.env_msg)
+
     def bag_close(self):
         self.bag.close()
 # ==================================================
 #                                              @main
 # ==================================================
+
     def spin(self):
         rospy.loginfo('# Start::%s::%s #', NodeName, time.asctime())
         rate = rospy.Rate(self.rate)
@@ -89,15 +97,19 @@ class EnvPublisherNode(BagPathClass):
             self.update_msg()
             rate.sleep()
         rospy.spin()
+
     def shutdown_node(self):
         rospy.loginfo('# Stop::%s::%s #', NodeName, time.asctime())
         self.bag_close()
         rospy.sleep(1)
 
 # %%
+
+
 def main():
     env_sensor = EnvPublisherNode()
     env_sensor.spin()
+
 
 if __name__ == '__main__':
     main()

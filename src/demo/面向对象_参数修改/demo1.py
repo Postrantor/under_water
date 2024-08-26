@@ -4,6 +4,7 @@ class demo1(object):
     """
     docstring
     """
+
     def __init__(self):
         self.Kp = 1
 

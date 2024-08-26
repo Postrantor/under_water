@@ -122,35 +122,35 @@ class ControlsToMotors(DebugSteam, BagPathClass):
         self.inits_AlgorithmPID()
 
     def inits_Node(self):
-        ## Initial Node
+        # Initial Node
         rospy.init_node(NodeName,
                         anonymous=False,
                         log_level=rospy.INFO,
                         disable_signals=False)
-        ## Advertise Subscriber
+        # Advertise Subscriber
         rospy.Subscriber(SubscriberNameCmdVel, cmd2drive_msg,
                          self.callback_msg)
-        ## Advertise Publisher
+        # Advertise Publisher
         self.control_pub = rospy.Publisher(PublisherNameControlDrive,
                                            ucr_msg,
                                            queue_size=1)
         self.feedback_pub = rospy.Publisher(PublisherNameFeedbackDrive,
                                             ucr_msg,
                                             queue_size=1)
-        ## Bag
+        # Bag
         self.bag_control = self.bag_path(PublisherNameControlDrive)
         self.bag_feedback = self.bag_path(PublisherNameFeedbackDrive)
 
     def inits_Parameter(self):
-        ## Sample
+        # Sample
         self.rate = rospy.get_param('/control/diff_drive/rate', 10)
         # 5Hz - 163 - 3
         # 7Hz - 211 - 2
         # 10Hz - 311 - 1
-        ## Msg_Subscriber
+        # Msg_Subscriber
         self.target_vel_l = 0
         self.target_vel_r = 0
-        ## Msg_Publisher
+        # Msg_Publisher
         self.control_msg = ucr_msg()
         self.frame_control = rospy.get_param('~frame_name',
                                              PublisherNameControlDrive)
@@ -166,7 +166,8 @@ class ControlsToMotors(DebugSteam, BagPathClass):
         self.amp_vel_r = 0
         self.amp_pos_l = 0
         self.amp_pos_r = 0
-        ## Parameter
+        # Parameter
+
     def inits_Motor(self):
         '''
         主驱动机构x2
@@ -223,7 +224,7 @@ class ControlsToMotors(DebugSteam, BagPathClass):
         还是采用在callback中配置算法，否则的话，只能接收到当前层的电机参数，目前是一对，但是可能会同时用到4个，那就不能用了
         其次，算法还是在节点中进行实例化，因为，如果在Motor中以继承的方式使用，就会被局限于Motor中。并且，在节点中也同样不采用继承的方式，为了更好得到区分，这样也可以提高兼容性
         """
-        ## 1. 获取反馈值
+        # 1. 获取反馈值
         # get feedback from motor
         get_all_0 = self.Motor_UCR.feedback_motor(node_id=0)
         self.amp_cur_l = get_all_0['current_amp']
@@ -234,13 +235,13 @@ class ControlsToMotors(DebugSteam, BagPathClass):
         self.amp_vel_r = get_all_1['velocity_amp']
         self.amp_pos_r = get_all_1['position_amp']
         # get feedback from other senser
-        ## 2.调用PID算法，若未经过PID，则直接返回订阅指令
+        # 2.调用PID算法，若未经过PID，则直接返回订阅指令
         # [issue]:
         # 因为电机在同一时刻下只能处在一个模式：位置模式、速度模式、电流模式
         # 所以不论用什么控制算法，最终控制的量只有一个，其他的量只能是约束(辅助作用)
         # self.target_vel_l = self.Control_PID.update(self.target_vel_l, self.amp_vel_l)
         # self.target_vel_r = self.Control_PID.update(self.target_vel_r, self.amp_vel_r)
-        ## 3. 控制量
+        # 3. 控制量
         self.Motor_UCR.control_motor_vel(target=self.target_vel_l, node_id=0)
         self.Motor_UCR.control_motor_vel(target=self.target_vel_r, node_id=1)
 
@@ -248,11 +249,11 @@ class ControlsToMotors(DebugSteam, BagPathClass):
     #                     Publisher_Msg
     # ==================================================
     def update_msg_control(self, stop=False):
-        ## Header
+        # Header
         self.control_msg.header.stamp = rospy.Time.now()
         self.control_msg.header.frame_id = self.frame_control
         # self.control_msg.header.seq = self.seq
-        ## Control Velocity
+        # Control Velocity
         if stop:
             self.control_msg.velocity.drive.motor_l = 0
             self.control_msg.velocity.drive.motor_r = 0
@@ -261,17 +262,17 @@ class ControlsToMotors(DebugSteam, BagPathClass):
         else:
             self.control_msg.velocity.drive.motor_l = self.target_vel_l
             self.control_msg.velocity.drive.motor_r = self.target_vel_r
-        ## Publish
+        # Publish
         self.control_pub.publish(self.control_msg)
-        ## Bag
+        # Bag
         self.bag_control.write(PublisherNameControlDrive, self.control_msg)
 
     def update_msg_feedback(self, stop=False):
-        ## Header
+        # Header
         self.feedback_msg.header.stamp = rospy.Time.now()
         self.feedback_msg.header.frame_id = self.frame_feedback
         # self.feedback_msg.header.seq = self.seq
-        ## Feedback Position
+        # Feedback Position
         if stop:
             self.feedback_msg.current.drive.motor_l = 0
             self.feedback_msg.current.drive.motor_r = 0
@@ -286,9 +287,9 @@ class ControlsToMotors(DebugSteam, BagPathClass):
             self.feedback_msg.velocity.drive.motor_r = self.amp_vel_r
             self.feedback_msg.position.drive.motor_l = self.amp_pos_l
             self.feedback_msg.position.drive.motor_r = self.amp_pos_r
-        ## Publish
+        # Publish
         self.feedback_pub.publish(self.feedback_msg)
-        ## Bag
+        # Bag
         self.bag_feedback.write(PublisherNameFeedbackDrive, self.feedback_msg)
 
     def update_msg(self, stop=False):

@@ -33,19 +33,18 @@
     转速:一圈的脉冲个数是确定的。以一秒或者半秒为单位。进行计数。注意转速单位的转化。
     方向:对ab相同时刻进行测量，。满足a正b反，a正b正，a反b正，a反b反。这个顺序是正转的话，反之就是反转。
 '''
-# %% 
+# %%
 import rospy
 import time
 import RPi.GPIO as GPIO
 from std_msgs.msg import Int64
 
 
-
 # %%
 class HallEncoderCounter:
-# ==================================================
-#                                                初始化
-# ==================================================
+    # ==================================================
+    #                                                初始化
+    # ==================================================
     def __init__(self):
         rospy.init_node('hall_encoder_right')
         # 初始化参数
@@ -60,12 +59,11 @@ class HallEncoderCounter:
         # 指定GPIO引脚规则：BOARD、BCM
         GPIO.setmode(GPIO.BCM)
         # 定义引脚常量
-        self.Hall_A = 16 # Right_A相
-        self.Hall_B = 17 # Right_B相
+        self.Hall_A = 16  # Right_A相
+        self.Hall_B = 17  # Right_B相
         # 初始化引脚状态
         GPIO.setup(self.Hall_A, GPIO.IN)
         GPIO.setup(self.Hall_B, GPIO.IN)
-
 
     def Hall_Encoder(self):
         # 记录并更新B的状态变化：
@@ -90,6 +88,7 @@ class HallEncoderCounter:
 # ==================================================
 #                                         主函数(main)
 # ==================================================
+
     def update(self):
         # if RF == 'Right':
         #     self.Right()
@@ -111,13 +110,13 @@ class HallEncoderCounter:
 
     def shutdown(self):
         GPIO.cleanup()
-    
 
 
 # %%
 def main():
     counter_encoder = HallEncoderCounter()
     counter_encoder.update()
+
 
 # Program start from here
 if __name__ == '__main__':

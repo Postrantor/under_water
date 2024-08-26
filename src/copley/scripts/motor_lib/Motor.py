@@ -24,6 +24,8 @@ from copley_lib.CopleyControl import CopleyControlClass
 from constant_lib.Constant_Motor import Maxon_306090, Maxon_266761, Maxon_305474
 
 # %% class
+
+
 class MotorClass(CopleyControlClass):
     '''
         # MotorClass
@@ -44,8 +46,9 @@ class MotorClass(CopleyControlClass):
 # 同时，处于力矩模式下的时候，辅助使用编码器的数值作为极限位置的限制
 # 考虑这个电机的初始化，是否应该去除。不同的电机不同的模式就有不同的初始化方式
 # 3*3=9，可能产生9种模式
-    def __init__(self, PortID, NodeID, Mode, 
-                        profile=1, pos=0, vel=100000, acc=1000000, dec=1000000, cur=0, rap=0):
+
+    def __init__(self, PortID, NodeID, Mode,
+                 profile=1, pos=0, vel=100000, acc=1000000, dec=1000000, cur=0, rap=0):
         '''
             :param PortID: 
             :param NodeID: 
@@ -55,10 +58,12 @@ class MotorClass(CopleyControlClass):
     # Hardware
         self._inits_motor()
         self._inits_coply(PortID, NodeID, Mode, profile, pos, vel, acc, dec, cur, rap)
+
     def _inits_motor(self):
         '''
         '''
         pass
+
     def _inits_coply(self, PortID, NodeID, Mode, profile, pos, vel, acc, dec, cur, rap):
         '''
             同时控制几个电机，就要实例化几个setInitParameters参数，区别在于，传入不同的node_id参数
@@ -79,16 +84,17 @@ class MotorClass(CopleyControlClass):
 #                             Convert to motor commands
 # ==================================================
     # 发送电机的控制指令 => 电机(ACSII)
+
     def cmdvel_2_motor(self, motor_cmd, node_id=0):
         self.attr_Velocity_read = motor_cmd
         # 若为位置环下的速度模式，则进行判断方向，不能和其他模式一样直接识别速度指令的正负号
-        if self.DesiredState==21 and self.ProfileType==2:
+        if self.DesiredState == 21 and self.ProfileType == 2:
             if motor_cmd >= 0:
                 self.write_Position(1, node_id)
             if motor_cmd < 0:
                 self.write_Position(-1, node_id)
             motor_cmd = abs(int(motor_cmd))
-            self.write_Velocity(self.attr_Velocity_read, node_id) # 写入电机速度
+            self.write_Velocity(self.attr_Velocity_read, node_id)  # 写入电机速度
         # 若为速度模式，仅调用Move()即可，将self.attr_Velocity_read写入
         self.Move(node_id)
 
@@ -101,6 +107,7 @@ class MotorClass(CopleyControlClass):
 #                                    Algorithm_Application
 # ==================================================
     # 1. 获取反馈值
+
     def feedback_motor(self, node_id=0):
         """
             get feedback from motor include current, velocity, position
@@ -108,13 +115,15 @@ class MotorClass(CopleyControlClass):
         current_amp = self.read_Current(node_id)
         velocity_amp = self.read_Velocity(node_id)
         position_amp = self.read_Position(node_id)
-        return {'current_amp': current_amp, 'velocity_amp':velocity_amp, 'position_amp':position_amp}
+        return {'current_amp': current_amp, 'velocity_amp': velocity_amp, 'position_amp': position_amp}
+
     def trajectory_motor(self, node_id=0):
         """
         临时，为轨迹跟踪提供速度反馈
         """
         return self.read_Velocity(node_id)
     # 3. 控制量 - 速度
+
     def control_motor_vel(self, target, node_id=0):
         """
             set target speed value to motor
@@ -124,6 +133,7 @@ class MotorClass(CopleyControlClass):
         self.attr_Velocity_read = target
         self.Move(node_id)
     # 3. 控制量 - 位置
+
     def control_motor_pos(self, adjust, enc_zero, CcwLimit, target, node_id=0):
         """
             set target position value to motor
@@ -150,6 +160,7 @@ class MotorClass(CopleyControlClass):
 
         self.Move(node_id)
     # 3. 控制量 - 位置/速度
+
     def control_motor_pos_vel(self, position, velocity, acceleration, node_id=0):
         """
             [issue]:

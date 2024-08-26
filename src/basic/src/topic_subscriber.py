@@ -8,18 +8,15 @@
 '''
 
 
-
 # %%
 import rospy
 from std_msgs.msg import Int32
-
 
 
 # %% 处理接收到消息的回调函数（callback）：
 # 打印消息包含的值
 def callback(msg):
     print(msg.data)
-
 
 
 # %% 初始化节点：
@@ -35,7 +32,6 @@ sub = rospy.Subscriber('counter', Int32, callback)
 # 该函数只有在节点准备结束的时候才返回，这样可以避免topic_publisher.py那样的高层while循环捷径
 # ROS并不是必须要接管程序的主线程
 rospy.spin()
-
 
 
 # %% 检查一切是否正常

@@ -23,30 +23,35 @@ NodeName = 'Sensor_Coulomb_Publisher'
 PublisherNameCoulomb = 'sensor/coulomb/data_raw'
 
 # %%Class
+
+
 class CoulombPublisherNode(BagPathClass):
-# ==================================================
-#                                                Initial_Parameters
-# ==================================================
+    # ==================================================
+    #                                                Initial_Parameters
+    # ==================================================
     def __init__(self):
         self.inits_node()
         self.inits_parameter()
+
     def inits_node(self):
         rospy.init_node(NodeName, anonymous=False, log_level=rospy.INFO, disable_signals=False)
     # Advertise Publisher
         self.cob_pub = rospy.Publisher(PublisherNameCoulomb, coulomb_msg, queue_size=1)
     # Bag
         self.bag = self.bag_path(PublisherNameCoulomb)
+
     def inits_parameter(self):
-    # Object
+        # Object
         self.cob = coulomb_lib.CoulombClass()
     # Msg_publisher
         self.cob_msg = coulomb_msg()
     # Parameter
-        self.rate = rospy.get_param('/sensor/coulomb/rate', 5) # 这个读取的频率受串口设置的timeout影响
+        self.rate = rospy.get_param('/sensor/coulomb/rate', 5)  # 这个读取的频率受串口设置的timeout影响
         self.frame_name = rospy.get_param('/sensor/coulomb/frame_name', PublisherNameCoulomb)
 # ==================================================
 #                                                Callback_Func
 # ==================================================
+
     def update_callback(self):
         self.cob.update()
     # Watt
@@ -63,8 +68,9 @@ class CoulombPublisherNode(BagPathClass):
 # ==================================================
 #                                              Update_Msg
 # ==================================================
+
     def update_msg(self):
-    # Header
+        # Header
         self.cob_msg.header.stamp = rospy.Time.now()
         self.cob_msg.header.frame_id = self.frame_name
         # self.cob_msg.header.seq = self.seq
@@ -83,11 +89,13 @@ class CoulombPublisherNode(BagPathClass):
         self.cob_pub.publish(self.cob_msg)
     # Bag
         self.bag.write(PublisherNameCoulomb, self.cob_msg)
+
     def bag_close(self):
         self.bag.close()
 # ==================================================
 #                                                  @main
 # ==================================================
+
     def spin(self):
         rospy.loginfo('# Start::%s::%s #', NodeName, time.asctime())
         rate = rospy.Rate(self.rate)
@@ -101,15 +109,19 @@ class CoulombPublisherNode(BagPathClass):
         # 将on_shutdown()放置在while之后进行，执行顺序就会反过来，也不会抛出异常
         rospy.on_shutdown(self.shutdown_node)
         rospy.spin()
+
     def shutdown_node(self):
         rospy.loginfo('# Stop::%s::%s #', NodeName, time.asctime())
         self.bag_close()
         rospy.sleep(1)
 
 # %%
+
+
 def main():
     cob_sensor = CoulombPublisherNode()
     cob_sensor.spin()
+
 
 if __name__ == '__main__':
     main()

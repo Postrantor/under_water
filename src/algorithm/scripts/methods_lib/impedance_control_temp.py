@@ -81,37 +81,42 @@ from methods_lib.differential_method import KinematicsClass as DiffKinematicsCla
 
 # %% constant
 # m_l3和tau_e之间有4倍的关系，在这个比例关系下，可以达到期望的接触力，即tau_varphi = tau_e
-l_0 = 0.361732 # unit: m # 连杆$L_{i}$的长度
+l_0 = 0.361732  # unit: m # 连杆$L_{i}$的长度
 l_1 = 0.07767
 l_2 = 0.02929
 l_3 = 0.29221
-m_l3 = 2.443 # unit: Kg # 连杆$L_3$的质量
-gravity = 9.8 # unit: m/s^2 # 重力加速度
+m_l3 = 2.443  # unit: Kg # 连杆$L_3$的质量
+gravity = 9.8  # unit: m/s^2 # 重力加速度
 # tau_e = 1.24 # 1.237 # 2.443/4 # unit: N·m # 外力矩 # 定阻抗
 # tau_e = 1.24 # 2.443/4 # unit: N·m # 外力矩 # 变阻抗
-beta = radians(45) # unit: rad # $\beta$为机器人本体的俯仰角；
+beta = radians(45)  # unit: rad # $\beta$为机器人本体的俯仰角；
 
 # %% class
+
+
 class AlgorithmImpedanceClass(DiffKinematicsClass):
-# ==================================================
-#                                         Initial_Parameters
-# ==================================================
+    # ==================================================
+    #                                         Initial_Parameters
+    # ==================================================
     def __init__(self):
         self.inits_control()
         self.inits_desired()
         self.inits_parameters()
+
     def inits_desired(self):
-    # desired params
-        self.varphi_d = 176128.0 # unit: rad # [-1.65, 42.66, 53.37]
-        self.dot_varphi_d = 0.0 # unit: rad/s #
-        self.ddot_varphi_d = 0.0 # unit: rad/s^2 #
+        # desired params
+        self.varphi_d = 176128.0  # unit: rad # [-1.65, 42.66, 53.37]
+        self.dot_varphi_d = 0.0  # unit: rad/s #
+        self.ddot_varphi_d = 0.0  # unit: rad/s^2 #
+
     def inits_parameters(self):
-        self.N_beta = (1./2.) * (m_l3*gravity) * (l_3) * (sin(beta)) # $N(\beta)$: 连杆$L_3$关于铰链$B$的有效重力矩；
-        self.M = (1./3.) * (m_l3) * (l_3**2) # $M$: 假设连杆$L_3$为均质杆，绕$B$点的转动惯量；
-        self.C = 0.25 # $C$为机构的不确定(摩擦)阻尼系数，实际中可取(0, 0.5)；
-        self.alpha = 25.0 # > 0，为常数；
-        self.H = 5.0 # > 0，为闭环动力学的惯量，可取为常数；
-        self.varepsilon = 0.1 # > 0，为小常数；
+        self.N_beta = (1. / 2.) * (m_l3 * gravity) * (l_3) * (sin(beta))  # $N(\beta)$: 连杆$L_3$关于铰链$B$的有效重力矩；
+        self.M = (1. / 3.) * (m_l3) * (l_3**2)  # $M$: 假设连杆$L_3$为均质杆，绕$B$点的转动惯量；
+        self.C = 0.25  # $C$为机构的不确定(摩擦)阻尼系数，实际中可取(0, 0.5)；
+        self.alpha = 25.0  # > 0，为常数；
+        self.H = 5.0  # > 0，为闭环动力学的惯量，可取为常数；
+        self.varepsilon = 0.1  # > 0，为小常数；
+
     def inits_control(self):
         """
             [Python 字典(Dictionary) | 菜鸟教程](https://www.runoob.com/python/python-dictionary.html)
@@ -119,18 +124,19 @@ class AlgorithmImpedanceClass(DiffKinematicsClass):
 
             :param impedance:
         """
-        self.Button = False # 开启Impedance算法
+        self.Button = False  # 开启Impedance算法
         self.impedance = {}
 # ==================================================
 #                                           Dynamic_Modeling
 # ==================================================
+
     def dynamics(self, tau_varphi):
         '''
             $J^{\mathrm{T}} \tau_{\varphi}=\tau_{e} \text { 或 } \tau_{\varphi}=J^{-\mathrm{T}} \tau_{e}$
             这个应该是用来画图用的，当给定tau_e时，经过动力学转换得到等价的tau_varphi
             从这里得到的tau_varphi与控制律计算得到的tau_varphi放在同一张图里
         '''
-        J_neg_T = np.linalg.inv(self.Jacobian_theta) # 雅克比矩阵求逆
+        J_neg_T = np.linalg.inv(self.Jacobian_theta)  # 雅克比矩阵求逆
         J_T = self.Jacobian_theta
         # tau_varphi = J_neg_T * tau_e
         tau_e = J_T * tau_varphi
@@ -138,6 +144,7 @@ class AlgorithmImpedanceClass(DiffKinematicsClass):
         # 在计算刚度矩阵的时候，这个量是要根据外力确定的，即外接接触力的状态来调整自身得到刚度；
         # 然而，外力并不容易测量得到(有力传感器的除外)，即通过上面的动力学关系，将外力转化到驱动力上，进而解得刚度系数矩阵
         return tau_e
+
     def inverse_dynamics(self, y, dt, varphi_d, dot_varphi_d, ddot_varphi_d, tau_e):
         """
             假设连杆$L_{3}$的质量和惯量远远大于连杆$L_{1}$和$L_{2}$的质量和惯量，因此连杆$L_{1}$和$L_{2}$的质量和惯量忽略。假设连杆$L_{3}$绕$B$点的转动惯量为$M$，连杆$L_{3}$的质量为$m$，机构的摩擦阻尼系数为$C$，连杆$L_{3}$关于铰链$B$的有效重力矩为$N(\beta)$，其中$\beta$为机器人本体的俯仰角。则该四杆机构的动力学模型可表示为：
@@ -156,7 +163,7 @@ class AlgorithmImpedanceClass(DiffKinematicsClass):
                     假设tau_e != 0时，根据bar_varphi是全局稳定，有bar_dot_varphi = 0、bar_ddot_varphi = 0。可得dot_varphi = dot_varphi_d、ddot_varphi = ddot_varphi_d；
                     将dot_varphi、ddot_varphi带入下面的式子，联立可以解得C1、C2
                     `line_solve = linsolve([-C1*sqrt(-C/M)*exp(-t*sqrt(-C/M)) + C2*sqrt(-C/M)*exp(t*sqrt(-C/M)) - dot_varphi_d, C1*(-C/M)*exp(-t*sqrt(-C/M)) + C2*(-C/M)*exp(t*sqrt(-C/M)) - ddot_varphi_d], (C1, C2))`
-            
+
             # 以状态空间方程的思路(详见`example_ode45.py`)
                 Examples
                 The second order differential equation for the angle `theta` of a
@@ -188,23 +195,23 @@ class AlgorithmImpedanceClass(DiffKinematicsClass):
         bar_dot_varphi = dot_varphi_d - dot_varphi
     # invariant impedance parameters
         tau_varphi = self.invariant_impedance(
-                                beta = beta, 
-                                bar_varphi = bar_varphi, 
-                                bar_dot_varphi = bar_dot_varphi, 
-                                dot_varphi = dot_varphi, 
-                                ddot_varphi_d = ddot_varphi_d, 
-                                tau_e = tau_e)
+            beta=beta,
+            bar_varphi=bar_varphi,
+            bar_dot_varphi=bar_dot_varphi,
+            dot_varphi=dot_varphi,
+            ddot_varphi_d=ddot_varphi_d,
+            tau_e=tau_e)
     # variable impedance parameters
         # tau_varphi, M, C, N_beta = self.variable_impedance(
-        #                         time = t, 
-        #                         beta = beta, 
-        #                         bar_varphi = bar_varphi, 
-        #                         bar_dot_varphi = bar_dot_varphi, 
-        #                         dot_varphi = dot_varphi, 
+        #                         time = t,
+        #                         beta = beta,
+        #                         bar_varphi = bar_varphi,
+        #                         bar_dot_varphi = bar_dot_varphi,
+        #                         dot_varphi = dot_varphi,
         #                         ddot_varphi_d = ddot_varphi_d)
     # State Space Equation
         # dot_varphi = dot_varphi
-        ddot_varphi = ((tau_varphi+tau_e) - (self.C*dot_varphi) - (self.N_beta)) / self.M
+        ddot_varphi = ((tau_varphi + tau_e) - (self.C * dot_varphi) - (self.N_beta)) / self.M
         # print("tau_varphi={}".format(tau_varphi))
 
         dot_varphi = ddot_varphi * dt
@@ -215,6 +222,7 @@ class AlgorithmImpedanceClass(DiffKinematicsClass):
 # ==================================================
 #                       Invariant_Impedance_Controller
 # ==================================================
+
     def invariant_impedance(self, beta, bar_varphi, bar_dot_varphi, dot_varphi, ddot_varphi_d, tau_e):
         """
             参数含义：
@@ -224,10 +232,10 @@ class AlgorithmImpedanceClass(DiffKinematicsClass):
                 4. $K$：刚度，应满足给定攀爬运动任务要求；
                 5. $D$：阻尼，使得闭环动力学系统稳定；
         """
-        K_t = 50.0 # > 0，为刚度。只会影响收敛速度
-        D_t = self.alpha*self.H + self.varepsilon # 为时变阻尼，为什么取阻尼为常数？
-        eq_1 = ddot_varphi_d - (1./self.H)*(tau_e - D_t*bar_dot_varphi - K_t*bar_varphi)
-        tau_varphi = self.M*(eq_1) + self.C*(dot_varphi) + self.N_beta - tau_e
+        K_t = 50.0  # > 0，为刚度。只会影响收敛速度
+        D_t = self.alpha * self.H + self.varepsilon  # 为时变阻尼，为什么取阻尼为常数？
+        eq_1 = ddot_varphi_d - (1. / self.H) * (tau_e - D_t * bar_dot_varphi - K_t * bar_varphi)
+        tau_varphi = self.M * (eq_1) + self.C * (dot_varphi) + self.N_beta - tau_e
     # PD
         # tau_varphi = 2*bar_varphi + 2*bar_dot_varphi
 
@@ -235,6 +243,7 @@ class AlgorithmImpedanceClass(DiffKinematicsClass):
 # ==================================================
 #                       Time-varying_Impedance_Controller
 # ==================================================
+
     def variable_impedance(self, time, beta, bar_varphi, bar_dot_varphi, dot_varphi, ddot_varphi_d, tau_e):
         """
             参数含义：
@@ -249,17 +258,17 @@ class AlgorithmImpedanceClass(DiffKinematicsClass):
                     1. 当外力矩$\tau_{e}=0$时，闭环动力学系统(3)的误差状态变量$\bar\varphi$是全局渐近稳定的，即$\lim_{t \rightarrow \infty} \bar{\varphi}=0$；
                     2. 当外力矩$\tau_{e} \neq 0$时，闭环动力学系统(3)的误差状态变量$\bar{\varphi}$是全局稳定的$({\dot{\bar{\varphi}}=0}, {\ddot{\bar{\varphi}}=0})$，即${K(t)}{\bar\varphi}={\tau_{e}}$成立。
         """
-        M = (1./3.) * (m_l3) * (l_3**2) # $M$: 假设连杆$L_3$为均质杆，绕$B$点的转动惯量；
-        C = 0.25 # $C$为机构的不确定(摩擦)阻尼系数，实际中可取(0, 0.5)；这个就是要考虑参数优化了呗！
-        N_beta = (1./2.) * (m_l3*gravity) * (l_3) * (sin(beta)) # $N(\beta)$: 连杆$L_3$关于铰链$B$的有效重力矩；
-        K_t = 7.0 * sin(2*time) + 35.0
-        alpha = 5.0 # > 0，为常数；
-        H = 5.0 # > 0，为闭环动力学的惯量，可取为常数；
-        varepsilon = 0.1 # > 0，为小常数；
-        D_t = alpha*H + varepsilon # 为时变阻尼，为什么取阻尼为常数？数值调大可以让波动平缓一些，也会让曲线上升变缓
+        M = (1. / 3.) * (m_l3) * (l_3**2)  # $M$: 假设连杆$L_3$为均质杆，绕$B$点的转动惯量；
+        C = 0.25  # $C$为机构的不确定(摩擦)阻尼系数，实际中可取(0, 0.5)；这个就是要考虑参数优化了呗！
+        N_beta = (1. / 2.) * (m_l3 * gravity) * (l_3) * (sin(beta))  # $N(\beta)$: 连杆$L_3$关于铰链$B$的有效重力矩；
+        K_t = 7.0 * sin(2 * time) + 35.0
+        alpha = 5.0  # > 0，为常数；
+        H = 5.0  # > 0，为闭环动力学的惯量，可取为常数；
+        varepsilon = 0.1  # > 0，为小常数；
+        D_t = alpha * H + varepsilon  # 为时变阻尼，为什么取阻尼为常数？数值调大可以让波动平缓一些，也会让曲线上升变缓
     # 时变阻抗闭环控制器：tau_varphi
-        eq_1 = ddot_varphi_d - (1./H)*(tau_e - D_t*bar_dot_varphi - K_t*bar_varphi)
-        tau_varphi = M*(eq_1) + C*(dot_varphi) + N_beta - tau_e
+        eq_1 = ddot_varphi_d - (1. / H) * (tau_e - D_t * bar_dot_varphi - K_t * bar_varphi)
+        tau_varphi = M * (eq_1) + C * (dot_varphi) + N_beta - tau_e
     # PD
         # tau_varphi = 50*bar_varphi + 25*bar_dot_varphi
 
@@ -268,16 +277,17 @@ class AlgorithmImpedanceClass(DiffKinematicsClass):
 #                                     Impedance Controller
 # 相较于仿真算法增加了该函数，但是本质上来说是取代了odeint()
 # ==================================================
+
     def control(self, impedance, varphi, dot_varphi, tau_e):
-    # initial params
-        if len(impedance)==0:
-            impedance.update({'t_pre': rospy.Time.now(), 
-                                                'varphi': varphi, 
-                                                'dot_varphi': dot_varphi})
+        # initial params
+        if len(impedance) == 0:
+            impedance.update({'t_pre': rospy.Time.now(),
+                              'varphi': varphi,
+                              'dot_varphi': dot_varphi})
         else:
             impedance['varphi'] = varphi
             impedance['dot_varphi'] = dot_varphi
-            # impedance.update({'varphi': varphi, 
+            # impedance.update({'varphi': varphi,
             #                                     'dot_varphi': dot_varphi})
     # dt = t_cur - t_pre
         impedance['t_cur'] = rospy.Time.now()
@@ -286,12 +296,12 @@ class AlgorithmImpedanceClass(DiffKinematicsClass):
         #     return 0, 0
     # calc control value
         varphi, dot_varphi, ddot_varphi = self.inverse_dynamics(
-                                            y=[impedance['varphi'], impedance['dot_varphi']], 
-                                            dt=impedance['dt'], 
-                                            varphi_d=self.varphi_d, 
-                                            dot_varphi_d=self.dot_varphi_d, 
-                                            ddot_varphi_d=self.ddot_varphi_d, 
-                                            tau_e = tau_e)
+            y=[impedance['varphi'], impedance['dot_varphi']],
+            dt=impedance['dt'],
+            varphi_d=self.varphi_d,
+            dot_varphi_d=self.dot_varphi_d,
+            ddot_varphi_d=self.ddot_varphi_d,
+            tau_e=tau_e)
     # update
         impedance['t_pre'] = impedance['t_cur']
         # impedance['varphi'] += varphi
@@ -301,8 +311,9 @@ class AlgorithmImpedanceClass(DiffKinematicsClass):
 # ==================================================
 #                                               Update
 # ==================================================
+
     def update(self, varphi, dot_varphi, tau_e):
-    # def update(self, theta, dot_theta):
+        # def update(self, theta, dot_theta):
         '''
             :param [0]: 机器人的实际位置
             :param [1]: 机器人的实际速度
@@ -311,10 +322,10 @@ class AlgorithmImpedanceClass(DiffKinematicsClass):
         '''
         # print("01 theta={}, dot_theta={}".format(theta, dot_theta))
         if self.Button:
-        # kinematic
+            # kinematic
             # __, __, varphi, dot_varphi, __ = self.kinematics(l_0, l_1, l_2, l_3, theta, dot_theta, ddot_theta=0)
             # print("02 varphi={}, dot_varphi={}".format(varphi, dot_varphi))
-        # dervatives
+            # dervatives
             varphi, dot_varphi, ddot_varphi = self.control(self.impedance, varphi, dot_varphi, tau_e)
             # print("03 varphi={}, dot_varphi={}".format(varphi, dot_varphi))
             # print("03_1 self.impedance={}".format(self.impedance))
@@ -326,7 +337,11 @@ class AlgorithmImpedanceClass(DiffKinematicsClass):
         return varphi, dot_varphi, ddot_varphi
 
 # %% main
+
+
 def main():
     print('AlgorithmImpedanceClass')
+
+
 if __name__ == '__main__':
     main()

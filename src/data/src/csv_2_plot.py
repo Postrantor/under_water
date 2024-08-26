@@ -30,18 +30,21 @@ from tools_lib.debug_stream import DebugSteam
 from tools_lib.make_directory import mk_dir
 
 # %% class
+
+
 class PlotBag(DebugSteam):
     def plot_topic(self, path_csv):
-        bag_csv = open(path_csv,'r')
+        bag_csv = open(path_csv, 'r')
         try:
-            data = np.loadtxt(bag_csv, dtype=float, delimiter=",", skiprows=1, usecols=(1,2))
+            data = np.loadtxt(bag_csv, dtype=float, delimiter=",", skiprows=1, usecols=(1, 2))
             # [numpy读取csv文件](https://blog.csdn.net/u012413551/article/details/87890989)
-            cols_01 = data[:,0]
-            cols_02 = data[:,1]
+            cols_01 = data[:, 0]
+            cols_02 = data[:, 1]
             self.debug_stream(cols_01, cols_02)
             plt.plot(cols_01, cols_02)
         finally:
             bag_csv.close()
+
     def spin(self):
         file_path_csv = "/home/{}/catkin_ws/csv/202191/1518/Impedance/".format(getpass.getuser())
         file_name = "wing_2021911518"
@@ -50,8 +53,12 @@ class PlotBag(DebugSteam):
         self.plot_topic(path_csv)
 
 # %%
+
+
 def main():
     plot_bag = PlotBag()
     plot_bag.spin()
+
+
 if __name__ == '__main__':
     main()

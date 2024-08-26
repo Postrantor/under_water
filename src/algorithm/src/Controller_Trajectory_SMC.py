@@ -47,7 +47,9 @@
 
 # %% import
 # Lib
-import rospy, time, tf
+import rospy
+import time
+import tf
 # Math
 from numpy import sin, cos, matrix, pi
 # Algorithm
@@ -75,16 +77,16 @@ class Trajectory_Tracking_SMC(ControllerPositionClass, ControllerHeadingClass,
         self.inits_parameter()
 
     def inits_node(self):
-        ## Initial Node
+        # Initial Node
         rospy.init_node(NodeName,
                         anonymous=False,
                         log_level=rospy.INFO,
                         disable_signals=False)
-        ## Advertise Publisher
+        # Advertise Publisher
         self.traj_pub = rospy.Publisher(PublisherTraj, Odometry, queue_size=10)
 
     def inits_parameter(self):
-        ## Sample
+        # Sample
         self.rate = rospy.get_param('traj/rate', 20)  # max = 20(Hz) = 0.05(s)
         self.time_prev = rospy.Time.now()  # 机器人的时间状态
         # TF transform
@@ -96,7 +98,7 @@ class Trajectory_Tracking_SMC(ControllerPositionClass, ControllerHeadingClass,
         self.child_frame_id = rospy.get_param('~child_frame_id',
                                               '/imu')  # 子坐标系id
         self.pose = {'x': 0, 'y': 0, 'th': 0}  # 机器人的位置信息
-        ## Parameters
+        # Parameters
         self.postrure_select(pos_type)
         self.q_c_prev = self.q_c
         self.q_r_prev = self.q_r
@@ -118,7 +120,7 @@ class Trajectory_Tracking_SMC(ControllerPositionClass, ControllerHeadingClass,
             [cos(phi - theta), 0],
             [-(1 / rho) * sin(phi - theta), 0],
             [0, 1],
-        ])  #@式(12)
+        ])  # @式(12)
         dot_q = S_q * z
         q = q_prev + dot_q * delta_t
         return q, dot_q
@@ -127,8 +129,10 @@ class Trajectory_Tracking_SMC(ControllerPositionClass, ControllerHeadingClass,
         '''还需补姿态控制器，停止运动时校正姿态'''
         u_init = self.Position(q_c, dot_q_c, q_r, dot_q_r, delta_t)
         self.z_c = self.z_r + u_init  # @式(21)
-        if self.z_c[0, 0] > .6: self.z_c[0, 0] = .6
-        if self.z_c[0, 0] <= -.6: self.z_c[0, 0] = -.6
+        if self.z_c[0, 0] > .6:
+            self.z_c[0, 0] = .6
+        if self.z_c[0, 0] <= -.6:
+            self.z_c[0, 0] = -.6
 
     def update(self, q_c, q_r):
         self.q_c_prev = q_c

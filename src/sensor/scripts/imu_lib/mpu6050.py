@@ -8,6 +8,7 @@
 import smbus
 # import smbus2 as smbus
 
+
 class MPU6050():
 
     # Global Variables
@@ -106,7 +107,7 @@ class MPU6050():
         # Write the new range to the ACCEL_CONFIG register
         self.bus.write_byte_data(self.address, self.ACCEL_CONFIG, accel_range)
 
-    def read_accel_range(self, raw = False):
+    def read_accel_range(self, raw=False):
         '''Reads the range the accelerometer is set to.
 
         If raw is True, it will return the raw value from the ACCEL_CONFIG
@@ -130,7 +131,7 @@ class MPU6050():
             else:
                 return -1
 
-    def get_accel_data(self, g = False):
+    def get_accel_data(self, g=False):
         '''Gets and returns the X, Y and Z values from the accelerometer.
 
         If g is True, it will return the data in g
@@ -180,7 +181,7 @@ class MPU6050():
         # Write the new range to the ACCEL_CONFIG register
         self.bus.write_byte_data(self.address, self.GYRO_CONFIG, gyro_range)
 
-    def read_gyro_range(self, raw = False):
+    def read_gyro_range(self, raw=False):
         '''Reads the range the gyroscope is set to.
 
         If raw is True, it will return the raw value from the GYRO_CONFIG
@@ -241,6 +242,7 @@ class MPU6050():
         gyro = self.get_gyro_data()
 
         return [accel, gyro, temp]
+
 
 if __name__ == '__main__':
     mpu = MPU6050()

@@ -105,24 +105,24 @@
 '''
 
 # %% doc
-__all__ = ['CopleyControlClass'] # 可用于模块导入时限制，只有__all__内指定的属性、方法、类可被导入
-__docformat__ = 'restructuredtext' # 允许诸如 epydoc之类的python文档生成器工具知道如何正确解析模块文档
+__all__ = ['CopleyControlClass']  # 可用于模块导入时限制，只有__all__内指定的属性、方法、类可被导入
+__docformat__ = 'restructuredtext'  # 允许诸如 epydoc之类的python文档生成器工具知道如何正确解析模块文档
 
 # %% import
 # import tango as PyTango
 # Add additional import
-#----- PROTECTED REGION ID(CopleyControl.additionnal_import) ENABLED START -----#
+# ----- PROTECTED REGION ID(CopleyControl.additionnal_import) ENABLED START -----#
 from copley_lib.Class_InitialParameter import *
 from copley_lib.Class_MoveMotor import MoveMotorClass
 from copley_lib.Class_MoveHome import MoveHomeClass
-#----- PROTECTED REGION END -----#	//	CopleyControl.additionnal_import
+# ----- PROTECTED REGION END -----#	//	CopleyControl.additionnal_import
 
 # %% Constant
 # -------- Add Global Variables Here ------------
-#----- PROTECTED REGION ID(CopleyControl.global_variables) ENABLED START -----#
+# ----- PROTECTED REGION ID(CopleyControl.global_variables) ENABLED START -----#
 from constant_lib.Constant_Unit import *
 from constant_lib.Constant_Serial import *
-#----- PROTECTED REGION END -----#	//	CopleyControl.global_variables
+# ----- PROTECTED REGION END -----#	//	CopleyControl.global_variables
 
 # -------- Device States Description ------------
 # MOVING : Moving
@@ -132,53 +132,58 @@ from constant_lib.Constant_Serial import *
 # INIT : The amp is initialising.
 
 # %% Class
-class CopleyControlClass(MoveMotorClass,MoveHomeClass):
+
+
+class CopleyControlClass(MoveMotorClass, MoveHomeClass):
     '''
         Copley Control Class
     '''
+
     def __str__(self):
         msg = 'Copley Control Class'
         return msg
+
     def __init__(self):
-    # def __init__(self, PortID, NodeID, Mode):
-        #----- PROTECTED REGION ID(CopleyControl.__init__) ENABLED START -----#
+        # def __init__(self, PortID, NodeID, Mode):
+        # ----- PROTECTED REGION ID(CopleyControl.__init__) ENABLED START -----#
         # super(CopleyControlClass,self).__init__(PortID=PortID, NodeID=NodeID, Mode=Mode)
         self.inits_parameters()
         self.inits_device()
-        #----- PROTECTED REGION END -----#	//	CopleyControl.__init__
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.__init__
+
     def inits_parameters(self):
         # inits the device
         # self.debug_stream('In init_device()') # Sends the given message to the tango debug stream.
-        self.attr_EncoderInitial_read = 0 # 0x32/0x17: Motor position. Units: counts. 
-        self.attr_Position_read = 0 # 0x17: Limited position. targetPosition = Position + SetPoint
-        self.attr_SetPoint_read = 0 # 0xca: Trajectory Generator Position Command(0xca).
+        self.attr_EncoderInitial_read = 0  # 0x32/0x17: Motor position. Units: counts.
+        self.attr_Position_read = 0  # 0x17: Limited position. targetPosition = Position + SetPoint
+        self.attr_SetPoint_read = 0  # 0xca: Trajectory Generator Position Command(0xca).
         self.attr_DialPosition_read = 0
-        self.attr_Conversion_read = 1 # The ratio between the position and the dial position. The default value is 1.0
-        self.attr_Velocity_read = 0 # 0x18: Actual velocity.
-        self.attr_Acceleration_read = 0 # 0xcc: Maximum acceleration rate.
-        self.attr_Deceleration_read = 0 # 0xcd: Maximum deceleration rate.
-        self.attr_Current_read = 0 # 0x02: Programmed current value.
-        self.attr_Current_ramp = 0 # 0x6a: Current ramp limit.
+        self.attr_Conversion_read = 1  # The ratio between the position and the dial position. The default value is 1.0
+        self.attr_Velocity_read = 0  # 0x18: Actual velocity.
+        self.attr_Acceleration_read = 0  # 0xcc: Maximum acceleration rate.
+        self.attr_Deceleration_read = 0  # 0xcd: Maximum deceleration rate.
+        self.attr_Current_read = 0  # 0x02: Programmed current value.
+        self.attr_Current_ramp = 0  # 0x6a: Current ramp limit.
 
-        self.attr_SoftwareCwLimit_read = 0 # 0xb8: Positive Software Limit
-        self.attr_SoftwareCcwLimit_read = 0 # 0xb9: Negative Software Limit
+        self.attr_SoftwareCwLimit_read = 0  # 0xb8: Positive Software Limit
+        self.attr_SoftwareCcwLimit_read = 0  # 0xb9: Negative Software Limit
         self.attr_SoftwareCwDialLimit_read = 0
         self.attr_SoftwareCcwDialLimit_read = 0
-        self.attr_CwLimit_read = False # Positive limit switche is active
-        self.attr_CcwLimit_read = False # Negative limit switche is active
+        self.attr_CwLimit_read = False  # Positive limit switche is active
+        self.attr_CcwLimit_read = False  # Negative limit switche is active
 
         self.attr_HomingMethod_read = 0  # 0xc2 归位方法
-        self.attr_HomingVelocityFast_read = 0 # 0xc3
-        self.attr_HomingVelocitySlow_read = 0 # 0xc4
-        self.attr_HomingAccDec_read = 0 # 0xc5
-        self.attr_HomeOffset_read = 0 # 0xc6: Home Offset.
-        self.attr_HomingCurrentLimit_read = 0 # 0xc7(0xbf)
-        self.attr_CurrentDelayTime_read = 250 # 0xbf(0xc7)/ms
-        
+        self.attr_HomingVelocityFast_read = 0  # 0xc3
+        self.attr_HomingVelocitySlow_read = 0  # 0xc4
+        self.attr_HomingAccDec_read = 0  # 0xc5
+        self.attr_HomeOffset_read = 0  # 0xc6: Home Offset.
+        self.attr_HomingCurrentLimit_read = 0  # 0xc7(0xbf)
+        self.attr_CurrentDelayTime_read = 250  # 0xbf(0xc7)/ms
+
         self.argout = 'UNKNOWN'
-        #----- PROTECTED REGION ID(CopleyControl.init_device) ENABLED START -----#
+        # ----- PROTECTED REGION ID(CopleyControl.init_device) ENABLED START -----#
         self.DesiredState = 11
-        self.ProfileType = 0 # 0xc8: Give trajectory profile mode(0xc8). Bits: *0\1\*256\257\*2
+        self.ProfileType = 0  # 0xc8: Give trajectory profile mode(0xc8). Bits: *0\1\*256\257\*2
 
         self.targetPosition = 0
         self.attr_SetPoint_read = 0
@@ -194,18 +199,17 @@ class CopleyControlClass(MoveMotorClass,MoveHomeClass):
         # InitialDeviceClass.connectSerial() # 也单独在调用的地方初始化了，不然改一个参数得改一串
         # self.setInitParameters() # 由于涉及参数较多，直接在调用函数中传参，另外可以考虑将其单独作为了一个Class
         pass
-        #----- PROTECTED REGION END -----#	//	CopleyControl.init_device
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.init_device
 
     def delete_device(self):
         # self.debug_stream('In delete_device()')
         # ----- PROTECTED REGION ID(CopleyControl.delete_device) ENABLED START -----#
         # print('Delete Device.{}'.format(self.print_log('time_msg')))
         pass
-        #----- PROTECTED REGION END -----#	//	CopleyControl.delete_device
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.delete_device
 
     def always_executed_hook(self):
         # self.debug_stream('In always_excuted_hook()')
-        #----- PROTECTED REGION ID(CopleyControl.always_executed_hook) ENABLED START -----#
+        # ----- PROTECTED REGION ID(CopleyControl.always_executed_hook) ENABLED START -----#
         pass
-        #----- PROTECTED REGION END -----#	//	CopleyControl.always_executed_hook
-
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.always_executed_hook

@@ -5,6 +5,7 @@ class classname1_1(object):
     """
     docstring
     """
+
     def class1_1_fun1(self):
         """
         docstring

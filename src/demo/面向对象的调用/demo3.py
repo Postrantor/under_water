@@ -2,16 +2,19 @@
 # -*- coding:utf-8 -*-
 from demo.OOP_1_1 import *
 import time
+
+
 class classname(object):
     """
     docstring
     """
+
     def demo1(self):
         file_thermal = "/sys/class/thermal/thermal_zone0/temp"
         try:
             while True:
                 file = open(file_thermal)
-                self.temp_actual = float(file.readline())/1000
+                self.temp_actual = float(file.readline()) / 1000
                 print("temp1 : %.2f" % self.temp_actual)
                 time.sleep(0.5)
         except KeyboardInterrupt as e:

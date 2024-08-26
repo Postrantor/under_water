@@ -79,8 +79,8 @@
 '''
 
 # %% doc
-__all__ = ['CopleyControlClass'] # 可用于模块导入时限制，只有__all__内指定的属性、方法、类可被导入
-__docformat__ = 'restructuredtext' # 允许诸如 epydoc之类的python文档生成器工具知道如何正确解析模块文档
+__all__ = ['CopleyControlClass']  # 可用于模块导入时限制，只有__all__内指定的属性、方法、类可被导入
+__docformat__ = 'restructuredtext'  # 允许诸如 epydoc之类的python文档生成器工具知道如何正确解析模块文档
 
 # %% import
 # import tango as PyTango
@@ -89,20 +89,20 @@ import serial
 # import sys
 # import os
 # Add additional import
-#----- PROTECTED REGION ID(CopleyControl.additionnal_import) ENABLED START -----#
+# ----- PROTECTED REGION ID(CopleyControl.additionnal_import) ENABLED START -----#
 from copley.scripts.copley_lib.ParamDict_EventStatus import BitsMapped as BitsMapped_ES
 from copley.scripts.copley_lib.ParamDict_HomingMethod import HomingMethod as BitsMapped_HM
 # [issue]:
 # 考虑将下面的类拆分成不同的.py，再通过包的形式导入进来
 # 这样的话，每个模式都是拆分出去，这样就不用每次都if了，而且每个模式有什么属性也都分明了
-#----- PROTECTED REGION END -----#	//	CopleyControl.additionnal_import
+# ----- PROTECTED REGION END -----#	//	CopleyControl.additionnal_import
 
 # %% Constant
 # -------- Add Global Variables Here ------------
-#----- PROTECTED REGION ID(CopleyControl.global_variables) ENABLED START -----#
+# ----- PROTECTED REGION ID(CopleyControl.global_variables) ENABLED START -----#
 from copley.scripts.copley_lib.Constant_Unit import *
 from copley.scripts.copley_lib.Constant_Serial import *
-#----- PROTECTED REGION END -----#	//	CopleyControl.global_variables
+# ----- PROTECTED REGION END -----#	//	CopleyControl.global_variables
 
 # -------- Device States Description ------------
 # MOVING : Moving
@@ -112,6 +112,8 @@ from copley.scripts.copley_lib.Constant_Serial import *
 # INIT : The amp is initialising.
 
 # %% Class
+
+
 class InitialParametersClass(object):
     '''
         initial the devide ports info.\n
@@ -120,9 +122,10 @@ class InitialParametersClass(object):
         :@param NodeID->(int): canopen node ID.\n
         :@param Mode->(str): sets programmed mode.\n
     '''
+
     def __init__(self, PortID='/dev/ttyUSB0', NodeID=0, Mode='Position'):
-        #----- PROTECTED REGION ID(CopleyControl.__init__) ENABLED START -----#
-        if isinstance(PortID,str):
+        # ----- PROTECTED REGION ID(CopleyControl.__init__) ENABLED START -----#
+        if isinstance(PortID, str):
             self.PortID = PortID
         else:
             print('NodeID is not string: {}'.format(PortID))
@@ -131,11 +134,12 @@ class InitialParametersClass(object):
         except Exception:
             print('NodeID is not number: {}'.format(NodeID))
 
-        if isinstance(Mode,str) and (Mode=='Position' or Mode=='Speed' or Mode=='Current'):
+        if isinstance(Mode, str) and (Mode == 'Position' or Mode == 'Speed' or Mode == 'Current'):
             self.Mode = Mode
         else:
             print('NodeID is not defined string(Position, Speed, Current): {}'.format(Mode))
-        #----- PROTECTED REGION END -----#	//	CopleyControl.__init__
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.__init__
+
 
 class InitialDeviceClass(InitialParametersClass):
     '''
@@ -146,15 +150,16 @@ class InitialDeviceClass(InitialParametersClass):
         :@def is_number: confirm the input is number when set attributes.\n
         :@def print_log: debug, output the device info and time.\n
     '''
+
     def connectSerial(self, baud=defaultBaud, timeout=defaultTimeout):
         '''
             Connects with the pyserial device and make the pyserial state be open.
         '''
-        #----- PROTECTED REGION ID(InitialDeviceClass.connectSerial) ENABLED START -----#
-        self.dev_serial=serial.Serial()
-        self.dev_serial.port=self.PortID # 获取当前usb端口: `python -m serial.tools.list_ports`
-        self.dev_serial.baudrate=baud # serial port baud rate: 9600, 115200
-        self.dev_serial.timeout=timeout # 超时设置，None = 永远等待操作；0 = ；立即返回请求结果；Num(其他数值) = 等待时间(s)
+        # ----- PROTECTED REGION ID(InitialDeviceClass.connectSerial) ENABLED START -----#
+        self.dev_serial = serial.Serial()
+        self.dev_serial.port = self.PortID  # 获取当前usb端口: `python -m serial.tools.list_ports`
+        self.dev_serial.baudrate = baud  # serial port baud rate: 9600, 115200
+        self.dev_serial.timeout = timeout  # 超时设置，None = 永远等待操作；0 = ；立即返回请求结果；Num(其他数值) = 等待时间(s)
         # self.dev_serial.parity=PARITY_EVEN,
         # self.dev_serial.stopbits=STOPBITS_ONE,
         # self.dev_serial.bytesize=SEVENBITS, # 该处会使编码发生变化，需要注释
@@ -172,23 +177,25 @@ class InitialDeviceClass(InitialParametersClass):
             print('Serial Port is OK.{}'.format(self.print_log('full_msg')))
         else:
             print('Serial Port is ERROR.{}'.format(self.print_log('full_msg')))
-        #----- PROTECTED REGION END -----#	//	CopleyControl.connectSerial
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.connectSerial
+
     def changeSerialSpeed(self, baud=highBaud):
         '''
             change the serial port baud rate
         '''
-        #----- PROTECTED REGION ID(InitialDeviceClass.changeSerialSpeed) ENABLED START -----#
-        cmd_string='{} s r0x90 {}\n'.format(self.NodeID, baud) # serial port baud rate. Units: bits/s.
+        # ----- PROTECTED REGION ID(InitialDeviceClass.changeSerialSpeed) ENABLED START -----#
+        cmd_string = '{} s r0x90 {}\n'.format(self.NodeID, baud)  # serial port baud rate. Units: bits/s.
         self.dev_serial.write(cmd_string)
         self.dev_serial.close()
-        self.dev_serial.baudrate=baud
+        self.dev_serial.baudrate = baud
         time.sleep(2)
         self.dev_serial.open()
         if self.dev_serial.isOpen() and self.dev_serial.readable():
             print('Successful change the port baud rate: {}'.format(self.dev_serial.baudrate))
         else:
             print('Failure change the port baud rate: {}'.format(self.dev_serial.baudrate))
-        #----- PROTECTED REGION END -----#	//	CopleyControl.changeSerialSpeed
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.changeSerialSpeed
+
     def openSerialPort(self):
         '''
             # open serial port and catch exceptions
@@ -196,52 +203,56 @@ class InitialDeviceClass(InitialParametersClass):
             # self.dev_serial.close()\n
             # self.dev_serial.open()\n
         '''
-        #----- PROTECTED REGION ID(InitialDeviceClass.openSerialPort) ENABLED START -----#
+        # ----- PROTECTED REGION ID(InitialDeviceClass.openSerialPort) ENABLED START -----#
         try:
             self.dev_serial.open()
         except Exception as result:
             # print('{}{}'.format(result, self.print_log()))
-            pass # not need print
+            pass  # not need print
         # flushInput = self.dev_serial.flushInput() # 丢弃接收缓存中的所有数据
         # flushOutput = self.dev_serial.flushOutput() # 终止当前写操作，并丢弃发送缓存中的数据。
-        #----- PROTECTED REGION END -----#	//	CopleyControl.openSerialPort
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.openSerialPort
+
     def is_number(self, num):
         '''
             str.isdigit()
         '''
-        #----- PROTECTED REGION ID(InitialDeviceClass.is_number) ENABLED START -----#
+        # ----- PROTECTED REGION ID(InitialDeviceClass.is_number) ENABLED START -----#
         try:
             float(num)
             return True
         except ValueError:
             print('Input is not numbers: {}'.format(num))
         return False
-        #----- PROTECTED REGION END -----#	//	CopleyControl.is_number
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.is_number
+
     def print_log(self, log='time_msg'):
         '''
             print('Serial Port is OK{}'.format(self.print_log('time_msg')))
         '''
-        #----- PROTECTED REGION ID(InitialDeviceClass.print_log) ENABLED START -----#
-        if log=='full_msg':
+        # ----- PROTECTED REGION ID(InitialDeviceClass.print_log) ENABLED START -----#
+        if log == 'full_msg':
             msg = '\n\t- PortID: {}\n\t- NodeID: {}\n\t- Buad: {}\n\t- Timeout: {}\n\t- Time: {}'.format(self.dev_serial.port, self.NodeID, self.dev_serial.baudrate, self.dev_serial.timeout, time.asctime())
-        elif log=='time_msg':
+        elif log == 'time_msg':
             msg = '\n\t- PortID: {}\n\t- NodeID: {}\n\t- Time: {}'.format(self.dev_serial.port, self.NodeID, time.asctime())
         else:
-            msg = '\n\t- PortID: {}'.format(self.dev_serial.port)            
+            msg = '\n\t- PortID: {}'.format(self.dev_serial.port)
         return msg
-        #----- PROTECTED REGION END -----#	//	CopleyControl.print_log
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.print_log
+
     def debug_stream(self, *msg):
         '''
             output debug info
             [issue]:
             有待完善
         '''
-        #----- PROTECTED REGION ID(InitialDeviceClass.debug_stream) ENABLED START -----#
+        # ----- PROTECTED REGION ID(InitialDeviceClass.debug_stream) ENABLED START -----#
         strs = ''
         for target_tuple in reversed(msg):
             strs = str(target_tuple) + '\t' + strs
-        print(strs+'{}'.format(self.print_log('time_msg')))
-        #----- PROTECTED REGION END -----#	//	CopleyControl.debug_stream
+        print(strs + '{}'.format(self.print_log('time_msg')))
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.debug_stream
+
     def is_int(self, input, output=0):
         """
             若read方法中为attribute值，则在write方法中不能使用is_int直接将返回值给attribute
@@ -249,7 +260,7 @@ class InitialDeviceClass(InitialParametersClass):
         try:
             result = int(input)
         except Exception:
-            if output=='No Power':
+            if output == 'No Power':
                 result = output
             else:
                 # 这行可以避免在单位转换的时候出现float小数
@@ -257,7 +268,8 @@ class InitialDeviceClass(InitialParametersClass):
                 print('The value: {} is not number, and return is {}.{}'.format(input, output, self.print_log('time_msg')))
         return result
 
-class FormatCmdClass(InitialDeviceClass,InitialParametersClass):
+
+class FormatCmdClass(InitialDeviceClass, InitialParametersClass):
     '''
         :@def write: write command to the serial line.\n
         :@def WriteRead: writes a command to the serial line and gets the result of this command from the amplifier.\n
@@ -279,15 +291,17 @@ class FormatCmdClass(InitialDeviceClass,InitialParametersClass):
         <CR>: 
             # A carriage return is used to indicate the end of the command to the drive.
     '''
+
     def write(self, cmd):
         '''
             write command to the serial line.\n
         '''
-        #----- PROTECTED REGION ID(FormatCmdClass.write) ENABLED START -----#
-        #print('In ', self.dev_serial.port, '::write()')
+        # ----- PROTECTED REGION ID(FormatCmdClass.write) ENABLED START -----#
+        # print('In ', self.dev_serial.port, '::write()')
         self.openSerialPort()
         self.dev_serial.write(cmd)
-        #----- PROTECTED REGION END -----#	//	FormatCmdClass.write
+        # ----- PROTECTED REGION END -----#	//	FormatCmdClass.write
+
     def WriteRead(self, argin):
         '''
             writes a command to the serial line and gets the result of this command from the amplifier.\n
@@ -295,7 +309,7 @@ class FormatCmdClass(InitialDeviceClass,InitialParametersClass):
             :@param argin: wait to command(acsii)\n
         '''
         argout = ''
-        #----- PROTECTED REGION ID(FormatCmdClass.WriteRead) ENABLED START -----#
+        # ----- PROTECTED REGION ID(FormatCmdClass.WriteRead) ENABLED START -----#
         raw_result = ''
         # print 'In ', self.dev_serial.port, '::WriteRead()', str(argin)
         self.openSerialPort()
@@ -304,63 +318,68 @@ class FormatCmdClass(InitialDeviceClass,InitialParametersClass):
         # self.debug_stream(argin, raw_result)
         # [issue]: IndexError: string index out of range
         # 如果返回值为空
-        if (raw_result[-1]=='\r' or raw_result[-1]=='\n'):
+        if (raw_result[-1] == '\r' or raw_result[-1] == '\n'):
             argout = raw_result[0:-1]
-        #----- PROTECTED REGION END -----#	//	FormatCmdClass.WriteRead
+        # ----- PROTECTED REGION END -----#	//	FormatCmdClass.WriteRead
         return argout
+
     def handShake(self, reply):
         '''
             Check the reply to confirm whether the command is sent successfully or not.\n
         '''
-        #----- PROTECTED REGION ID(FormatCmdClass.handShake) ENABLED START -----#
+        # ----- PROTECTED REGION ID(FormatCmdClass.handShake) ENABLED START -----#
         if reply == 'No power' or 'ok' or reply[0:1] == 'e' or reply[0:1] == 'v ':
             return True
         else:
             return False
-        #----- PROTECTED REGION END -----#	//	FormatCmdClass.handShake
+        # ----- PROTECTED REGION END -----#	//	FormatCmdClass.handShake
+
     def setParamCmd(self, ascii, data=0):
         ''' 
             Return the Set Command with NodeID, command and data for copley control.\n
         '''
-        #----- PROTECTED REGION ID(FormatCmdClass.setParamCmd) ENABLED START -----#
+        # ----- PROTECTED REGION ID(FormatCmdClass.setParamCmd) ENABLED START -----#
         try:
             data = int(data)
-            if ascii[:2]=='0x':
+            if ascii[:2] == '0x':
                 cmd = '{} s r{} {}\n'.format(self.NodeID, ascii, data)
-            elif ascii=='t':
+            elif ascii == 't':
                 cmd = '{} {} {}\n'.format(self.NodeID, ascii, data)
-            elif ascii=='r':
+            elif ascii == 'r':
                 cmd = '{} {}\n'.format(self.NodeID, ascii)
             else:
                 cmd = 'command error.\nformat command: [node ID][<.>axis letter] [cmd code] [cmd parameters] <CR>'
         except Exception:
             print('the input value is not numbers.{}'.format(self.print_log('time_msg')))
         return cmd
-        #----- PROTECTED REGION END -----#	//	FormatCmdClass.setParamCmd
+        # ----- PROTECTED REGION END -----#	//	FormatCmdClass.setParamCmd
+
     def getParamCmd(self, cmd):
         '''
             Return the Get Command with NodeID, command for copley control.\n
         '''
-        #----- PROTECTED REGION ID(FormatCmdClass.getParamCmd) ENABLED START -----#
+        # ----- PROTECTED REGION ID(FormatCmdClass.getParamCmd) ENABLED START -----#
         return '{} g r{}\n'.format(self.NodeID, cmd)
-        #----- PROTECTED REGION END -----#	//	FormatCmdClass.getParamCmd
+        # ----- PROTECTED REGION END -----#	//	FormatCmdClass.getParamCmd
+
     def setValue(self, result, new, old):
         '''
             Set the mathematical value of the answer to the attribute after sending the command.\n
             主要针对读取方法为属性类的参数，这样省了一步
         '''
-        #----- PROTECTED REGION ID(FormatCmdClass.setValue) ENABLED START -----#
-        if result[0:-1]=='ok':
+        # ----- PROTECTED REGION ID(FormatCmdClass.setValue) ENABLED START -----#
+        if result[0:-1] == 'ok':
             return new
         else:
             print('The result is ERROR: {} is not number, and return old value: {}.{}'.format(result[0:-1], old, self.print_log('time_msg')))
             return old
-        #----- PROTECTED REGION END -----#	//	FormatCmdClass.setValue
+        # ----- PROTECTED REGION END -----#	//	FormatCmdClass.setValue
+
     def getValue(self, cmd):
         '''
             Get the mathematical value of the answer after sending the command.\n
         '''
-        #----- PROTECTED REGION ID(FormatCmdClass.getValue) ENABLED START -----#
+        # ----- PROTECTED REGION ID(FormatCmdClass.getValue) ENABLED START -----#
         reply = self.WriteRead(cmd)
         if self.handShake(reply):
             if reply[0:1] == 'v':
@@ -372,24 +391,27 @@ class FormatCmdClass(InitialDeviceClass,InitialParametersClass):
             print('Handshake() ERROR.{}'.format(self.print_log('full_msg')))
         # [issue]:
         # 增加一个前缀的e的判断，这个是错误代码，同时修改setvalue()
-        #----- PROTECTED REGION END -----#	//	FormatCmdClass.getValue
+        # ----- PROTECTED REGION END -----#	//	FormatCmdClass.getValue
+
 
 class CheckEventStateClass(FormatCmdClass):
     '''
         device state
         latched event status register
     '''
-    ## ------------------------EventStatusRegister------------------------
+    # ------------------------EventStatusRegister------------------------
+
     def readEventStatusRegister(self):
         '''
             return the event status register(0xa0_R*)
         '''
-        #----- PROTECTED REGION ID(StateRegisteClass.readEventStatusRegister) ENABLED START -----#
+        # ----- PROTECTED REGION ID(StateRegisteClass.readEventStatusRegister) ENABLED START -----#
         cmd = self.getParamCmd('0xa0')
         value = self.is_int(self.getValue(cmd), 'No Power')
         self.argout = str(value)
-        #----- PROTECTED REGION END -----#	//	StateRegisteClass.readEventStatusRegister
+        # ----- PROTECTED REGION END -----#	//	StateRegisteClass.readEventStatusRegister
         return self.argout
+
     def readLatchedEventStatus(self):
         '''
             return the latched event status(0xa1)
@@ -398,17 +420,18 @@ class CheckEventStateClass(FormatCmdClass):
             This is latched version of Event Status Register (0xA0). 
             Bits are set by drive when events occur. Bits are only cleared by writing to this parameter as explained below: When writing to Latched Event Status Register, any bit set will cause corresponding bit in register to be cleared. 
             For example, to clear over voltage bit, write decimal 4 or 0x4 to register. To clear all bits, write 0xffffffff to register.
-            
+
             [Note]:
                 f(15)变成二进制：1111，则 0xffffffff = 1111 1111 1111 1111 1111 1111 1111 1111 (8个F的二进制形式, 一个F占4个字节 ) 
                 0x代表16进制，后面是数字，十进制是4294967295
         '''
-        #----- PROTECTED REGION ID(StateRegisteClass.readLatchedEventStatus) ENABLED START -----#
+        # ----- PROTECTED REGION ID(StateRegisteClass.readLatchedEventStatus) ENABLED START -----#
         cmd = self.getParamCmd('0xa1')
         value = self.is_int(self.getValue(cmd), 'No Power')
         self.argout = str(value)
-        #----- PROTECTED REGION END -----#	//	StateRegisteClass.readLatchedEventStatus
+        # ----- PROTECTED REGION END -----#	//	StateRegisteClass.readLatchedEventStatus
         return self.argout
+
     def clearLatchedStatus(self):
         '''
             clear the latched status
@@ -418,48 +441,51 @@ class CheckEventStateClass(FormatCmdClass):
             竟然要先清除这个错误，在清除a1才能全部清除，否则a1的不能清除
             也就是如果a1中的22位有问题，需要先调用这里
         '''
-        #----- PROTECTED REGION ID(StateRegisteClass.clearLatchedStatus) ENABLED START -----#
+        # ----- PROTECTED REGION ID(StateRegisteClass.clearLatchedStatus) ENABLED START -----#
         self.clearFaultRegister()
         cmd_setLatched = self.setParamCmd('0xa1', 4294967295)
-        value_setLatched =  self.getValue(cmd_setLatched)
+        value_setLatched = self.getValue(cmd_setLatched)
         # [issue]:
         # 在这里需要判断一个返回的数据是什么，是ok还是数字，然后根据返回值，决定是return一个true或者其他；
         # 以此来告诉调用对象，现在的状态，不光是打印一串字符；
         result = 'the latched event status register is {}, and the current status is {}{}'.format(value_setLatched, self.print_log('time_msg'))
-        #----- PROTECTED REGION END -----#	//	StateRegisteClass.clearLatchedStatus
+        # ----- PROTECTED REGION END -----#	//	StateRegisteClass.clearLatchedStatus
         return result
+
     def readFaultRegisterStatus(self):
         '''
             return the latched fault register status(0xA4)
-            
+
             When latching fault has occurred, the fault bit (bit 22) of Event Status Register (0xA0) is set. 
             Cause of fault can be read from this register. To clear fault condition, write a 1 to associated bit in this register. Events that cause drive to latch fault are programmable. See Fault Mask (0xA7) for details.
         '''
-        #----- PROTECTED REGION ID(StateRegisteClass.readFaultRegisterStatus) ENABLED START -----#
+        # ----- PROTECTED REGION ID(StateRegisteClass.readFaultRegisterStatus) ENABLED START -----#
         cmd = self.getParamCmd('0xa4')
         value = self.is_int(self.getValue(cmd), 'No Power')
         self.argout = str(value)
-        #----- PROTECTED REGION END -----#	//	StateRegisteClass.readFaultRegisterStatus
+        # ----- PROTECTED REGION END -----#	//	StateRegisteClass.readFaultRegisterStatus
         return self.argout
+
     def clearFaultRegister(self):
         '''
             clear latched fault register
             0xffff = b1111111111111111 = o65535
         '''
-        #----- PROTECTED REGION ID(StateRegisteClass.clearFaultRegister) ENABLED START -----#
+        # ----- PROTECTED REGION ID(StateRegisteClass.clearFaultRegister) ENABLED START -----#
         cmd_setFault = self.setParamCmd('0xa4', 65535)
-        value_setFault =  self.getValue(cmd_setFault)
+        value_setFault = self.getValue(cmd_setFault)
         # [issue]:
         # 在这里需要判断一个返回的数据是什么，是ok还是数字，然后根据返回值，决定是return一个true或者其他；
         # 以此来告诉调用对象，现在的状态，不光是打印一串字符；
         result = 'the latched fault register is {}, and the current status is {}{}'.format(value_setFault, self.print_log('time_msg'))
-        #----- PROTECTED REGION END -----#	//	StateRegisteClass.clearFaultRegister
+        # ----- PROTECTED REGION END -----#	//	StateRegisteClass.clearFaultRegister
         return result
-    ## ------------------------@DevStatus------------------------
+    # ------------------------@DevStatus------------------------
+
     def dev_status(self):
         '''
             This command gets the device status (stored in its device_status data member) and returns it to the caller.
-            
+
             :return: Device status
 
             if the motor is in motion, the Status is 'Status is MOVING';
@@ -473,44 +499,47 @@ class CheckEventStateClass(FormatCmdClass):
         '''
         argout = ''
         # self.debug_stream('dev_status()')
-        #----- PROTECTED REGION ID(StateRegisteClass.dev_status) ENABLED START -----#
+        # ----- PROTECTED REGION ID(StateRegisteClass.dev_status) ENABLED START -----#
         # write command(0xa0)
         # self.clearLatchedStatus()
-        DriveEventStatus = self.readEventStatusRegister() # 0xa0
-        if DriveEventStatus=='No Power':
+        DriveEventStatus = self.readEventStatusRegister()  # 0xa0
+        if DriveEventStatus == 'No Power':
             argout = 'Status is OFF, Power OFF'
-        elif DriveEventStatus=='0':
+        elif DriveEventStatus == '0':
             argout = 'Status is STANDBY'
-        elif DriveEventStatus!='0' and str(DriveEventStatus)!='No Power':
+        elif DriveEventStatus != '0' and str(DriveEventStatus) != 'No Power':
             # (value&2^DriveEventStatus) != 0
-            argout = BitsMapped_ES('0xA0', DriveEventStatus) # -> list/str
+            argout = BitsMapped_ES('0xA0', DriveEventStatus)  # -> list/str
         else:
             argout = 'Status is MOVING'
         self.argout = argout
-        #----- PROTECTED REGION END -----#	//	StateRegisteClass.dev_status
+        # ----- PROTECTED REGION END -----#	//	StateRegisteClass.dev_status
         return self.argout
+
     def dev_fault(self):
         '''
             Fault Register(0xA4). Bits: 0~18
         '''
         argout = ''
         # self.debug_stream('dev_fault()')
-        #----- PROTECTED REGION ID(StateRegisteClass.dev_fault) ENABLED START -----#
+        # ----- PROTECTED REGION ID(StateRegisteClass.dev_fault) ENABLED START -----#
         DriveFaultRegiater = self.readFaultRegisterStatus()
-        if DriveFaultRegiater=='No Power':
+        if DriveFaultRegiater == 'No Power':
             argout = 'Status is OFF, Power OFF'
-        elif DriveFaultRegiater=='0':
+        elif DriveFaultRegiater == '0':
             argout = 'Status is STANDBY'
-        elif DriveFaultRegiater!='0' and str(DriveFaultRegiater)!='No Power':
+        elif DriveFaultRegiater != '0' and str(DriveFaultRegiater) != 'No Power':
             # (value&2^DriveEventStatus) != 0
-            argout = BitsMapped_ES('0xA4', DriveFaultRegiater) # from copley_lib import
+            argout = BitsMapped_ES('0xA4', DriveFaultRegiater)  # from copley_lib import
         else:
             argout = 'Status is FAULT'
         self.argout = argout
-        #----- PROTECTED REGION END -----#	//	StateRegisteClass.dev_fault
+        # ----- PROTECTED REGION END -----#	//	StateRegisteClass.dev_fault
         return self.argout
 
 # %%
+
+
 class SetModeClass(CheckEventStateClass):
     '''
         set mode, include position, speed, current mode\n
@@ -540,37 +569,40 @@ class SetModeClass(CheckEventStateClass):
         :def read_CurrentRamp:
         :def write_CurrentRamp:
     '''
-    ## ------------------------AttrState------------------------
-    def read_DesiredState(self): # -> attribute
+    # ------------------------AttrState------------------------
+
+    def read_DesiredState(self):  # -> attribute
         '''
             Desired State(0x24). Bits: 0~42(P19).
         '''
         # self.debug_stream('read_DesiredState()')
-        #----- PROTECTED REGION ID(RWAttributesClass.read_DesiredState) ENABLED START -----#
+        # ----- PROTECTED REGION ID(RWAttributesClass.read_DesiredState) ENABLED START -----#
         cmd = self.getParamCmd('0x24')
-        data =  self.getValue(cmd)
+        data = self.getValue(cmd)
         self.DesiredState = self.is_int(data, self.DesiredState)
-        #----- PROTECTED REGION END -----#	//	RWAttributesClass.read_DesiredState
+        # ----- PROTECTED REGION END -----#	//	RWAttributesClass.read_DesiredState
         return self.DesiredState
-    def write_DesiredState(self, data): # -> attribute
+
+    def write_DesiredState(self, data):  # -> attribute
         '''
             0x24	R F	Desired state:
                                 0 = Drive disabled.
                                 1 = Programmed current value drives current loop
-                             21 = Programmed Position Mode, Servo
-                             31 = Programmed Position Mode, Stepper
+                                21 = Programmed Position Mode, Servo
+                                31 = Programmed Position Mode, Stepper
         '''
         # self.debug_stream('write_DesiredState()')
-        #----- PROTECTED REGION ID(RWAttributesClass.write_DesiredState) ENABLED START -----#
+        # ----- PROTECTED REGION ID(RWAttributesClass.write_DesiredState) ENABLED START -----#
         data = self.is_int(data, self.DesiredState)
         cmd = self.setParamCmd('0x24', data)
-        result = self.getValue(cmd) # self.write(cmd)
+        result = self.getValue(cmd)  # self.write(cmd)
 
         self.DesiredState = self.setValue(result, data, self.DesiredState)
         return result
         # print('Set Desired State to  ', str(self.DesiredState), 'counts/s.'.format(self.print_log('time_msg')))
-        #----- PROTECTED REGION END -----#	//	RWAttributesClass.write_DesiredState
-    def read_Profile(self): # -> attribute
+        # ----- PROTECTED REGION END -----#	//	RWAttributesClass.write_DesiredState
+
+    def read_Profile(self):  # -> attribute
         '''
             Trajectory Profile Mode. To set profile in CANopen see CAN object 0x6086 in CANopen Programmers Manual.
 
@@ -586,36 +618,38 @@ class SetModeClass(CheckEventStateClass):
                 Velocity mode. Uses velocity, acceleration, and deceleration. Jerk is not used in this mode, and position is only used to define direction of move (zero or positive to move with a positive velocity, negative to move with a negative velocity). Any parameter may be changed during move. Set velocity to zero to stop.
         '''
         # self.debug_stream('read_Velocity()')
-        #----- PROTECTED REGION ID(RWAttributesClass.read_Profile) ENABLED START -----#
+        # ----- PROTECTED REGION ID(RWAttributesClass.read_Profile) ENABLED START -----#
         cmd = self.getParamCmd('0xc8')
         data = self.getValue(cmd)
         self.ProfileType = self.is_int(data, self.ProfileType)
-        #----- PROTECTED REGION END -----#	//	RWAttributesClass.read_Profile
+        # ----- PROTECTED REGION END -----#	//	RWAttributesClass.read_Profile
         return self.ProfileType
-    def write_Profile(self, data): # -> attribute
+
+    def write_Profile(self, data):  # -> attribute
         '''
             Profile type:
-             0 = Absolute move, trapezoidal profile.
-             1 = Absolute move, S-curve profile.
-             256 = Relative move, trapezoidal profile.
-             257 = Relative move, S-curve profile.
-             2 = Velocity move.
+                0 = Absolute move, trapezoidal profile.
+                1 = Absolute move, S-curve profile.
+                256 = Relative move, trapezoidal profile.
+                257 = Relative move, S-curve profile.
+                2 = Velocity move.
         '''
         # self.debug_stream('write_Profile()')
-        #----- PROTECTED REGION ID(RWAttributesClass.write_Profile) ENABLED START -----#
+        # ----- PROTECTED REGION ID(RWAttributesClass.write_Profile) ENABLED START -----#
         data = self.is_int(data, self.ProfileType)
-        if self.DesiredState==21: # Programmed Position Mode
+        if self.DesiredState == 21:  # Programmed Position Mode
             cmd = self.setParamCmd('0xc8', data)
-            result = self.getValue(cmd) # self.write(cmd)
+            result = self.getValue(cmd)  # self.write(cmd)
         else:
             print('this is not position mode and the "DesiredState" is {}.{}'.format(self.DesiredState, self.print_log('time_msg')))
             result = 'ERROR'
         self.ProfileType = self.setValue(result, data, self.ProfileType)
         return result
         # print('Set Profile type to  ', str(self.ProfileType), 'counts/s.'.format(self.print_log('time_msg')))
-        #----- PROTECTED REGION END -----#	//	RWAttributesClass.write_Profile
-    ## ------------------------AttrPosition------------------------
-    def read_Position(self): # -> actual
+        # ----- PROTECTED REGION END -----#	//	RWAttributesClass.write_Profile
+    # ------------------------AttrPosition------------------------
+
+    def read_Position(self):  # -> actual
         '''
             # read actual position and convert unit to count.
 
@@ -629,13 +663,14 @@ class SetModeClass(CheckEventStateClass):
             # 换句话说，取消了读取所有的限制值，后面可以考虑再写一些函数专门用来读取限制值
         '''
         # self.debug_stream('read_Position()')
-        #----- PROTECTED REGION ID(RWAttributesClass.Position_read) ENABLED START -----#   
+        # ----- PROTECTED REGION ID(RWAttributesClass.Position_read) ENABLED START -----#
         cmd = self.getParamCmd('0x17')
         data = self.getValue(cmd)
         self.attr_Position_read = self.is_int(data, self.attr_Position_read)
-        #----- PROTECTED REGION END -----#	//	RWAttributesClass.Position_read
+        # ----- PROTECTED REGION END -----#	//	RWAttributesClass.Position_read
         return self.attr_Position_read
-    def write_Position(self, data): # -> order
+
+    def write_Position(self, data):  # -> order
         '''
             # absolute move
 
@@ -650,36 +685,38 @@ class SetModeClass(CheckEventStateClass):
             0xb9
         '''
         # self.debug_stream('write_Position()')
-        #----- PROTECTED REGION ID(RWAttributesClass.Position_write) ENABLED START -----#
+        # ----- PROTECTED REGION ID(RWAttributesClass.Position_write) ENABLED START -----#
         self.targetPosition = self.is_int(data, self.targetPosition)
         # set attr_SetPoint_read
         self.attr_Position_read = self.read_Position()
-        if self.ProfileType==256 or self.ProfileType==257: # relative move
+        if self.ProfileType == 256 or self.ProfileType == 257:  # relative move
             self.attr_SetPoint_read = self.targetPosition - int(self.attr_Position_read)
-        elif self.ProfileType==0 or self.ProfileType==1: # absolute move
+        elif self.ProfileType == 0 or self.ProfileType == 1:  # absolute move
             self.attr_SetPoint_read = self.targetPosition
         # write attr_SetPoint_read to command
         # [issue]:
         # 在使用这个软件限制之前，是不是应该先读取一下
-        if self.attr_SoftwareCwLimit_read==0 and self.attr_SoftwareCcwLimit_read==0:
+        if self.attr_SoftwareCwLimit_read == 0 and self.attr_SoftwareCcwLimit_read == 0:
             print('Software Limits are not set.{}'.format(self.print_log('time_msg')))
             cmd = self.setParamCmd('0xca', self.attr_SetPoint_read)
-            result = self.getValue(cmd) # self.write(cmd)
+            result = self.getValue(cmd)  # self.write(cmd)
         elif self.targetPosition in range(self.attr_SoftwareCcwLimit_read, self.attr_SoftwareCwLimit_read):
             cmd = self.setParamCmd('0xca', self.attr_SetPoint_read)
-            result = self.getValue(cmd) # self.write(cmd)
+            result = self.getValue(cmd)  # self.write(cmd)
         else:
             print('The input is out of the valid range, check the software limits.{}'.format(self.print_log('time_msg')))
             result = 'ERROR'
         return result
-        #----- PROTECTED REGION END -----#	//	CopleyControl.Position_write
-    def read_SetPoint(self): # -> attribute
-        # self.debug_stream('In read_SetPoint()')
-        #----- PROTECTED REGION ID(CopleyControl.SetPoint_read) ENABLED START -----#
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.Position_write
 
-        #----- PROTECTED REGION END -----#	//	CopleyControl.SetPoint_read
+    def read_SetPoint(self):  # -> attribute
+        # self.debug_stream('In read_SetPoint()')
+        # ----- PROTECTED REGION ID(CopleyControl.SetPoint_read) ENABLED START -----#
+
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.SetPoint_read
         return self.attr_SetPoint_read
-    def write_SetPoint(self, data): # -> order
+
+    def write_SetPoint(self, data):  # -> order
         '''
             # relative move
 
@@ -694,80 +731,85 @@ class SetModeClass(CheckEventStateClass):
             0xb9
         '''
         # self.debug_stream('write_SetPoint()')
-        #----- PROTECTED REGION ID(CopleyControl.SetPoint_write) ENABLED START -----#
+        # ----- PROTECTED REGION ID(CopleyControl.SetPoint_write) ENABLED START -----#
         data = self.is_int(data, self.attr_SetPoint_read)
         # set targetPosition
         self.attr_Position_read = self.read_Position()
-        if self.ProfileType==256 or self.ProfileType==257:
+        if self.ProfileType == 256 or self.ProfileType == 257:
             self.targetPosition = data + self.attr_Position_read
-        elif self.ProfileType==0 or self.ProfileType==1:
+        elif self.ProfileType == 0 or self.ProfileType == 1:
             self.targetPosition = data
         # write attr_SetPoint_read to command
-        if self.attr_SoftwareCwLimit_read==0 and self.attr_SoftwareCcwLimit_read==0:
+        if self.attr_SoftwareCwLimit_read == 0 and self.attr_SoftwareCcwLimit_read == 0:
             print('Software Limits are not set.{}'.format(self.print_log('time_msg')))
             cmd = self.setParamCmd('0xca', data)
-            result = self.getValue(cmd) # self.write(cmd)
+            result = self.getValue(cmd)  # self.write(cmd)
         elif self.targetPosition in range(self.attr_SoftwareCcwLimit_read, self.attr_SoftwareCwLimit_read):
             # print('SetPoint:', data, 'expected position: ', self.targetPosition, 'Ccwlimit: ', self.attr_SoftwareCcwLimit_read, 'Cwlimit: ', self.attr_SoftwareCwLimit_read)
             cmd = self.setParamCmd('0xca', data)
-            result = self.getValue(cmd) # self.write(cmd)
+            result = self.getValue(cmd)  # self.write(cmd)
         else:
             print('The input is out of range of the software limits.{}'.format(self.print_log('time_msg')))
             result = 'ERROR'
         self.attr_SetPoint_read = self.setValue(result, data, self.attr_SetPoint_read)
         return result
-        #----- PROTECTED REGION END -----#	//	CopleyControl.SetPoint_write
-    def read_DialPosition(self): # -> actual
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.SetPoint_write
+
+    def read_DialPosition(self):  # -> actual
         '''
         # Limited position. Units: counts.(0x2d_R*).
         # the dial position 
         '''
         # self.debug_stream('read_DialPosition()')
-        #----- PROTECTED REGION ID(CopleyControl.DialPosition_read) ENABLED START -----#
+        # ----- PROTECTED REGION ID(CopleyControl.DialPosition_read) ENABLED START -----#
         self.attr_Position_read = self.read_Position()
         self.attr_DialPosition_read = float(self.attr_Position_read) / float(self.attr_Conversion_read)
         return self.attr_DialPosition_read
-        #----- PROTECTED REGION END -----#	//	CopleyControl.DialPosition_read
-    def write_DialPosition(self, data): # -> order
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.DialPosition_read
+
+    def write_DialPosition(self, data):  # -> order
         '''
             # Trajectory Generator Position Command(0xca). Units: Counts.
             # This value gives destination position for absolute moves or move distance for relative moves.
         '''
         # self.debug_stream('write_DialPosition()')
         data = self.is_int(data, self.targetPosition)
-        #----- PROTECTED REGION ID(CopleyControl.DialPosition_write) ENABLED START -----#
+        # ----- PROTECTED REGION ID(CopleyControl.DialPosition_write) ENABLED START -----#
         # [issue]: is_int
         self.targetPosition = float(self.attr_Conversion_read) * data
-        data_new = (data - self.attr_DialPosition_read) * float(self.attr_Conversion_read) 
-        self.attr_SetPoint_read = (data - self.attr_DialPosition_read) * float(self.attr_Conversion_read) 
+        data_new = (data - self.attr_DialPosition_read) * float(self.attr_Conversion_read)
+        self.attr_SetPoint_read = (data - self.attr_DialPosition_read) * float(self.attr_Conversion_read)
         if self.targetPosition in range(int(self.attr_SoftwareCcwLimit_read), int(self.attr_SoftwareCwLimit_read)):
             cmd = self.setParamCmd('0xca', data_new)
-            result = self.getValue(cmd) # self.write(cmd)
+            result = self.getValue(cmd)  # self.write(cmd)
         else:
             print('DialPosition is out of range.{}'.format(self.print_log('time_msg')))
             result = 'ERROR'
         return result
-        #----- PROTECTED REGION END -----#	//	CopleyControl.DialPosition_write
-    ## ------------------------AttrConversion------------------------
-    def read_Conversion(self): # -> attribute
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.DialPosition_write
+    # ------------------------AttrConversion------------------------
+
+    def read_Conversion(self):  # -> attribute
         '''
             The ratio between the position and the dial position. The default value is 1.0
         '''
         # self.debug_stream('In read_Conversion()')
-        #----- PROTECTED REGION ID(RWAttributesClass.Conversion_read) ENABLED START -----#
+        # ----- PROTECTED REGION ID(RWAttributesClass.Conversion_read) ENABLED START -----#
         print('In ', self.dev_serial.port, '::read_Conversion()')
-        #----- PROTECTED REGION END -----#	//	RWAttributesClass.Conversion_read
-    def write_Conversion(self, data): # -> attribute
+        # ----- PROTECTED REGION END -----#	//	RWAttributesClass.Conversion_read
+
+    def write_Conversion(self, data):  # -> attribute
         '''
             The ratio between the position and the dial position. The default value is 1.0
         '''
         # self.debug_stream('In write_Conversion()')
-        #----- PROTECTED REGION ID(RWAttributesClass.Conversion_write) ENABLED START -----#
+        # ----- PROTECTED REGION ID(RWAttributesClass.Conversion_write) ENABLED START -----#
         # [issue]: 应该有一个ascii
         self.attr_Conversion_read = data
-        #----- PROTECTED REGION END -----#	//	RWAttributesClass.Conversion_write
-    ## ------------------------AttrVelocity------------------------
-    def read_Velocity(self): # -> actual
+        # ----- PROTECTED REGION END -----#	//	RWAttributesClass.Conversion_write
+    # ------------------------AttrVelocity------------------------
+
+    def read_Velocity(self):  # -> actual
         '''
             # read actual velocity and convert unit to counts/s, so data=data*unit
             # This variable(0x18) differentiates between positive and negative
@@ -779,13 +821,14 @@ class SetModeClass(CheckEventStateClass):
             这里将0xcb -> 0x18，即读取实际的速度值且有符号，区别于0xcb读取的是设定的最大速度数值（是位置模式下的命令）
         '''
         # self.debug_stream('read_Velocity()')
-        #----- PROTECTED REGION ID(RWAttributesClass.Velocity_read) ENABLED START -----#
+        # ----- PROTECTED REGION ID(RWAttributesClass.Velocity_read) ENABLED START -----#
         cmd = self.getParamCmd('0x18')
         data = self.is_int(self.getValue(cmd), self.attr_Velocity_read)
         self.attr_Velocity_read = data * unit_0x18
-        #----- PROTECTED REGION END -----#	//	RWAttributesClass.Velocity_read
+        # ----- PROTECTED REGION END -----#	//	RWAttributesClass.Velocity_read
         return self.attr_Velocity_read
-    def write_Velocity(self, data): # -> order
+
+    def write_Velocity(self, data):  # -> order
         '''
             # write the target velocity value to the amplifire. 
             # include position & speed mode.
@@ -804,27 +847,28 @@ class SetModeClass(CheckEventStateClass):
         # 但是电流模式感觉啥都没法控制
         # self.debug_stream('write_Velocity()')
         data = self.is_int(data, self.attr_Velocity_read)
-        #----- PROTECTED REGION ID(RWAttributesClass.Velocity_write) ENABLED START -----#
-        if self.DesiredState==21: # Programmed Position Mode
+        # ----- PROTECTED REGION ID(RWAttributesClass.Velocity_write) ENABLED START -----#
+        if self.DesiredState == 21:  # Programmed Position Mode
             # [issue]
             # 将单位设置为全局变量
             velocity = data / unit_0xcb
             cmd = self.setParamCmd('0xcb', velocity)
-            result = self.getValue(cmd) # self.write(cmd)
+            result = self.getValue(cmd)  # self.write(cmd)
             # [issue]:
             # 需要完善，当设置为速度模式时候，速度的方向是由0xca指定的(1/-1)
-        elif self.DesiredState==11: # Programmed Speed Mode
+        elif self.DesiredState == 11:  # Programmed Speed Mode
             velocity = data / unit_0x2f
             cmd = self.setParamCmd('0x2f', velocity)
-            result = self.getValue(cmd) # self.write(cmd)
+            result = self.getValue(cmd)  # self.write(cmd)
         else:
             print('this is not position/speed mode and the "DesiredState" is {}.{}'.format(self.DesiredState, self.print_log('time_msg')))
             result = 'ERROR'
         return result
         # print('Set maximum(command) velocity to  ', str(velocity), 'counts/s.'.format(self.print_log('time_msg')))
-        #----- PROTECTED REGION END -----#	//	RWAttributesClass.Velocity_write
-    ## ------------------------AttrAc/Deceleration------------------------
-    def read_Acceleration(self): # -> attribute
+        # ----- PROTECTED REGION END -----#	//	RWAttributesClass.Velocity_write
+    # ------------------------AttrAc/Deceleration------------------------
+
+    def read_Acceleration(self):  # -> attribute
         '''
             # Programmed Position Mode
                 0xcc    R F Trajectory Maximum Acceleration. Units: 10 counts/s2.
@@ -838,12 +882,12 @@ class SetModeClass(CheckEventStateClass):
             不过，好像没有，编码器能读取的是位置，做一次差分得到速度值，如果再差一次的话，噪声会比较大；但是既然能设置最大加速度，就应该可以读取实际的加速度值；在CME的上位机中调试电机也是只有位置和速度，没有加速度的数值
         '''
         self.debug_stream('read_Acceleration()')
-        #----- PROTECTED REGION ID(RWAttributesClass.Acceleration_read) ENABLED START -----#
-        if self.DesiredState==21: # Programmed Position Mode
+        # ----- PROTECTED REGION ID(RWAttributesClass.Acceleration_read) ENABLED START -----#
+        if self.DesiredState == 21:  # Programmed Position Mode
             cmd = self.getParamCmd('0xcc')
             data = self.is_int(self.getValue(cmd), self.attr_Acceleration_read)
             self.attr_Acceleration_read = data * unit_0xcc
-        elif self.DesiredState==11: # Programmed Speed Mode
+        elif self.DesiredState == 11:  # Programmed Speed Mode
             cmd = self.getParamCmd('0x36')
             data = self.is_int(self.getValue(cmd), self.attr_Acceleration_read)
             self.attr_Acceleration_read = data * unit_0x36
@@ -851,34 +895,36 @@ class SetModeClass(CheckEventStateClass):
         # conversion = 0.0025
         # realAcceleration = self.attr_Acceleration_read * conversion
         # print('Read motor real maximum acceleration: ', str(realAcceleration), 'counts/s2)')
-        #----- PROTECTED REGION END -----#	//	RWAttributesClass.Acceleration_read
+        # ----- PROTECTED REGION END -----#	//	RWAttributesClass.Acceleration_read
         return self.attr_Acceleration_read
-    def write_Acceleration(self, data): # -> order
+
+    def write_Acceleration(self, data):  # -> order
         '''
         '''
         # self.debug_stream('write_Acceleration()')
         data = self.is_int(data, self.attr_Acceleration_read)
-        #----- PROTECTED REGION ID(RWAttributesClass.Acceleration_write) ENABLED START -----#
+        # ----- PROTECTED REGION ID(RWAttributesClass.Acceleration_write) ENABLED START -----#
         # print 'realAcceleration input is: ', int(data)
         # realAcceleration = int(data)
         # Inverse_conversion = 400
         # self.attr_Acceleration_read = realAcceleration * Inverse_conversion
-        if self.DesiredState==21: # Programmed Position Mode
+        if self.DesiredState == 21:  # Programmed Position Mode
             acceleration = data / unit_0xcc
             cmd = self.setParamCmd('0xcc', acceleration)
-            result = self.getValue(cmd) # self.write(cmd)
-        elif self.DesiredState==11: # Programmed Speed Mode
+            result = self.getValue(cmd)  # self.write(cmd)
+        elif self.DesiredState == 11:  # Programmed Speed Mode
             acceleration = data / unit_0x36
             cmd = self.setParamCmd('0x36', acceleration)
-            result = self.getValue(cmd) # self.write(cmd)
+            result = self.getValue(cmd)  # self.write(cmd)
         else:
             print('this is not position/speed mode and the "DesiredState" is {}.{}'.format(self.DesiredState, self.print_log('time_msg')))
             result = 'ERROR'
         self.attr_Acceleration_read = self.setValue(result, data, self.attr_Acceleration_read)
         return result
         # print('Set maximum acceleration to  ', str(acc), 'counts/s2.')
-        #----- PROTECTED REGION END -----#	//	RWAttributesClass.Acceleration_write
-    def read_Deceleration(self): # -> attribute
+        # ----- PROTECTED REGION END -----#	//	RWAttributesClass.Acceleration_write
+
+    def read_Deceleration(self):  # -> attribute
         '''
             # Programmed Position Mode
                 0xcd    R F Trajectory Maximum Deceleration. Units: 10 counts/s2. 
@@ -889,12 +935,12 @@ class SetModeClass(CheckEventStateClass):
                                     Not used when velocity loop is controlled by position loop.
         '''
         # self.debug_stream('read_Deceleration()')
-        #----- PROTECTED REGION ID(RWAttributesClass.Deceleration_read) ENABLED START -----#
-        if self.DesiredState==21: # Programmed Position Mode
+        # ----- PROTECTED REGION ID(RWAttributesClass.Deceleration_read) ENABLED START -----#
+        if self.DesiredState == 21:  # Programmed Position Mode
             cmd = self.getParamCmd('0xcd')
             data = self.is_int(self.getValue(cmd), self.attr_Deceleration_read)
             self.attr_Deceleration_read = data * unit_0xcd
-        elif self.DesiredState==11: # Programmed Speed Mode
+        elif self.DesiredState == 11:  # Programmed Speed Mode
             cmd = self.getParamCmd('0x37')
             data = self.is_int(self.getValue(cmd), self.attr_Deceleration_read)
             self.attr_Deceleration_read = data * unit_0x37
@@ -902,100 +948,106 @@ class SetModeClass(CheckEventStateClass):
         # conversion = 0.0025
         # realDeceleration = int(self.attr_Deceleration_read)*conversion
         # print('Read motor real maximum deceleration: ', realDeceleration, 'counts/(second*second)')
-        # attr.set_value(int(realDeceleration))  
+        # attr.set_value(int(realDeceleration))
         # attr.set_value(int(self.attr_Deceleration_read))
-        #----- PROTECTED REGION END -----#	//	RWAttributesClass.Deceleration_read
+        # ----- PROTECTED REGION END -----#	//	RWAttributesClass.Deceleration_read
         return self.attr_Deceleration_read
-    def write_Deceleration(self, data): # -> order
+
+    def write_Deceleration(self, data):  # -> order
         '''
         '''
         # self.debug_stream('write_Deceleration()')
         data = self.is_int(data, self.attr_Deceleration_read)
-        #----- PROTECTED REGION ID(RWAttributesClass.Deceleration_write) ENABLED START -----#
-        #print('realDeceleration input is: ', int(data))
-        #self.attr_Deceleration_read = int(data)*400
-        if self.DesiredState==21: # Programmed Position Mode
+        # ----- PROTECTED REGION ID(RWAttributesClass.Deceleration_write) ENABLED START -----#
+        # print('realDeceleration input is: ', int(data))
+        # self.attr_Deceleration_read = int(data)*400
+        if self.DesiredState == 21:  # Programmed Position Mode
             deceleration = data / unit_0xcd
             cmd = self.setParamCmd('0xcd', deceleration)
-            result = self.getValue(cmd) # self.write(cmd)
-        elif self.DesiredState==11: # Programmed Speed Mode
+            result = self.getValue(cmd)  # self.write(cmd)
+        elif self.DesiredState == 11:  # Programmed Speed Mode
             deceleration = data / unit_0x37
             cmd = self.setParamCmd('0x37', deceleration)
-            result = self.getValue(cmd) # self.write(cmd)
+            result = self.getValue(cmd)  # self.write(cmd)
         else:
             print('this is not position/speed mode and the "DesiredState" is {}.{}'.format(self.DesiredState, self.print_log('time_msg')))
             result = 'ERROR'
         self.attr_Deceleration_read = self.setValue(result, data, self.attr_Deceleration_read)
         return result
         # print('Set maximum deceleration to  ', str(deceleration), 'counts/s2.')
-        #----- PROTECTED REGION END -----#	//	RWAttributesClass.Deceleration_write
-    ## ------------------------AttrCurrent------------------------
-    def read_Current(self): # ->actural
+        # ----- PROTECTED REGION END -----#	//	RWAttributesClass.Deceleration_write
+    # ------------------------AttrCurrent------------------------
+
+    def read_Current(self):  # ->actural
         '''
             # 0x0b  R*  Actual Current, D axis of rotor space. Units: 0.01 A.
             # 0x0c  R*  Actual Current, Q axis of rotor space. Units: 0.01 A.
                                 The d axis, also known as the direct axis, is the axis by which flux is produced by the field winding. The q axis, or the quadrature axis is the axis on which torque is produced.
             #* 0x38    R*  Actual Motor Current. Units: 0.01 A. This current is calculated based on both D and Q axis currents.
-            
+
             # A -> mA
         '''
         self.debug_stream('read_Current()')
-        #----- PROTECTED REGION ID(RWAttributesClass.read_Current) ENABLED START -----#
+        # ----- PROTECTED REGION ID(RWAttributesClass.read_Current) ENABLED START -----#
         cmd = self.getParamCmd('0x38')
         data = self.is_int(self.getValue(cmd), self.attr_Current_read)
-        self.attr_Current_read = data * unit_0x38 # mA
-        #----- PROTECTED REGION END -----#	//	RWAttributesClass.read_Current
+        self.attr_Current_read = data * unit_0x38  # mA
+        # ----- PROTECTED REGION END -----#	//	RWAttributesClass.read_Current
         return self.attr_Current_read
-    def write_Current(self, data): # -> attribute
+
+    def write_Current(self, data):  # -> attribute
         '''
             # 0x02  R F Current loop programmed value. Units: 0.01 A.
                                 # This current will be used to command drive when Desired State (0x24) is set to 1.
-            
+
             # 将单位转换成mA
         '''
         # self.debug_stream('write_Current()')
         data = self.is_int(data, self.attr_Current_read)
-        #----- PROTECTED REGION ID(RWAttributesClass.Current_write) ENABLED START -----#
-        if self.DesiredState==1: # Programmed Current Mode
-            current = data / unit_0x02 # mA
+        # ----- PROTECTED REGION ID(RWAttributesClass.Current_write) ENABLED START -----#
+        if self.DesiredState == 1:  # Programmed Current Mode
+            current = data / unit_0x02  # mA
             cmd = self.setParamCmd('0x02', current)
-            result = self.getValue(cmd) # self.write(cmd)
+            result = self.getValue(cmd)  # self.write(cmd)
             self.attr_Current_read = self.setValue(result, data, self.attr_Current_read)
         else:
             print('this is not current mode and the "DesiredState" is {}.{}'.format(self.DesiredState, self.print_log('time_msg')))
             result = 'ERROR'
         return result
-        #----- PROTECTED REGION END -----#	//	RWAttributesClass.Current_write
-    def read_CurrentRamp(self): # ->attribute
+        # ----- PROTECTED REGION END -----#	//	RWAttributesClass.Current_write
+
+    def read_CurrentRamp(self):  # ->attribute
         '''
             # 0x6a  R F Commanded Current Ramp Limit. Units: mA/s. 
                                 # Used when running in Current (Torque) mode. 
                                 # Setting this to zero disables slope limiting.
         '''
         # self.debug_stream('read_CurrentRamp')
-        #----- PROTECTED REGION ID(RWAttributesClass.CurrentRamp_read) ENABLED START -----#
+        # ----- PROTECTED REGION ID(RWAttributesClass.CurrentRamp_read) ENABLED START -----#
         cmd = self.getParamCmd('0x6a')
         data = self.is_int(self.getValue(cmd), self.attr_Current_ramp)
         self.attr_Current_ramp = data * unit_0x6a
-        #----- PROTECTED REGION END -----#	//	RWAttributesClass.CurrentRamp_read
+        # ----- PROTECTED REGION END -----#	//	RWAttributesClass.CurrentRamp_read
         return self.attr_Current_ramp
-    def write_CurrentRamp(self, data): # -> attribute
+
+    def write_CurrentRamp(self, data):  # -> attribute
         '''
         '''
         # self.debug_stream('write_CurrentRamp')
         data = self.is_int(data, self.attr_Current_ramp)
-        #----- PROTECTED REGION ID(RWAttributesClass.CurrentRamp_write) ENABLED START -----#
-        if self.DesiredState==1: # Programmed Current Mode
+        # ----- PROTECTED REGION ID(RWAttributesClass.CurrentRamp_write) ENABLED START -----#
+        if self.DesiredState == 1:  # Programmed Current Mode
             ramp = data / unit_0x6a
             cmd = self.setParamCmd('0x6a', ramp)
-            result = self.getValue(cmd) # self.write(cmd)
+            result = self.getValue(cmd)  # self.write(cmd)
         else:
             print('this is not current mode and the "DesiredState" is {}.{}'.format(self.DesiredState, self.print_log('time_msg')))
             result = 'ERROR'
         self.attr_Current_ramp = self.setValue(result, data, self.attr_Current_ramp)
         return result
-        #----- PROTECTED REGION END -----#	//	RWAttributesClass.CurrentRamp_write
-    ## ------------------------@SetMode------------------------
+        # ----- PROTECTED REGION END -----#	//	RWAttributesClass.CurrentRamp_write
+    # ------------------------@SetMode------------------------
+
     def setInitParameters(self, profile=1, pos=0, vel=0, acc=100, dec=100, cur=0, rap=0):
         '''
             initial parameters and sent to specified mode.
@@ -1006,7 +1058,7 @@ class SetModeClass(CheckEventStateClass):
 
             位置模式下也有速度模式，但是速度模式下能达到的速度值更大。位置模式下过大的速度会出现位置跟随错误，所以虽然位置模式也有速度模式，但是并不能舍弃速度模式。
         '''
-        #----- PROTECTED REGION ID(SetModeClass.setInitParameters) ENABLED START -----#
+        # ----- PROTECTED REGION ID(SetModeClass.setInitParameters) ENABLED START -----#
         if self.Mode == 'Position':
             self.DesiredState = 21
             self.ProfileType = profile
@@ -1026,13 +1078,14 @@ class SetModeClass(CheckEventStateClass):
         elif self.Mode == 'Current':
             # [issue]: 这个初始化的参数会让电机直接动起来
             # 是否应该让这个参数1放在Move()方法中
-            self.DesiredState = 1 # 应该设置为0合适，这里可以不设置为21，和停止不同，这个是初始化
+            self.DesiredState = 1  # 应该设置为0合适，这里可以不设置为21，和停止不同，这个是初始化
             self.attr_Current_read = cur
             self.attr_Current_ramp = rap
             self.setCurrentMode()
         else:
             print('SetInitParameters() is ERROR{}'.format(self.print_log('time_msg')))
-        #----- PROTECTED REGION END -----#	//	SetModeClass.setInitParameters
+        # ----- PROTECTED REGION END -----#	//	SetModeClass.setInitParameters
+
     def setPositionMode(self):
         ''' 
             Sets Programmed Position Mode, Trajectory Profile Mode, position, velocity, acceleration, deceleration.
@@ -1079,8 +1132,8 @@ class SetModeClass(CheckEventStateClass):
             # 0xcf	R F	Trajectory Abort Deceleration. Units: 10 counts/s2.
                                 # If move is aborted, this value will be used by trajectory generator to decelerate to stop.
         '''
-        #----- PROTECTED REGION ID(SetModeClass.setPositionMode) ENABLED START -----#
-        cmd_state = self.write_DesiredState(self.DesiredState) # 21
+        # ----- PROTECTED REGION ID(SetModeClass.setPositionMode) ENABLED START -----#
+        cmd_state = self.write_DesiredState(self.DesiredState)  # 21
         cmd_profile = self.write_Profile(self.ProfileType)
         cmd_pos = self.write_SetPoint(self.attr_SetPoint_read)
         cmd_vel = self.write_Velocity(self.attr_Velocity_read)
@@ -1091,14 +1144,15 @@ class SetModeClass(CheckEventStateClass):
         # [command specific parameters]
         # Command specific parameters are used to provide additional data for a command. If more than one parameter is required, they should be separated by spaces. The remaining sections of this chapter describe the parameters for each command code.
 
-        if cmd_state==cmd_profile==cmd_pos==cmd_vel==cmd_acc==cmd_dec and cmd_state== 'ok':
+        if cmd_state == cmd_profile == cmd_pos == cmd_vel == cmd_acc == cmd_dec and cmd_state == 'ok':
             result = 'ok'
             print('SetPositionMode() is OK{}'.format(self.print_log('time_msg')))
         else:
             result = 'ERROR'
             print('SetPositionMode() is ERROR{}'.format(self.print_log('time_msg')))
-        #----- PROTECTED REGION END -----#	//	SetModeClass.setPositionMode
+        # ----- PROTECTED REGION END -----#	//	SetModeClass.setPositionMode
         return result
+
     def setSpeedMode(self):
         ''' 
             Sets Programmed Speed Mode
@@ -1116,20 +1170,21 @@ class SetModeClass(CheckEventStateClass):
                                 # This current is calculated based on both D and Q axis currents.
             # 0x39	R F	Fast stop ramp. Units: 1000 counts/second2
         '''
-        #----- PROTECTED REGION ID(SetModeClass.setSpeedMode) ENABLED START -----#
-        cmd_state = self.write_DesiredState(self.DesiredState) # 11
+        # ----- PROTECTED REGION ID(SetModeClass.setSpeedMode) ENABLED START -----#
+        cmd_state = self.write_DesiredState(self.DesiredState)  # 11
         cmd_vel = self.write_Velocity(self.attr_Velocity_read)
         cmd_acc = self.write_Acceleration(self.attr_Acceleration_read)
         cmd_dec = self.write_Deceleration(self.attr_Deceleration_read)
 
-        if cmd_state==cmd_vel==cmd_acc==cmd_dec and cmd_state=='ok':
+        if cmd_state == cmd_vel == cmd_acc == cmd_dec and cmd_state == 'ok':
             result = 'ok'
             print('SetSpeedMode() is OK{}'.format(self.print_log('time_msg')))
         else:
             result = 'ERROR'
             print('SetSpeedMode() is ERROR{}'.format(self.print_log('time_msg')))
-        #----- PROTECTED REGION END -----#	//	SetModeClass.setSpeedMode
+        # ----- PROTECTED REGION END -----#	//	SetModeClass.setSpeedMode
         return result
+
     def setCurrentMode(self):
         ''' 
             Sets Programmed Current Mode
@@ -1143,24 +1198,26 @@ class SetModeClass(CheckEventStateClass):
                                 # Used when running in Current (Torque) mode. Setting this to zero disables slope limiting.
             注意：在启用驱动器的同时更改电平和斜坡参数时，请先更改斜坡率。
         '''
-        #----- PROTECTED REGION ID(SetModeClass.setCurrentMode) ENABLED START -----#
-        cmd_state = self.write_DesiredState(self.DesiredState) # 1
+        # ----- PROTECTED REGION ID(SetModeClass.setCurrentMode) ENABLED START -----#
+        cmd_state = self.write_DesiredState(self.DesiredState)  # 1
         cmd_cur = self.write_Current(self.attr_Current_read)
         cmd_rap = self.write_CurrentRamp(self.attr_Current_ramp)
 
-        if cmd_state==cmd_cur==cmd_rap and cmd_state=='ok':
+        if cmd_state == cmd_cur == cmd_rap and cmd_state == 'ok':
             result = 'ok'
             print('SetCurrentMode() is OK{}'.format(self.print_log('time_msg')))
         else:
             result = 'ERROR'
             print('SetCurrentMode() is ERROR{}'.format(self.print_log('time_msg')))
-        #----- PROTECTED REGION END -----#	//	SetModeClass.setCurrentMode
+        # ----- PROTECTED REGION END -----#	//	SetModeClass.setCurrentMode
         return result
+
 
 class MoveMotorClass(SetModeClass):
     '''
         Stop/Move
     '''
+
     def Move(self):
         ''' 
             triggers the motor to move.
@@ -1168,28 +1225,28 @@ class MoveMotorClass(SetModeClass):
             Trajectory Generator Position Command(0xca). Units: Counts.
             This value gives destination position for absolute moves or move distance for relative moves.
             Commanded Position(0x2d_R*). Units: counts. 
-            
+
             [issue]:
             是否考虑要加入其它模式，相对stopMove()函数而言
         '''
-        #----- PROTECTED REGION ID(CopleyControl.Move) ENABLED START -----#
+        # ----- PROTECTED REGION ID(CopleyControl.Move) ENABLED START -----#
         # 这个函数应该是其余的数据都准备好了，然后再来调用的，因为只有一条指令，前面的都是验证是否满足执行的要求
-        if self.Mode=='Position': # 这里不用DesiredState参数，是因为在电流模式初始化的时候，可能设置为0(防止突然启动)
+        if self.Mode == 'Position':  # 这里不用DesiredState参数，是因为在电流模式初始化的时候，可能设置为0(防止突然启动)
             # 1.Relative move
-            if self.ProfileType==256 or self.ProfileType==257:
-                if self.attr_SetPoint_read==0: # 位置差已经消除变为零，但是这个差要从哪里获取，一直读参数吗？
+            if self.ProfileType == 256 or self.ProfileType == 257:
+                if self.attr_SetPoint_read == 0:  # 位置差已经消除变为零，但是这个差要从哪里获取，一直读参数吗？
                     print('The expected position is achieved.{}'.format(self.print_log('time_msg')))
-                elif self.attr_SoftwareCwLimit_read==0 and self.attr_SoftwareCcwLimit_read==0:
+                elif self.attr_SoftwareCwLimit_read == 0 and self.attr_SoftwareCcwLimit_read == 0:
                     # print('NO software limits are set.')
                     # self.setMoveParameters() # MovePostion(self)_Note
                     self.getValue('{} t 1\r'.format(self.NodeID))
-                    self.attr_SetPoint_read = 0 # 是否检测判断一下更好呢
+                    self.attr_SetPoint_read = 0  # 是否检测判断一下更好呢
                 else:
                     status = str(self.dev_status())
-                    current_position = self.getValue('{} g r0x2d\n'.format(self.NodeID)) # Commanded Position(0x2d_R*).
+                    current_position = self.getValue('{} g r0x2d\n'.format(self.NodeID))  # Commanded Position(0x2d_R*).
                     self.targetPosition = int(current_position) + int(self.attr_SetPoint_read)
                     # 首先判断驱动器的状态是否可用，则设定参数，开始执行
-                    if status=='Status is STANDBY' or status=='Positive limit switch Active' or status=='Negative limit switch Active':
+                    if status == 'Status is STANDBY' or status == 'Positive limit switch Active' or status == 'Negative limit switch Active':
                         if self.targetPosition in range(self.attr_SoftwareCcwLimit_read, self.attr_SoftwareCwLimit_read):
                             # print('The expected position ', self.targetPosition, ' is among the range from ', int(self.attr_SoftwareCcwLimit_read), ' to ', int(self.attr_SoftwareCwLimit_read))
                             # self.setMoveParameters() # MovePostion(self)_Note
@@ -1200,19 +1257,19 @@ class MoveMotorClass(SetModeClass):
                     else:
                         print('Check Device State please.{}'.format(self.print_log('time_msg')))
             # 2.Absolute move
-            elif self.ProfileType==0 or self.ProfileType==1:
-                if self.attr_SoftwareCcwLimit_read==0 and self.attr_SoftwareCwLimit_read==0:
+            elif self.ProfileType == 0 or self.ProfileType == 1:
+                if self.attr_SoftwareCcwLimit_read == 0 and self.attr_SoftwareCwLimit_read == 0:
                     # print('NO software limits are set.')
                     # self.setMoveParameters() # MovePostion(self)_Note
                     self.getValue(str('{} t 1\n'.format(self.NodeID)))
                     self.attr_SetPoint_read = 0
                 else:
                     status = str(self.dev_status())
-                    current_position = self.getValue('{} g r0x17\n'.format(self.NodeID)) # 0x2d
+                    current_position = self.getValue('{} g r0x17\n'.format(self.NodeID))  # 0x2d
                     self.targetPosition = int(current_position) + int(self.attr_SetPoint_read)
 
                     if status == 'Status is STANDBY' or status == 'Positive limit switch Active' or status == 'Negative limit switch Active':
-                        if self.targetPosition >=self.attr_SoftwareCcwLimit_read and self.targetPosition <= self.attr_SoftwareCwLimit_read:
+                        if self.targetPosition >= self.attr_SoftwareCcwLimit_read and self.targetPosition <= self.attr_SoftwareCwLimit_read:
                             print('The expected position position ', self.targetPosition, ' is among the range from ', self.attr_SoftwareCcwLimit_read, ' to ', self.attr_SoftwareCwLimit_read)
                             # self.setMoveParameters() # MovePostion(self)_Note
                             self.getValue(str('{} t 1\n'.format(self.NodeID)))
@@ -1222,316 +1279,338 @@ class MoveMotorClass(SetModeClass):
                     else:
                         print('Check Device State please.{}'.format(self.print_log('time_msg')))
             # 3.Velocity move.
-            elif self.ProfileType==2:
+            elif self.ProfileType == 2:
                 # self.setMoveParameters() # MovePostion(self)_Note
                 # cmd_pos = self.setParameterCmd( '0xca', direction) # Velocity move = 1 for positive, -1 for negative.
                 # self.getValue(str(cmd_pos))
                 self.getValue(str('{} t 1\n'.format(self.NodeID)))
         # 这里是作为扩充，只是为了形式上的完整，对于速度模式，只要是速度不为零，即开始运动
-        elif self.Mode=='Speed':
+        elif self.Mode == 'Speed':
             self.write_Velocity(self.attr_Velocity_read)
         # 对于电流模式，只要是0x24设置为1，即开始运动
-        elif self.Mode=='Current':
+        elif self.Mode == 'Current':
             cmd = self.setParamCmd('0x24', 1)
-            result = self.getValue(cmd) # self.write(cmd)
+            result = self.getValue(cmd)  # self.write(cmd)
         else:
             result = 'ERROR'
             print('Check Device State please.{}'.format(self.print_log('time_msg')))
-        #----- PROTECTED REGION END -----#	//	CopleyControl.Move
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.Move
         return result
+
     def StopMove(self):
         ''' 
             stops a movement immediately.
         '''
         # self.debug_stream('StopMove()')
-        #----- PROTECTED REGION ID(CmdMethodsClass.StopMove) ENABLED START -----#
-        if self.Mode=='Position': # Programmed Position Mode
+        # ----- PROTECTED REGION ID(CmdMethodsClass.StopMove) ENABLED START -----#
+        if self.Mode == 'Position':  # Programmed Position Mode
             cmd = self.setParamCmd('t', 0)
-            result1 = self.getValue(cmd) # self.write(cmd)
+            result1 = self.getValue(cmd)  # self.write(cmd)
             cmd = self.setParamCmd('0xcb', 0)
-            result2 = self.getValue(cmd) # self.write(cmd)
-            result = result1 # + result2
-        elif self.Mode == 'Speed': # Programmed Speed Mode
+            result2 = self.getValue(cmd)  # self.write(cmd)
+            result = result1  # + result2
+        elif self.Mode == 'Speed':  # Programmed Speed Mode
             cmd = self.setParamCmd('0x2f', 0)
-            result = self.getValue(cmd) # self.write(cmd)
-        elif self.Mode == 'Current': # Programmed Current Mode
+            result = self.getValue(cmd)  # self.write(cmd)
+        elif self.Mode == 'Current':  # Programmed Current Mode
             # [issue]:
             # 如果突然关闭驱动器可能出现一些问题，比如无法维持当前位置，考虑切换成位置模式
             # 与此同时，要再度开启力矩模式就需要再重设0x24参数，需要更改Move()方法
             cmd = self.setParamCmd('0x24', 21)
-            result = self.getValue(cmd) # self.write(cmd)
+            result = self.getValue(cmd)  # self.write(cmd)
         else:
             print('StopMove() is ERROR.{}'.format(self.print_log('time_msg')))
             result = 'ERROR'
-        #----- PROTECTED REGION END -----#	//	CmdMethodsClass.StopMove
+        # ----- PROTECTED REGION END -----#	//	CmdMethodsClass.StopMove
         return result
-    ## ------------------------Amplifire------------------------
+    # ------------------------Amplifire------------------------
+
     def StopAmplifire(self):
         """
             stop the amplifire
             0x24
         """
         # self.debug_stream('StopMotor()')
-        #----- PROTECTED REGION ID(CmdMethodsClass.StopMotor) ENABLED START -----#
+        # ----- PROTECTED REGION ID(CmdMethodsClass.StopMotor) ENABLED START -----#
         # [issue]:
         # 需要检测一下位置，看看是否发生移动，确保真的停止了
         # 考虑增加一个stopmotor的方法
         # 另外需要检测一下返回值是否是ok
         cmd = self.setParamCmd('0x24', 0)
-        result = self.getValue(cmd) # self.write(cmd)
-        #----- PROTECTED REGION END -----#	//	CmdMethodsClass.StopMotor
+        result = self.getValue(cmd)  # self.write(cmd)
+        # ----- PROTECTED REGION END -----#	//	CmdMethodsClass.StopMotor
         return result
+
     def ResetAmplifire(self):
         ''' 
             `r\n` Reset the amplifier immediately. 
             The amplifier baud rate is set to 9600 when the amplifier restarts.
-            
+
             NOTE: 
                 if a reset command is issued to an amplifier on a multi-drop network, error code 32, 'CAN Network communications failure,' will be received. 
                 This is because the amplifier reset before responding to the gateway amplifier. 
                 This error can be safely ignored in this circumstance.
         '''
-        #----- PROTECTED REGION ID(CmdMethodsClass.ResetMotor) ENABLED START -----#
+        # ----- PROTECTED REGION ID(CmdMethodsClass.ResetMotor) ENABLED START -----#
         cmd = self.setParamCmd('r')
-        result = self.getValue(cmd) # self.write(cmd)
-        #----- PROTECTED REGION END -----#	//	CmdMethodsClass.ResetMotor
+        result = self.getValue(cmd)  # self.write(cmd)
+        # ----- PROTECTED REGION END -----#	//	CmdMethodsClass.ResetMotor
         # [issue]:
         # error code 32, 'CAN Network communications failure'
         return result
 
 # %%
+
+
 class CheckHomeStatueClass(CheckEventStateClass):
-    def read_CwLimit(self): # -> attribute
+    def read_CwLimit(self):  # -> attribute
         '''
             0xb8    R F Positive hardware limit.
                                 2^9 = 512 正限位开关有效(Positive limit switch active)[电机轴已经接触到正限位开关。]
                                 2^10 = 1024 负限位开关有效(Negative limit switch active)[电机轴已经接触到负限位开关。]
-            
+
             [issue]:
             没有制造出这两个状态，但是有16、17；感觉这个9、10应该就是设置了b8、b9
         '''
-        #----- PROTECTED REGION ID(HomingMethodClass.CwLimit_read) ENABLED START -----#  
+        # ----- PROTECTED REGION ID(HomingMethodClass.CwLimit_read) ENABLED START -----#
         value = self.is_int(self.readLatchedEventStatus(), 0)
-        self.attr_CwLimit_read = (int(value)&512)!=0
+        self.attr_CwLimit_read = (int(value) & 512) != 0
         if self.attr_CwLimit_read:
             print('Positive limit switche is active.{}'.format(self.print_log('time_msg')))
-        #----- PROTECTED REGION END -----#	//	HomingMethodClass.CwLimit_read
+        # ----- PROTECTED REGION END -----#	//	HomingMethodClass.CwLimit_read
         return self.attr_CwLimit_read
-    def read_CcwLimit(self): # -> attribute
+
+    def read_CcwLimit(self):  # -> attribute
         '''
             0xb9    R F Negative hardware limit.
         '''
-        #----- PROTECTED REGION ID(HomingMethodClass.CcwLimit_read) ENABLED START -----#  
+        # ----- PROTECTED REGION ID(HomingMethodClass.CcwLimit_read) ENABLED START -----#
         value = self.is_int(self.readLatchedEventStatus(), 0)
-        self.attr_CcwLimit_read = (int(value)&1024)!=0
+        self.attr_CcwLimit_read = (int(value) & 1024) != 0
         if self.attr_CcwLimit_read:
-            print('Negative limit switche is active.{}'.format(self.print_log('time_msg')))   
-        #----- PROTECTED REGION END -----#	//	HomingMethodClass.CcwLimit_read
+            print('Negative limit switche is active.{}'.format(self.print_log('time_msg')))
+        # ----- PROTECTED REGION END -----#	//	HomingMethodClass.CcwLimit_read
         return self.attr_CcwLimit_read
+
     def checkLimit(self):
         '''
             Check the Hardware limit switches.
         '''
-        #----- PROTECTED REGION ID(CopleyControl.programmer_methods) ENABLED START -----#
+        # ----- PROTECTED REGION ID(CopleyControl.programmer_methods) ENABLED START -----#
         # self.clearLatchedStatus()
         value = self.is_int(self.readLatchedEventStatus(), 0)
-        if (int(value)&1536)!=0: # 9/10
+        if (int(value) & 1536) != 0:  # 9/10
             print('Positive and Negative limit switches are active.{}'.format(self.print_log('time_msg')))
             return 3
-        elif (int(value)&512)!=0: # 9
+        elif (int(value) & 512) != 0:  # 9
             print('Positive limit switch is active.{}'.format(self.print_log('time_msg')))
             return 1
-        elif (int(value)&1024)!=0: # 10
+        elif (int(value) & 1024) != 0:  # 10
             print('Negative limit switch is active.{}'.format(self.print_log('time_msg')))
-            return 2 
-        elif int(value)==0 or (int(value)&131072)!=0 or (int(value)&65536)!=0 or (int(value)&67108864)!=0:  
+            return 2
+        elif int(value) == 0 or (int(value) & 131072) != 0 or (int(value) & 65536) != 0 or (int(value) & 67108864) != 0:
             # Bit_17: Negative software limit condition
             # Bit_16: Positive software limit condition
             # Bit_26: Home switch is active
             print('NO limit switch is active.{}'.format(self.print_log('time_msg')))
             return 0
+
     def checkHomeStatus(self):
         '''
             Check the Home Switch status.
         '''
         # self.clearLatchedStatus()
         value = self.is_int(self.readLatchedEventStatus(), 0)
-        if (value&67108864)!=0: # Bit_26: Home switch is active
+        if (value & 67108864) != 0:  # Bit_26: Home switch is active
             print('Home Switch is active.')
             return 1
-        else:            
+        else:
             print('Home Switch is not active.')
             return 0
 
-class SetHomeMethodClass(SetModeClass,CheckHomeStatueClass):
+
+class SetHomeMethodClass(SetModeClass, CheckHomeStatueClass):
     '''
         SoftwareLimit
         HardwareLimit
         Homing
         AttrHardware
     '''
-    ## ------------------------Homing------------------------
-    def read_HomingMethod(self): # -> attribute # 0xc2
+    # ------------------------Homing------------------------
+
+    def read_HomingMethod(self):  # -> attribute # 0xc2
         '''
             0xc2    R F Homing Method Configuration.
         '''
-        #----- PROTECTED REGION ID(CopleyControl.HomingMethod_read) ENABLED START -----#
+        # ----- PROTECTED REGION ID(CopleyControl.HomingMethod_read) ENABLED START -----#
         cmd = self.getParamCmd('0xc2')
         homing = self.is_int(self.getValue(cmd), self.attr_HomingMethod_read)
-        if self.DesiredState==21:
+        if self.DesiredState == 21:
             self.attr_HomingMethod_read = homing
-            argout = BitsMapped_HM('0xC2', homing) # -> str
+            argout = BitsMapped_HM('0xC2', homing)  # -> str
         else:
             argout = 'ERROR'
             print('The Desired State is {}, doesn`t position mode.{}'.format(self.print_log('time_msg')))
         print('The homing method is {}'.format(argout, self.print_log('time_msg')))
-        #----- PROTECTED REGION END -----#	//	CopleyControl.HomingMethod_read
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.HomingMethod_read
         return self.attr_HomingMethod_read
-    def write_HomingMethod(self, data): # -> attribute
+
+    def write_HomingMethod(self, data):  # -> attribute
         '''
             0xc2
 
             [512, 544, 560, 513, 529, 545, 561, 514, 530, 546, 562, 610, 626, 516, 532, 548, 564, 771, 787, 515, 531, 803, 819, 867, 883, 547, 563, 611, 627,15]
         '''
         data = self.is_int(data, self.attr_HomingMethod_read)
-        #----- PROTECTED REGION ID(CopleyControl.HomingMethod_write) ENABLED START -----#
-        HomeRefNrList = [512, 544, 560, 513, 529, 545, 561, 514, 530, 546, 562, 610, 626, 516, 532, 548, 564, 771, 787, 515, 531, 803, 819, 867, 883, 547, 563, 611, 627,15]
+        # ----- PROTECTED REGION ID(CopleyControl.HomingMethod_write) ENABLED START -----#
+        HomeRefNrList = [512, 544, 560, 513, 529, 545, 561, 514, 530, 546, 562, 610, 626, 516, 532, 548, 564, 771, 787, 515, 531, 803, 819, 867, 883, 547, 563, 611, 627, 15]
         if data in HomeRefNrList:
             cmd = self.setParamCmd('0xc2', data)
             result = self.getValue(cmd)
         else:
             result = 'ERROR'
             print('Input home reference number: {} is not valid.{}'.format(data, self.print_log('time_msg')))
-        
+
         self.attr_HomingMethod_read = self.setValue(result, data, self.attr_HomingMethod_read)
-        #----- PROTECTED REGION END -----#	//	CopleyControl.HomingMethod_write
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.HomingMethod_write
         return result
-    def read_HomingVelocityFast(self): # -> attribute # 0xc3
+
+    def read_HomingVelocityFast(self):  # -> attribute # 0xc3
         """
             0xc3    R F Homing Velocity (fast moves). Units: 0.1 counts/s.
                                 This velocity value is used during segments of homing procedure that may be handled at high speed. Generally, this means moves in which home sensor is being located, but edge of sensor is not being found.
         """
         # self.debug_stream('read_HomingVelocityFast()')
-        #----- PROTECTED REGION ID(HomingMethodClass.read_HomingVelocityFast) ENABLED START -----#
+        # ----- PROTECTED REGION ID(HomingMethodClass.read_HomingVelocityFast) ENABLED START -----#
         cmd = self.getParamCmd('0xc3')
         data = self.is_int(self.getValue(cmd), self.attr_HomingVelocityFast_read)
         self.attr_HomingVelocityFast_read = data * unit_0xc3
-        #----- PROTECTED REGION END -----#	//	HomingMethodClass.read_HomingVelocityFast
+        # ----- PROTECTED REGION END -----#	//	HomingMethodClass.read_HomingVelocityFast
         return self.attr_HomingVelocityFast_read
-    def write_HomingVelocityFast(self, data): # -> attribute
+
+    def write_HomingVelocityFast(self, data):  # -> attribute
         '''
         '''
         # self.debug_stream('write_HomingVelocityFast()')
         data = self.is_int(data, self.attr_HomingVelocityFast_read)
-        #----- PROTECTED REGION ID(RWAttributesClass.write_HomingVelocityFast) ENABLED START -----#
+        # ----- PROTECTED REGION ID(RWAttributesClass.write_HomingVelocityFast) ENABLED START -----#
         velocity = data / unit_0xc3
         cmd = self.setParamCmd('0xc3', velocity)
-        result = self.getValue(cmd) # self.write(cmd)
+        result = self.getValue(cmd)  # self.write(cmd)
         self.attr_HomingVelocityFast_read = self.setValue(result, data, self.attr_HomingVelocityFast_read)
         # print('set homing velocity fast to  ', str(velocity), 'counts/s.'.format(self.print_log('time_msg')))
-        #----- PROTECTED REGION END -----#	//	RWAttributesClass.write_HomingVelocityFast
+        # ----- PROTECTED REGION END -----#	//	RWAttributesClass.write_HomingVelocityFast
         return result
-    def read_HomingVelocitySlow(self): # -> attribute # 0xc4
+
+    def read_HomingVelocitySlow(self):  # -> attribute # 0xc4
         """
             0xc4    R F Homing Velocity (slow moves). Units: 0.1 counts/s.
                                 This velocity value is used for homing segments that require low speed, such as cases where edge of a homing sensor is being sought.
         """
         # self.debug_stream('read_HomingVelocitySlow()')
-        #----- PROTECTED REGION ID(HomingMethodClass.read_HomingVelocitySlow) ENABLED START -----#
+        # ----- PROTECTED REGION ID(HomingMethodClass.read_HomingVelocitySlow) ENABLED START -----#
         cmd = self.getParamCmd('0xc4')
         data = self.is_int(self.getValue(cmd), self.attr_HomingVelocitySlow_read)
         self.attr_HomingVelocitySlow_read = data * unit_0xc4
-        #----- PROTECTED REGION END -----#	//	HomingMethodClass.read_HomingVelocitySlow
+        # ----- PROTECTED REGION END -----#	//	HomingMethodClass.read_HomingVelocitySlow
         return self.attr_HomingVelocitySlow_read
-    def write_HomingVelocitySlow(self, data): # -> attribute
+
+    def write_HomingVelocitySlow(self, data):  # -> attribute
         '''
             0xc4
         '''
         # self.debug_stream('write_HomingVelocitySlow()')
         data = self.is_int(data, self.attr_HomingVelocitySlow_read)
-        #----- PROTECTED REGION ID(RWAttributesClass.write_HomingVelocitySlow) ENABLED START -----#
+        # ----- PROTECTED REGION ID(RWAttributesClass.write_HomingVelocitySlow) ENABLED START -----#
         velocity = data / unit_0xc4
         cmd = self.setParamCmd('0xc4', velocity)
-        result = self.getValue(cmd) # self.write(cmd)
+        result = self.getValue(cmd)  # self.write(cmd)
         self.attr_HomingVelocitySlow_read = self.setValue(result, data, self.attr_HomingVelocityFast_read)
         # print('set homing velocity slow to  ', str(velocity), 'counts/s.'.format(self.print_log('time_msg')))
-        #----- PROTECTED REGION END -----#	//	RWAttributesClass.write_HomingVelocitySlow
+        # ----- PROTECTED REGION END -----#	//	RWAttributesClass.write_HomingVelocitySlow
         return result
-    def read_HomingAccDec(self): # -> attribute # 0xc5
+
+    def read_HomingAccDec(self):  # -> attribute # 0xc5
         """
             0xc5    R F Homing Acceleration/Deceleration. Units: 10 counts/s2.
                                 This value defines acceleration used for all homing moves. Same value is used at beginning and ending of moves (i.e. no separate deceleration value).
         """
         # self.debug_stream('read_HomingAccDec()')
-        #----- PROTECTED REGION ID(HomingMethodClass.read_HomingAccDec) ENABLED START -----#
+        # ----- PROTECTED REGION ID(HomingMethodClass.read_HomingAccDec) ENABLED START -----#
         cmd = self.getParamCmd('0xc5')
         data = self.is_int(self.getValue(cmd), self.attr_HomingAccDec_read)
         self.attr_HomingAccDec_read = data * unit_0xc5
-        #----- PROTECTED REGION END -----#	//	HomingMethodClass.read_HomingAccDec
+        # ----- PROTECTED REGION END -----#	//	HomingMethodClass.read_HomingAccDec
         return self.attr_HomingAccDec_read
-    def write_HomingAccDec(self, data): # -> attribute
+
+    def write_HomingAccDec(self, data):  # -> attribute
         # self.debug_stream('write_HomingAccDec()')
         data = self.is_int(data, self.attr_HomingAccDec_read)
-        #----- PROTECTED REGION ID(RWAttributesClass.write_HomingAccDec) ENABLED START -----#
+        # ----- PROTECTED REGION ID(RWAttributesClass.write_HomingAccDec) ENABLED START -----#
         accdec = data / unit_0xc5
         cmd = self.setParamCmd('0xc5', accdec)
-        result = self.getValue(cmd) # self.write(cmd)
+        result = self.getValue(cmd)  # self.write(cmd)
         self.attr_HomingAccDec_read = self.setValue(result, data, self.attr_HomingAccDec_read)
         # print('set homing acc\dec to  ', str(accdec), 'counts/s2.'.format(self.print_log('time_msg')))
-        #----- PROTECTED REGION END -----#	//	RWAttributesClass.write_HomingAccDec
+        # ----- PROTECTED REGION END -----#	//	RWAttributesClass.write_HomingAccDec
         return result
-    def read_HomeOffset(self): # -> attribute # 0xc6/0
+
+    def read_HomeOffset(self):  # -> attribute # 0xc6/0
         '''
             0xc6    R F Home Offset. Units: counts.
                 Home offset is difference between zero position for application and machine home position (found during homing). Once homing is completed, new zero position determined by homing state machine will be located sensor position plus this offset. All subsequent absolute moves shall be taken relative to this new zero position.
-            
+
             默认值为0，这个数值可以忽略
         '''
         # self.debug_stream('read_HomeOffset()')
-        #----- PROTECTED REGION ID(HomingMethodClass.HomeOffset_read) ENABLED START -----#
+        # ----- PROTECTED REGION ID(HomingMethodClass.HomeOffset_read) ENABLED START -----#
         cmd = self.getParamCmd('0xc6')
         self.attr_HomeOffset_read = self.is_int(self.getValue(cmd), self.attr_HomeOffset_read)
-        #----- PROTECTED REGION END -----#	//	HomingMethodClass.HomeOffset_read
+        # ----- PROTECTED REGION END -----#	//	HomingMethodClass.HomeOffset_read
         return self.attr_HomeOffset_read
+
     def write_HomeOffset(self, data):
         '''
         '''
         # self.debug_stream('write_HomeOffset()')
-        #----- PROTECTED REGION ID(HomingMethodClass.HomeOffset_write) ENABLED START -----#
+        # ----- PROTECTED REGION ID(HomingMethodClass.HomeOffset_write) ENABLED START -----#
         data = self.is_int(data, self.attr_HomeOffset_read)
         cmd = self.setParamCmd('0xc6', data)
         result = self.getValue(cmd)
 
         self.attr_HomeOffset_read = self.setValue(result, data, self.attr_HomeOffset_read)
-        #----- PROTECTED REGION END -----#	//	HomingMethodClass.HomeOffset_write
+        # ----- PROTECTED REGION END -----#	//	HomingMethodClass.HomeOffset_write
         return result
-    def read_HomingCurrentLimit(self): # -> attribute # 0xc7
+
+    def read_HomingCurrentLimit(self):  # -> attribute # 0xc7
         """
             0xc7    R F Homing Current Limit. Units: 0.01 A.
                                 Used in Home to Hard Stop mode only, this current is used to determine when drive has reached end of travel (hard stop). Used in conjunction with Home to Hard Stop Delay Time (0xBF).
-            
+
             unit: A -> mA
         """
         # self.debug_stream('read_HomingCurrentLimit()')
-        #----- PROTECTED REGION ID(HomingMethodClass.read_HomingCurrentLimit) ENABLED START -----#
+        # ----- PROTECTED REGION ID(HomingMethodClass.read_HomingCurrentLimit) ENABLED START -----#
         cmd = self.getParamCmd('0xc7')
         data = self.is_int(self.getValue(cmd), self.attr_HomingCurrentLimit_read)
         self.attr_HomingCurrentLimit_read = data * unit_0xc7
-        #----- PROTECTED REGION END -----#	//	HomingMethodClass.read_HomingCurrentLimit
+        # ----- PROTECTED REGION END -----#	//	HomingMethodClass.read_HomingCurrentLimit
         return self.attr_HomingCurrentLimit_read
-    def write_HomingCurrentLimit(self, data): # -> attribute
+
+    def write_HomingCurrentLimit(self, data):  # -> attribute
         # self.debug_stream('write_HomingCurrentLimit()')
         data = self.is_int(data, self.attr_HomingCurrentLimit_read)
-        #----- PROTECTED REGION ID(RWAttributesClass.write_HomingCurrentLimit) ENABLED START -----#
+        # ----- PROTECTED REGION ID(RWAttributesClass.write_HomingCurrentLimit) ENABLED START -----#
         curlimit = data / unit_0xc7
         cmd = self.setParamCmd('0xc7', curlimit)
-        result = self.getValue(cmd) # self.write(cmd)
+        result = self.getValue(cmd)  # self.write(cmd)
         self.attr_HomingCurrentLimit_read = self.setValue(result, data, self.attr_HomingCurrentLimit_read)
         # print('set homing current limit to  ', str(curlimit), 'mA.'.format(self.print_log('time_msg')))
-        #----- PROTECTED REGION END -----#	//	RWAttributesClass.write_HomingCurrentLimit
+        # ----- PROTECTED REGION END -----#	//	RWAttributesClass.write_HomingCurrentLimit
         return result
-    ## ------------------------SoftwareLimit------------------------
-    def read_SoftwareCwLimit(self): # -> attribute # 0xb8
+    # ------------------------SoftwareLimit------------------------
+
+    def read_SoftwareCwLimit(self):  # -> attribute # 0xb8
         '''
             0xb8    R F Positive Software Limit value. Units: counts. 
                 This parameter is only available on drives that support trajectory generation and homing. 
@@ -1539,18 +1618,19 @@ class SetHomeMethodClass(SetModeClass,CheckHomeStatueClass):
                 Set to less than negative software limit to disable.
         '''
         # self.debug_stream('In read_SoftwareCwLimit()')
-        #----- PROTECTED REGION ID(HomingMethodClass.SoftwareCwLimit_read) ENABLED START -----#
+        # ----- PROTECTED REGION ID(HomingMethodClass.SoftwareCwLimit_read) ENABLED START -----#
         cmd = self.getParamCmd('0xb8')
         self.attr_SoftwareCwLimit_read = self.is_int(self.getValue(cmd), self.attr_SoftwareCwLimit_read)
-        #----- PROTECTED REGION END -----#	//	HomingMethodClass.SoftwareCwLimit_read
+        # ----- PROTECTED REGION END -----#	//	HomingMethodClass.SoftwareCwLimit_read
         return self.attr_SoftwareCwLimit_read
-    def write_SoftwareCwLimit(self, data): # -> attribute
+
+    def write_SoftwareCwLimit(self, data):  # -> attribute
         '''
             0xb8
         '''
         # self.debug_stream('In write_SoftwareCwLimit()')
         data = self.is_int(data, self.attr_SoftwareCwLimit_read)
-        #----- PROTECTED REGION ID(HomingMethodClass.SoftwareCwLimit_write) ENABLED START -----#
+        # ----- PROTECTED REGION ID(HomingMethodClass.SoftwareCwLimit_write) ENABLED START -----#
         # print('SoftwareCwLimit:', data, 'current position: ', self.attr_Position_read, 'Ccwlimit: ', self.attr_SoftwareCcwLimit_read, 'Cwlimit: ', self.attr_SoftwareCwLimit_read)
         self.targetPosition = self.attr_Position_read + self.attr_SetPoint_read
         if self.targetPosition in range(self.attr_SoftwareCcwLimit_read, data):
@@ -1560,23 +1640,25 @@ class SetHomeMethodClass(SetModeClass,CheckHomeStatueClass):
             result = 'ERROR'
             print('SoftwareCwLimit must be higher than `current Position` + `current SetPoint`.{}'.format(self.print_log('time_msg')))
         self.attr_SoftwareCwLimit_read = self.setValue(result, data, self.attr_SoftwareCwLimit_read)
-        #----- PROTECTED REGION END -----#	//	HomingMethodClass.SoftwareCwLimit_write
+        # ----- PROTECTED REGION END -----#	//	HomingMethodClass.SoftwareCwLimit_write
         return result
-    def read_SoftwareCcwLimit(self): # -> attribute # 0xb9
+
+    def read_SoftwareCcwLimit(self):  # -> attribute # 0xb9
         '''
             # 0xb9 R F  Negative Software Limit. Units: counts. 
                 Software limits are only in effect after drive has been referenced (i.e. homing has been successfully completed). Set to greater than positive software limit to disable.
         '''
-        #----- PROTECTED REGION ID(HomingMethodClass.read_SoftwareCcwLimit) ENABLED START -----#
+        # ----- PROTECTED REGION ID(HomingMethodClass.read_SoftwareCcwLimit) ENABLED START -----#
         cmd = self.getParamCmd('0xb9')
         self.attr_SoftwareCcwLimit_read = self.is_int(self.getValue(cmd), self.attr_SoftwareCcwLimit_read)
-        #----- PROTECTED REGION END -----#	//	HomingMethodClass.read_SoftwareCcwLimit
+        # ----- PROTECTED REGION END -----#	//	HomingMethodClass.read_SoftwareCcwLimit
         return self.attr_SoftwareCcwLimit_read
-    def write_SoftwareCcwLimit(self, data): # -> attribute
+
+    def write_SoftwareCcwLimit(self, data):  # -> attribute
         '''
         '''
         data = self.is_int(data, self.attr_SoftwareCcwLimit_read)
-        #----- PROTECTED REGION ID(HomingMethodClass.write_SoftwareCcwLimit) ENABLED START -----#
+        # ----- PROTECTED REGION ID(HomingMethodClass.write_SoftwareCcwLimit) ENABLED START -----#
         self.targetPosition = self.attr_Position_read + self.attr_SetPoint_read
         if data < self.targetPosition:
             cmd = self.setParamCmd('0xb9', data)
@@ -1584,89 +1666,97 @@ class SetHomeMethodClass(SetModeClass,CheckHomeStatueClass):
         else:
             result = 'ERROR'
             print('SoftwareCcwLimit must be smaller than `Position` + `SetPoint`.{}'.format(self.print_log('time_msg')))
-        
+
         self.setValue(result, data, self.attr_SoftwareCcwLimit_read)
-        #----- PROTECTED REGION END -----#	//	HomingMethodClass.write_SoftwareCcwLimit
+        # ----- PROTECTED REGION END -----#	//	HomingMethodClass.write_SoftwareCcwLimit
         return result
-    def read_SoftwareCwDialLimit(self): # -> attribute # 0xb8
+
+    def read_SoftwareCwDialLimit(self):  # -> attribute # 0xb8
         '''
             0xb8    R F Positive Software Limit value. Units: counts. 
                 This parameter is only available on drives that support trajectory generation and homing. 
                 Software limits are only in effect after drive has been referenced (i.e. homing has been successfully completed). 
                 Set to less than negative software limit to disable.
         '''
-        #----- PROTECTED REGION ID(CopleyControl.SoftwareCwDialLimit_read) ENABLED START -----#
+        # ----- PROTECTED REGION ID(CopleyControl.SoftwareCwDialLimit_read) ENABLED START -----#
         self.attr_SoftwareCwLimit_read = self.read_SoftwareCwLimit()
         self.attr_SoftwareCwDialLimit_read = int(float(self.attr_SoftwareCwLimit_read) / float(self.attr_Conversion_read))
-        #----- PROTECTED REGION END -----#	//	CopleyControl.SoftwareCwDialLimit_read
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.SoftwareCwDialLimit_read
         return self.attr_SoftwareCwDialLimit_read
-    def write_SoftwareCwDialLimit(self, data): # -> attribute
+
+    def write_SoftwareCwDialLimit(self, data):  # -> attribute
         '''
         '''
         data = self.is_int(data, self.attr_SoftwareCwDialLimit_read)
-        #----- PROTECTED REGION ID(CopleyControl.SoftwareCwDialLimit_write) ENABLED START -----#
+        # ----- PROTECTED REGION ID(CopleyControl.SoftwareCwDialLimit_write) ENABLED START -----#
         self.attr_SoftwareCwLimit_read = self.attr_Conversion_read * data
         cmd = self.setParamCmd('0xb8', self.attr_SoftwareCwLimit_read)
         result = self.getValue(cmd)
 
         self.attr_SoftwareCwDialLimit_read = self.setValue(result, data, self.attr_SoftwareCwDialLimit_read)
-        #----- PROTECTED REGION END -----#	//	CopleyControl.SoftwareCwDialLimit_write
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.SoftwareCwDialLimit_write
         return result
-    def read_SoftwareCcwDialLimit(self): # -> attribute # 0xb9
+
+    def read_SoftwareCcwDialLimit(self):  # -> attribute # 0xb9
         '''
             0xb9    R F Negative Software Limit. Units: counts. 
                 Software limits are only in effect after drive has been referenced (i.e. homing has been successfully completed). 
                 Set to greater than positive software limit to disable.
         '''
-        #----- PROTECTED REGION ID(CopleyControl.SoftwareCcwDialLimit_read) ENABLED START -----#
+        # ----- PROTECTED REGION ID(CopleyControl.SoftwareCcwDialLimit_read) ENABLED START -----#
         self.attr_SoftwareCcwLimit_read = self.read_SoftwareCcwLimit()
         self.attr_SoftwareCcwDialLimit_read = int(float(self.attr_SoftwareCcwLimit_read) / float(self.attr_Conversion_read))
-        #----- PROTECTED REGION END -----#	//	CopleyControl.SoftwareCcwDialLimit_read
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.SoftwareCcwDialLimit_read
         return self.attr_SoftwareCcwDialLimit_read
-    def write_SoftwareCcwDialLimit(self, data): # -> attribute
+
+    def write_SoftwareCcwDialLimit(self, data):  # -> attribute
         '''
         '''
         data = self.is_int(data, self.attr_SoftwareCcwDialLimit_read)
-        #----- PROTECTED REGION ID(CopleyControl.SoftwareCcwDialLimit_write) ENABLED START -----#
+        # ----- PROTECTED REGION ID(CopleyControl.SoftwareCcwDialLimit_write) ENABLED START -----#
         self.attr_SoftwareCcwLimit_read = self.attr_Conversion_read * data
         cmd = self.setParamCmd('0xb9', self.attr_SoftwareCcwLimit_read)
         result = self.getValue(cmd)
 
         self.attr_SoftwareCcwDialLimit_read = self.setValue(result, data, self.attr_SoftwareCcwDialLimit_read)
-        #----- PROTECTED REGION END -----#	//	CopleyControl.SoftwareCcwDialLimit_write
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.SoftwareCcwDialLimit_write
         return result
-    ## ------------------------HardwareLimit------------------------
-    def read_attr_hardware(self): # -> attribute
+    # ------------------------HardwareLimit------------------------
+
+    def read_attr_hardware(self):  # -> attribute
         self.debug_stream('read_attr_hardware()')
-        #----- PROTECTED REGION ID(HomingMethodClass.read_attr_hardware) ENABLED START -----#
-        #----- PROTECTED REGION END -----#	//	HomingMethodClass.read_attr_hardware
-    def read_CurrentDelayTime(self): # -> attribute # 0xbf(->0xc7)/250
+        # ----- PROTECTED REGION ID(HomingMethodClass.read_attr_hardware) ENABLED START -----#
+        # ----- PROTECTED REGION END -----#	//	HomingMethodClass.read_attr_hardware
+
+    def read_CurrentDelayTime(self):  # -> attribute # 0xbf(->0xc7)/250
         """
             0xbf    R F Home to Hard Stop Delay Time. Units: ms. 
                                 When performing home to hard stop, drive will push against stop for this long before sampling home position.
             0xc7
         """
         # self.debug_stream('read_CurrentDelayTime()')
-        #----- PROTECTED REGION ID(HomingMethodClass.read_CurrentDelayTime) ENABLED START -----#
+        # ----- PROTECTED REGION ID(HomingMethodClass.read_CurrentDelayTime) ENABLED START -----#
         cmd = self.getParamCmd('0xc3')
         data = self.is_int(self.getValue(cmd), self.attr_CurrentDelayTime_read)
         self.attr_CurrentDelayTime_read = data
-        #----- PROTECTED REGION END -----#	//	HomingMethodClass.read_CurrentDelayTime
+        # ----- PROTECTED REGION END -----#	//	HomingMethodClass.read_CurrentDelayTime
         return self.attr_CurrentDelayTime_read
-    def write_CurrentDelayTime(self, data): # -> attribute
+
+    def write_CurrentDelayTime(self, data):  # -> attribute
         '''
             0xbf
         '''
         # self.debug_stream('write_CurrentDelayTime()')
         data = self.is_int(data, self.attr_CurrentDelayTime_read)
-        #----- PROTECTED REGION ID(RWAttributesClass.write_CurrentDelayTime) ENABLED START -----#
+        # ----- PROTECTED REGION ID(RWAttributesClass.write_CurrentDelayTime) ENABLED START -----#
         cmd = self.setParamCmd('0xc3', data)
-        result = self.getValue(cmd) # self.write(cmd)
+        result = self.getValue(cmd)  # self.write(cmd)
         self.attr_CurrentDelayTime_read = self.setValue(result, data, self.attr_CurrentDelayTime_read)
         # print('set current delay time to  ', str(data), 'ms.'.format(self.print_log('time_msg')))
-        #----- PROTECTED REGION END -----#	//	RWAttributesClass.write_CurrentDelayTime
+        # ----- PROTECTED REGION END -----#	//	RWAttributesClass.write_CurrentDelayTime
         return result
-    ## ------------------------setHomeParam------------------------
+    # ------------------------setHomeParam------------------------
+
     def setHomeParams(self, homing=512):
         '''
             Set the Homing parameters using the input Homing method value
@@ -1715,32 +1805,33 @@ class SetHomeMethodClass(SetModeClass,CheckHomeStatueClass):
 
             t 2               Execute homing. Assumes all homing parameters have been previously set.
         '''
-        self.attr_HomingMethod_read = self.is_int(homing, 512) # 512: Set Current Position as Home.
+        self.attr_HomingMethod_read = self.is_int(homing, 512)  # 512: Set Current Position as Home.
 
-        cmd_DesiredState = self.write_DesiredState(self.DesiredState) # 0x24/21
-        cmd_HomingMethod = self.write_HomingMethod(self.attr_HomingMethod_read) # 0xc2
-        cmd_FastVelocity = self.write_HomingVelocityFast(self.attr_HomingVelocityFast_read) # 0xc3=Velocity
-        cmd_SlowVelocity = self.write_HomingVelocitySlow(self.attr_HomingVelocitySlow_read) # 0xc4=3333
-        cmd_Acceleration = self.write_HomingAccDec(self.attr_HomingAccDec_read) # 0xc5=acc
-        cmd_HomeOffset = self.write_HomeOffset(self.attr_HomeOffset_read) # 0xc6=0
-        cmd_CurrentLimit = self.write_HomingCurrentLimit(self.attr_HomingCurrentLimit_read) # 0xc7=173、19mA
-        cmd_PositiveSoftwareLimit = self.write_SoftwareCwLimit(self.attr_SoftwareCwLimit_read) # 0xb8
-        cmd_NegativeSoftwareLimit = self.write_SoftwareCcwLimit(self.attr_SoftwareCcwLimit_read) # 0xb9
-        cmd_ProfileMode = self.write_Profile(self.ProfileType) # 0xc8
+        cmd_DesiredState = self.write_DesiredState(self.DesiredState)  # 0x24/21
+        cmd_HomingMethod = self.write_HomingMethod(self.attr_HomingMethod_read)  # 0xc2
+        cmd_FastVelocity = self.write_HomingVelocityFast(self.attr_HomingVelocityFast_read)  # 0xc3=Velocity
+        cmd_SlowVelocity = self.write_HomingVelocitySlow(self.attr_HomingVelocitySlow_read)  # 0xc4=3333
+        cmd_Acceleration = self.write_HomingAccDec(self.attr_HomingAccDec_read)  # 0xc5=acc
+        cmd_HomeOffset = self.write_HomeOffset(self.attr_HomeOffset_read)  # 0xc6=0
+        cmd_CurrentLimit = self.write_HomingCurrentLimit(self.attr_HomingCurrentLimit_read)  # 0xc7=173、19mA
+        cmd_PositiveSoftwareLimit = self.write_SoftwareCwLimit(self.attr_SoftwareCwLimit_read)  # 0xb8
+        cmd_NegativeSoftwareLimit = self.write_SoftwareCcwLimit(self.attr_SoftwareCcwLimit_read)  # 0xb9
+        cmd_ProfileMode = self.write_Profile(self.ProfileType)  # 0xc8
         # [issue]:
         # 不确定这个数值对归位方法有什么影响，这里用的write_Position会有什么影响，还需要考虑
         # cmd_Position = self.write_Position(self.attr_Position_read) # 0
 
-        if cmd_DesiredState==cmd_HomingMethod==cmd_FastVelocity==\
-            cmd_SlowVelocity==cmd_Acceleration==cmd_HomeOffset==\
-            cmd_CurrentLimit==cmd_PositiveSoftwareLimit==cmd_NegativeSoftwareLimit==\
-            cmd_ProfileMode==cmd_ProfileMode and cmd_DesiredState=='ok':
+        if cmd_DesiredState == cmd_HomingMethod == cmd_FastVelocity ==\
+                cmd_SlowVelocity == cmd_Acceleration == cmd_HomeOffset ==\
+                cmd_CurrentLimit == cmd_PositiveSoftwareLimit == cmd_NegativeSoftwareLimit ==\
+                cmd_ProfileMode == cmd_ProfileMode and cmd_DesiredState == 'ok':
             result = 'ok'
             print('SetHomeParams() is OK.{}'.format(self.print_log('time_msg')))
         else:
             print('SetHomeParams() is ERROR.{}'.format(self.print_log('time_msg')))
-            result = 'ERROR'        
+            result = 'ERROR'
         return result
+
 
 class MoveHomeClass(SetHomeMethodClass):
     '''
@@ -1748,18 +1839,20 @@ class MoveHomeClass(SetHomeMethodClass):
         properties: 由设备中的名称标识。通常，设备属性用于提供一种配置设备的方法。
         commands: 也由名称标识。命令执行时可能接收或不接收参数，并且可能会返回值。
     '''
-    ## ------------------------MoveHome/Limit------------------------
+    # ------------------------MoveHome/Limit------------------------
+
     def MoveHome(self):
         ''' 
             executes the homing procedure.
         '''
         # self.debug_stream('In MoveHome()')
         argout = ''
-        #----- PROTECTED REGION ID(CopleyControl.MoveHome) ENABLED START -----#
+        # ----- PROTECTED REGION ID(CopleyControl.MoveHome) ENABLED START -----#
         cmd = self.setParamCmd('t', 2)
         argout = self.getValue(cmd)
-        #----- PROTECTED REGION END -----#	//	CopleyControl.MoveHome
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.MoveHome
         return argout
+
     def MoveToCwLimit(self):
         '''
             moves the motor until the CW limit is reached (positive step direction). 
@@ -1767,15 +1860,16 @@ class MoveHomeClass(SetHomeMethodClass):
             StopMove works.
         '''
         argout = 0
-        #----- PROTECTED REGION ID(CopleyControl.MoveToCwLimit) ENABLED START -----#
+        # ----- PROTECTED REGION ID(CopleyControl.MoveToCwLimit) ENABLED START -----#
         limitStatus = self.checkLimit()
-        if limitStatus != 1: # Positive limit switch is active.
-            self.getValue(self.setParamCmd('0xc2', 516)) # Hard Stop - Positive
+        if limitStatus != 1:  # Positive limit switch is active.
+            self.getValue(self.setParamCmd('0xc2', 516))  # Hard Stop - Positive
             self.MoveHome()
         else:
             print('Check Device State please.{}'.format(self.print_log('time_msg')))
-        #----- PROTECTED REGION END -----#	//	CopleyControl.MoveToCwLimit
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.MoveToCwLimit
         return argout
+
     def MoveToCcwLimit(self):
         '''
             moves the motor until the CcW limit is reached (negative step direction). 
@@ -1783,66 +1877,71 @@ class MoveHomeClass(SetHomeMethodClass):
             StopMove works.
         '''
         argout = 0
-        #----- PROTECTED REGION ID(CopleyControl.MoveToCcwLimit) ENABLED START -----#
+        # ----- PROTECTED REGION ID(CopleyControl.MoveToCcwLimit) ENABLED START -----#
         limitStatus = self.checkLimit()
-        if limitStatus != 2: # Negative limit switch is active.
-            self.getValue(self.setParamCmd('0xc2', 532)) # Hard Stop - Negative
+        if limitStatus != 2:  # Negative limit switch is active.
+            self.getValue(self.setParamCmd('0xc2', 532))  # Hard Stop - Negative
             self.MoveHome()
         else:
             print('Check Device State please.{}'.format(self.print_log('time_msg')))
-        #----- PROTECTED REGION END -----#	//	CopleyControl.MoveToCcwLimit
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.MoveToCcwLimit
         return argout
 
 # %%
-class CopleyControlClass(MoveMotorClass,MoveHomeClass):
+
+
+class CopleyControlClass(MoveMotorClass, MoveHomeClass):
     '''
         Copley Control Class
     '''
 # ------------------------------------------------------------------------------------------------
 #                  CopleyControl Initial Device
 # ------------------------------------------------------------------------------------------------
+
     def __init__(self, PortID, NodeID, Mode):
-        #----- PROTECTED REGION ID(CopleyControl.__init__) ENABLED START -----#
-        super(CopleyControlClass,self).__init__(PortID=PortID, NodeID=NodeID, Mode=Mode)
+        # ----- PROTECTED REGION ID(CopleyControl.__init__) ENABLED START -----#
+        super(CopleyControlClass, self).__init__(PortID=PortID, NodeID=NodeID, Mode=Mode)
         self.inits_param()
         self.inits_device()
         # CopleyControlClass.init_device(self)
-        #----- PROTECTED REGION END -----#	//	CopleyControl.__init__
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.__init__
+
     def __str__(self):
         msg = 'Copley Control Class'
         return msg
+
     def inits_param(self):
         # inits the device
         # self.debug_stream('In init_device()') # Sends the given message to the tango debug stream.
-        self.attr_Position_read = 0 # 0x17: Limited position. targetPosition = Position + SetPoint
-        self.attr_SetPoint_read = 0 # 0xca: Trajectory Generator Position Command(0xca).
+        self.attr_Position_read = 0  # 0x17: Limited position. targetPosition = Position + SetPoint
+        self.attr_SetPoint_read = 0  # 0xca: Trajectory Generator Position Command(0xca).
         self.attr_DialPosition_read = 0
-        self.attr_Conversion_read = 1 # The ratio between the position and the dial position. The default value is 1.0
-        self.attr_Velocity_read = 0 # 0x18: Actual velocity. 这里将0xcb替换成了0x18
-        self.attr_Acceleration_read = 0 # 0xcc: Maximum acceleration rate.
-        self.attr_Deceleration_read = 0 # 0xcd: Maximum deceleration rate.
-        self.attr_Current_read = 0 # 0x02: Programmed current value.
-        self.attr_Current_ramp = 0 # 0x6a: Current ramp limit.
+        self.attr_Conversion_read = 1  # The ratio between the position and the dial position. The default value is 1.0
+        self.attr_Velocity_read = 0  # 0x18: Actual velocity. 这里将0xcb替换成了0x18
+        self.attr_Acceleration_read = 0  # 0xcc: Maximum acceleration rate.
+        self.attr_Deceleration_read = 0  # 0xcd: Maximum deceleration rate.
+        self.attr_Current_read = 0  # 0x02: Programmed current value.
+        self.attr_Current_ramp = 0  # 0x6a: Current ramp limit.
 
-        self.attr_SoftwareCwLimit_read = 0 # 0xb8: Positive Software Limit
-        self.attr_SoftwareCcwLimit_read = 0 # 0xb9: Negative Software Limit
+        self.attr_SoftwareCwLimit_read = 0  # 0xb8: Positive Software Limit
+        self.attr_SoftwareCcwLimit_read = 0  # 0xb9: Negative Software Limit
         self.attr_SoftwareCwDialLimit_read = 0
         self.attr_SoftwareCcwDialLimit_read = 0
-        self.attr_CwLimit_read = False # Positive limit switche is active
-        self.attr_CcwLimit_read = False # Negative limit switche is active
+        self.attr_CwLimit_read = False  # Positive limit switche is active
+        self.attr_CcwLimit_read = False  # Negative limit switche is active
 
         self.attr_HomingMethod_read = 0  # 0xc2 归位方法
-        self.attr_HomingVelocityFast_read = 0 # 0xc3
-        self.attr_HomingVelocitySlow_read = 0 # 0xc4
-        self.attr_HomingAccDec_read = 0 # 0xc5
-        self.attr_HomeOffset_read = 0 # 0xc6: Home Offset.
-        self.attr_HomingCurrentLimit_read = 0 # 0xc7(0xbf)
-        self.attr_CurrentDelayTime_read = 250 # 0xbf(0xc7)/ms
-        
+        self.attr_HomingVelocityFast_read = 0  # 0xc3
+        self.attr_HomingVelocitySlow_read = 0  # 0xc4
+        self.attr_HomingAccDec_read = 0  # 0xc5
+        self.attr_HomeOffset_read = 0  # 0xc6: Home Offset.
+        self.attr_HomingCurrentLimit_read = 0  # 0xc7(0xbf)
+        self.attr_CurrentDelayTime_read = 250  # 0xbf(0xc7)/ms
+
         self.argout = 'UNKNOWN'
-        #----- PROTECTED REGION ID(CopleyControl.init_device) ENABLED START -----#
+        # ----- PROTECTED REGION ID(CopleyControl.init_device) ENABLED START -----#
         self.DesiredState = 11
-        self.ProfileType = 0 # 0xc8: Give trajectory profile mode(0xc8). Bits: *0\1\*256\257\*2
+        self.ProfileType = 0  # 0xc8: Give trajectory profile mode(0xc8). Bits: *0\1\*256\257\*2
 
         self.targetPosition = 0
         self.attr_SetPoint_read = 0
@@ -1851,25 +1950,29 @@ class CopleyControlClass(MoveMotorClass,MoveHomeClass):
         self.attr_Deceleration_read = 500
         self.attr_Current_read = 0
         self.attr_Current_ramp = 0
+
     def inits_device(self):
         InitialDeviceClass.connectSerial(self, baud=defaultBaud, timeout=defaultTimeout)
         # InitialDeviceClass.changeSerialSpeed(self, baud=highBaud)
         # self.setInitParameters() # 由于涉及参数较多，直接在调用函数中传参，另外可以考虑将其单独作为了一个Class
-        #----- PROTECTED REGION END -----#	//	CopleyControl.init_device
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.init_device
+
     def delete_device(self):
         # self.debug_stream('In delete_device()')
         # ----- PROTECTED REGION ID(CopleyControl.delete_device) ENABLED START -----#
         print('Delete Device.{}'.format(self.print_log('time_msg')))
-        #----- PROTECTED REGION END -----#	//	CopleyControl.delete_device
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.delete_device
+
     def always_executed_hook(self):
         # self.debug_stream('In always_excuted_hook()')
-        #----- PROTECTED REGION ID(CopleyControl.always_executed_hook) ENABLED START -----#
+        # ----- PROTECTED REGION ID(CopleyControl.always_executed_hook) ENABLED START -----#
         pass
-        #----- PROTECTED REGION END -----#	//	CopleyControl.always_executed_hook
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.always_executed_hook
 
 
 def main():
     copleycontrol = CopleyControlClass()
+
 
 if __name__ == '__main__':
     main()

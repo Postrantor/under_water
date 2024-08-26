@@ -32,6 +32,8 @@ from sensor_msgs.msg import Imu, MagneticField
 NodeName = 'Package_Function'
 
 # %% class
+
+
 class PackageFunctions():
     '''
         docstring
@@ -39,18 +41,21 @@ class PackageFunctions():
 # ==================================================
 #                                            Inital_Parameter
 # ==================================================
+
     def __init__(self):
         self.inits_node()
         self.inits_parameter()
+
     def inits_node(self):
-    # Initial Node
+        # Initial Node
         rospy.init_node('Sensor_Fan_Publisher', anonymous=False, log_level=rospy.INFO, disable_signals=False)
     # Advertise Subscriber
         self.package1_sub = rospy.Subscriber('cmd_start', function1_msg, self.callback_msg)
     # Advertise Publisher
         self.package2_pub = rospy.Publisher('fan', function2_msg, queue_size=1)
+
     def inits_parameter(self):
-    # Object
+        # Object
         self.fan = hardware_lib.PCA9685()
     # Msg
         self.fan_msg = function_msg()
@@ -60,20 +65,23 @@ class PackageFunctions():
 # ==================================================
 #                                            Callback_Msg
 # ==================================================
+
     def callback_msg(self, msg):
         self.data_1 = msg.data1
         self.data_2 = msg.data2
 # ==================================================
 #                                            Callback_Func
 # ==================================================
+
     def update_callback(self):
         self.data_1 = self.data_1
         self.data_2 = self.data_2
 # ==================================================
 #                                            Publisher_Msg
 # ==================================================
+
     def update_msg(self):
-    # Header
+        # Header
         self.function_msg.header.stamp = rospy.Time.now()
         self.function_msg.header.frame_id = self.frame_name
         # self.fan_msg.header.seq = self.seq
@@ -86,6 +94,7 @@ class PackageFunctions():
 # ==================================================
 #                                                 @main
 # ==================================================
+
     def spin(self):
         rospy.loginfo('# Start::%s::%s #', NodeName, rospy.Time.now())
         rate = rospy.Rate(self.rate)
@@ -98,11 +107,14 @@ class PackageFunctions():
 
     def shutdown_node(self):
         rospy.loginfo('# Stop::%s::%s #', NodeName, rospy.Time.now())
-        
-# %% 
+
+# %%
+
+
 def main():
     Package = PackageFunctions()
     Package.spin()
+
 
 if __name__ == '__main__':
     main()

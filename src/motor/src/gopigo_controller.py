@@ -19,16 +19,15 @@
 '''
 
 # %%
-import rospy
-import roslib
-import RPi.GPIO as GPIO
 # Messages
-from std_msgs.msg import Float32
-
 
 
 # %%
 # 定义引脚常量
+import rospy
+import roslib
+import RPi.GPIO as GPIO
+from std_msgs.msg import Float32
 L298N_IN1_left = 23
 L298N_IN2_left = 24
 L298N_IN3_right = 21
@@ -49,21 +48,20 @@ GPIO.setup(L298N_IN4_right, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(L298N_ENAB, GPIO.OUT, initial=GPIO.HIGH)
 
 # 创建一个 pwm 实例，需要两个参数：
-    # 第一个是 GPIO 引脚号，该引脚（L298N_ENAB）与 A Enable 相连；
-    # 第二个是频率(HZ)，影响电机的响应速度
+# 第一个是 GPIO 引脚号，该引脚（L298N_ENAB）与 A Enable 相连；
+# 第二个是频率(HZ)，影响电机的响应速度
 pwm = GPIO.PWM(L298N_ENAB, 80)
-# 以输出 75%占空比(duty cycle)开始，影响电机的转速
+#  以输出 75%占空比(duty cycle)开始，影响电机的转速
 pwm.start(75)
-
 
 
 # %%
 # 向GoPiGo电机发出命令以达到目标速度
 # 使用PID比较基于编码器读数的误差
 class ControlsToMotors:
-# ==================================================
-#                                                初始化
-# ==================================================
+    # ==================================================
+    #                                                初始化
+    # ==================================================
     def __init__(self):
         rospy.init_node('gopigo_controller')
     # 从参数服务器获取数据
@@ -86,14 +84,14 @@ class ControlsToMotors:
 
     # Publisher: 发布机器人运动控制命令
         # 暂时注释掉该段，因为涉及到gopigo包
-            # self.gopigo_on = rospy.get_param('~gopigo_on', True)
-            # if self.gopigo_on:
-            #     import gopigo3 as gopigo
-            #     # 注册一个退出函数，在解释器正常终止时自动执行，一般用来做一些资源清理的操作
-            #     # 所以，这个是用来在到达目标位置的时候停止机器人的吗？
-            #     # 考虑一下，将该语句替换成发布的速度为0，可是之前在/diffdrive_controller中已经添加了一个发布速度为零的功能
-            #     import atexit
-            #     atexit.register(gopigo.stop)
+        # self.gopigo_on = rospy.get_param('~gopigo_on', True)
+        # if self.gopigo_on:
+        #     import gopigo3 as gopigo
+        #     # 注册一个退出函数，在解释器正常终止时自动执行，一般用来做一些资源清理的操作
+        #     # 所以，这个是用来在到达目标位置的时候停止机器人的吗？
+        #     # 考虑一下，将该语句替换成发布的速度为0，可是之前在/diffdrive_controller中已经添加了一个发布速度为零的功能
+        #     import atexit
+        #     atexit.register(gopigo.stop)
         # 1.声明一个Publisher，发布电机的角速度控制命令，由发布的Twist消息转换成的运动速度，同样都仅仅是指令
         self.lwheel_angular_vel_target_pub = rospy.Publisher('lwheel_angular_vel_target', Float32, queue_size=10)
         self.rwheel_angular_vel_target_pub = rospy.Publisher('rwheel_angular_vel_target', Float32, queue_size=10)
@@ -138,13 +136,18 @@ class ControlsToMotors:
     # 从回调函数 -> 车轮转速(wheel_tangent_vel_target = msg.data)
     # 这个左右两个轮子的数据是否可以合并到一个函数里面来订阅，这个分开太麻烦了
     # 另外，这个回调函数仅仅是读入订阅的数据，太亏了吧，考虑把上面的赋值为零的处理合并进来
+
+
     def lwheel_tangent_vel_target_callback(self, msg):
         self.lwheel_tangent_vel_target = msg.data
+
     def rwheel_tangent_vel_target_callback(self, msg):
         self.rwheel_tangent_vel_target = msg.data
     # 从回调函数 -> 编码器读数(wheel_angular_vel_enc = msg.data)
+
     def lwheel_angular_vel_enc_callback(self, msg):
         self.lwheel_angular_vel_enc = msg.data
+
     def rwheel_angular_vel_enc_callback(self, msg):
         self.rwheel_angular_vel_enc = msg.data
 
@@ -154,7 +157,9 @@ class ControlsToMotors:
 # ==================================================
     # 车轮的切线速度 -> 车轮的角速度(angular velocity target)，在/diffdrive_odom中有相反的变换
     # return angular_vel
-    #- 这个地方就是/diffdrive_controller中的update()没有处理完，可以放到/diff中，其他地方没有引用这个中间数据
+    # - 这个地方就是/diffdrive_controller中的update()没有处理完，可以放到/diff中，其他地方没有引用这个中间数据
+
+
     def tangentvel_2_angularvel(self, tangent_vel):
         # v = wr
         # v - tangential velocity (m/s)
@@ -168,20 +173,20 @@ class ControlsToMotors:
     # reutrn target_new = target + control_signal
         # 需要好好看看这个target，为什么可以和编码器的读数直接运算
     def pid_control(self, wheel_pid, target, state):
-    # 初始化PID参数：时间、微分、积分、前项差分、差分
+        # 初始化PID参数：时间、微分、积分、前项差分、差分
         if len(wheel_pid) == 0:
-            wheel_pid.update({'time_prev': rospy.Time.now(), 'derivative': 0, 'integral': [0]*10, 'error_prev': 0, 'error_curr': 0})
+            wheel_pid.update({'time_prev': rospy.Time.now(), 'derivative': 0, 'integral': [0] * 10, 'error_prev': 0, 'error_curr': 0})
     # 计算 dt = time_curr - time_prev
         wheel_pid['time_curr'] = rospy.Time.now()
         wheel_pid['dt'] = (wheel_pid['time_curr'] - wheel_pid['time_prev']).to_sec()
-        if wheel_pid['dt'] == 0: # 这个判断是干吗用的？
+        if wheel_pid['dt'] == 0:  # 这个判断是干吗用的？
             return 0
     # 计算P、I、D
-        wheel_pid['error_curr']   = target - state # wheel_vel_target - wheel_enc
-        wheel_pid['error_prev']  = wheel_pid['error_curr']
-        wheel_pid['integral']       = wheel_pid['integral'][1:] + [(wheel_pid['error_curr']*wheel_pid['dt'])]
-        wheel_pid['derivative']   = (wheel_pid['error_curr'] - wheel_pid['error_prev']) / wheel_pid['dt']
-        control_signal = (self.Kp*wheel_pid['error_curr'] + self.Ki*sum(wheel_pid['integral']) + self.Kd*wheel_pid['derivative'])
+        wheel_pid['error_curr'] = target - state  # wheel_vel_target - wheel_enc
+        wheel_pid['error_prev'] = wheel_pid['error_curr']
+        wheel_pid['integral'] = wheel_pid['integral'][1:] + [(wheel_pid['error_curr'] * wheel_pid['dt'])]
+        wheel_pid['derivative'] = (wheel_pid['error_curr'] - wheel_pid['error_prev']) / wheel_pid['dt']
+        control_signal = (self.Kp * wheel_pid['error_curr'] + self.Ki * sum(wheel_pid['integral']) + self.Kd * wheel_pid['derivative'])
         # 确保符号，计算的PID控制信号(control_signal)的符号没有翻转(does not flip sign)
         target_new = target + control_signal
         if target > 0 and target_new < 0:
@@ -190,7 +195,7 @@ class ControlsToMotors:
             target_new = target
         if (target == 0):  # Not moving
             target_new = 0
-            return target_new # 执行到`return`语句之后会退出函数，之后的语句不再执行
+            return target_new  # 执行到`return`语句之后会退出函数，之后的语句不再执行
     # 更新一下时间，返回目标速度
         wheel_pid['time_prev'] = wheel_pid['time_curr']
         return target_new
@@ -202,6 +207,8 @@ class ControlsToMotors:
 # 1.将计算的角速度(wheel_angular_vel_target) -> 电机控制指令(wheel_angular_vel_motor)[0, 100]
     # input wheel_angular_vel_target
     # return wheel_angular_vel_motor([0, 100])
+
+
     def angularvel_2_motorcmd(self, angular_vel_target):
         if angular_vel_target == 0:
             # 程序执行到return之后就会跳出
@@ -232,12 +239,12 @@ class ControlsToMotors:
     # motorcmd_2_robot()主要功能是将int[0, 100] -> PWM发送给电机，由wheel_update()进行调用
     def motorcmd_2_robot(self, wheel='left', motor_command=0):
         pwm.ChangeDutyCycle(int(abs(motor_command)))
-        if wheel == 'left': # 左轮
-            if motor_command > 0: # 正转
+        if wheel == 'left':  # 左轮
+            if motor_command > 0:  # 正转
                 GPIO.output(L298N_IN1_left, GPIO.HIGH)
                 GPIO.output(L298N_IN2_left, GPIO.LOW)
                 print '左轮 - 正转'
-            elif motor_command < 0: # 反转
+            elif motor_command < 0:  # 反转
                 GPIO.output(L298N_IN1_left, GPIO.LOW)
                 GPIO.output(L298N_IN2_left, GPIO.HIGH)
                 print '左轮 - 反转'
@@ -245,12 +252,12 @@ class ControlsToMotors:
                 GPIO.output(L298N_IN1_left, GPIO.LOW)
                 GPIO.output(L298N_IN2_left, GPIO.LOW)
                 print '停止'
-        if wheel == 'right': # 右轮
-            if motor_command > 0: # 正转
+        if wheel == 'right':  # 右轮
+            if motor_command > 0:  # 正转
                 GPIO.output(L298N_IN3_right, GPIO.HIGH)
                 GPIO.output(L298N_IN4_right, GPIO.LOW)
                 print '右轮 - 正转'
-            elif motor_command < 0: # 反转
+            elif motor_command < 0:  # 反转
                 GPIO.output(L298N_IN3_right, GPIO.LOW)
                 GPIO.output(L298N_IN4_right, GPIO.HIGH)
                 print '右轮 - 反转'
@@ -265,8 +272,10 @@ class ControlsToMotors:
 # ==================================================
 # 更新并发布电机的控制指令：左轮
     # 左轮和右轮是否可以合并，写一个通用的方法调用，虽然没有节省太多，但是还是有必要的
+
+
     def lwheel_update(self):
-    # 1.计算并发布目标的角速度(target angular velocity)，根据运动控制命令转换的
+        # 1.计算并发布目标的角速度(target angular velocity)，根据运动控制命令转换的
         self.lwheel_angular_vel_target = self.tangentvel_2_angularvel(self.lwheel_tangent_vel_target)
         self.lwheel_angular_vel_target_pub.publish(self.lwheel_angular_vel_target)
     # 1.调用PID控制器结合订阅的编码器读数来调整目标的角速度，并将控制速度发布出去
@@ -282,7 +291,7 @@ class ControlsToMotors:
 
 # 更新并发布电机的控制指令：右轮
     def rwheel_update(self):
-    # 1.计算并发布电机的角速度(target angular velocity)
+        # 1.计算并发布电机的角速度(target angular velocity)
         self.rwheel_angular_vel_target = self.tangentvel_2_angularvel(self.rwheel_tangent_vel_target)
         self.rwheel_angular_vel_target_pub.publish(self.rwheel_angular_vel_target)
     # 1.通过PID控制器结合订阅的编码器读数来调整目标的角速度，并将控制速度发布出去
@@ -297,13 +306,14 @@ class ControlsToMotors:
         self.motorcmd_2_robot('right', rwheel_motor_cmd)
 
 
-
 # %%
 # ==================================================
 #                                         主函数(main)
 # ==================================================
     # 开启gopigo_controller，进行while循环
     # 当短时间内没有运动控制指令时，停止机器人
+
+
     def spin(self):
         rospy.loginfo("开启gopigo_controller")
         rate = rospy.Rate(self.rate)
@@ -328,12 +338,10 @@ class ControlsToMotors:
         rospy.sleep(1)
 
 
-
 # %%
 def main():
     controls_to_motors = ControlsToMotors()
     controls_to_motors.spin()
-
 
 
 if __name__ == '__main__':

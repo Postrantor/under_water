@@ -28,7 +28,6 @@ import rospy
 from std_msgs.msg import Int32
 
 
-
 # %% 声明一个counter话题，并且许可其他节点订阅：
 # 初始化节点
 rospy.init_node('topic_publisher')
@@ -40,7 +39,6 @@ rospy.init_node('topic_publisher')
 # 使用latched参数将其标记为锁存话题，即，订阅者在完成订阅之后将会自动获取到话题上发布的最后一个消息
 # pub = rospy.Publisher('map', nav_msgs/OccupancyGrid, latched=Ture)
 pub = rospy.Publisher('counter', Int32, queue_size=10)
-
 
 
 # %% 对声明的counter话题上发布消息，设定频率为2Hz：
@@ -55,7 +53,6 @@ while not rospy.is_shutdown():
     pub.publish(count)
     count += 1
     rate.sleep()
-
 
 
 # %% 使用’rostopic‘检查已经发布的节点相关信息：

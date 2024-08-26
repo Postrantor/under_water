@@ -27,6 +27,8 @@ from copley.msg import ucr_msg
 from tools_lib.debug_stream import DebugSteam
 
 # %% class
+
+
 class ReadBag(DebugSteam):
     def print_topic(self):
         '''
@@ -41,28 +43,32 @@ class ReadBag(DebugSteam):
         # 获取bag中的话题信息
         bag_info = rosbag.Bag(path_bag, mode='r')
         info_dict = yaml.load(bag_info._get_yaml_info(), Loader=yaml.FullLoader)
-            # {'end': 1630480726.396359, 'compression': 'none', 'topics': [{'topic': 'Impedance/wing', 'type': 'copley/ucr_msg', 'frequency': 10.4162, 'messages': 85}], 'messages': 85, 'start': 1630480718.009544, 'version': 2.0, 'types': [{'type': 'copley/ucr_msg', 'md5': '697cf9df9ce516a16d261952c472d294'}], 'indexed': True, 'path': '/home/ubuntu/catkin_ws/bag/202191/1518/Impedance/wing_2021911518.bag', 'duration': 8.386815, 'size': 21026}
+        # {'end': 1630480726.396359, 'compression': 'none', 'topics': [{'topic': 'Impedance/wing', 'type': 'copley/ucr_msg', 'frequency': 10.4162, 'messages': 85}], 'messages': 85, 'start': 1630480718.009544, 'version': 2.0, 'types': [{'type': 'copley/ucr_msg', 'md5': '697cf9df9ce516a16d261952c472d294'}], 'indexed': True, 'path': '/home/ubuntu/catkin_ws/bag/202191/1518/Impedance/wing_2021911518.bag', 'duration': 8.386815, 'size': 21026}
         # 打印bag中的话题信息
         bag_messages = bag_info.read_messages(topics=[info_dict['topics'][0]['topic']])
         path_csv = '/home/ubuntu/catkin_ws/csv/topic_02.csv'
-        bag_csv = open(path_csv,'w')
+        bag_csv = open(path_csv, 'w')
         try:
             writer = csv.writer(bag_csv)
-            writer.writerow(['seq','secs','vel_l','vel_r'])
+            writer.writerow(['seq', 'secs', 'vel_l', 'vel_r'])
             for topic, msg, t in bag_messages:
                 secs_nsecs = float("{}.{}".format(msg.header.stamp.secs, msg.header.stamp.nsecs)) - info_dict['start']
-                writer.writerow([msg.header.seq, 
-                                            secs_nsecs, 
-                                            msg.velocity.drive.motor_l, 
-                                            msg.velocity.drive.motor_r,])
+                writer.writerow([msg.header.seq,
+                                 secs_nsecs,
+                                 msg.velocity.drive.motor_l,
+                                 msg.velocity.drive.motor_r,])
         except rosbag.bag.ROSBagFormatException as error:
             error
         finally:
             bag_info.close()
             bag_csv.close()
 # %%
+
+
 def main():
     read_bag = ReadBag()
     read_bag.print_topic()
+
+
 if __name__ == '__main__':
     main()

@@ -26,32 +26,36 @@ NodeName = 'Sensor_Depth_Publisher'
 PublisherNameDepth = 'sensor/depth'
 
 # %% class
+
+
 class DepthPublisherNode(BagPathClass):
-# ==================================================
-#                                                Initial_Parameters
-# ==================================================
+    # ==================================================
+    #                                                Initial_Parameters
+    # ==================================================
     def __init__(self):
         self.inits_node()
         self.inits_parameter()
+
     def inits_node(self):
-    # Initial Node
+        # Initial Node
         rospy.init_node(NodeName, anonymous=False, log_level=rospy.INFO, disable_signals=False)
     # Advertise Publisher
         self.depth_pub = rospy.Publisher(PublisherNameDepth, ms5837_msg, queue_size=10)
     # Bag
         self.bag = self.bag_path(PublisherNameDepth)
+
     def inits_parameter(self):
-    # Sample
+        # Sample
         self.rate = rospy.get_param('/sensor/depth/rate', 5)
     # Object
         self.depth = ms5837_lib.MS5837_30BA()
         # self.depth = ms5837_lib.MS5837_02BA()
-        #self.depth = ms5837_lib.MS5837(model=ms5837_lib.MS5837_MODEL_30BA, bus=0) # Specify model and bus
+        # self.depth = ms5837_lib.MS5837(model=ms5837_lib.MS5837_MODEL_30BA, bus=0) # Specify model and bus
     # Msg_Publisher
         self.depth_msg = ms5837_msg()
         self.frame_name = rospy.get_param('/sensor/depth/frame_name', PublisherNameDepth)
 # ==================================================
-#                                         Algorithm_Smooth 
+#                                         Algorithm_Smooth
 # ==================================================
     # 等同于MATLAB中的smooth函数，但是平滑窗口必须为奇数。
     # yy = smooth(y) smooths the data in the column vector y ..
@@ -61,17 +65,18 @@ class DepthPublisherNode(BagPathClass):
     # yy(3) = (y(1) + y(2) + y(3) + y(4) + y(5))/5
     # yy(4) = (y(2) + y(3) + y(4) + y(5) + y(6))/5
     # ...
+
     def smooth(self, a, WSZ):
         # a:原始数据，NumPy 1-D array containing the data to be smoothed
-        # 必须是1-D的，如果不是，请使用 np.ravel()或者np.squeeze()转化 
+        # 必须是1-D的，如果不是，请使用 np.ravel()或者np.squeeze()转化
         # WSZ: smoothing window size needs, which must be odd number,
         # as in the original MATLAB implementation
-        out0 = np.convolve(a,np.ones(WSZ,dtype=float),'valid')/WSZ
-        r = np.arange(1,WSZ-1,2)
-        start = np.cumsum(a[:WSZ-1])[::2]/r
-        stop = (np.cumsum(a[:-WSZ:-1])[::2]/r)[::-1]
-        
-        return np.concatenate(( start , out0, stop ))
+        out0 = np.convolve(a, np.ones(WSZ, dtype=float), 'valid') / WSZ
+        r = np.arange(1, WSZ - 1, 2)
+        start = np.cumsum(a[:WSZ - 1])[::2] / r
+        stop = (np.cumsum(a[:-WSZ:-1])[::2] / r)[::-1]
+
+        return np.concatenate((start, out0, stop))
     # another one，边缘处理的不好
     """
     def movingaverage(data, window_size):
@@ -89,15 +94,16 @@ class DepthPublisherNode(BagPathClass):
 # ==================================================
 #                                              Callback_Func
 # ==================================================
+
     def update_callback(self):
         self.depth.read()
     # Pressure
-        self.depth_mbar = self.depth.pressure(ms5837_lib.UNITS_mbar) # Default is mbar (no arguments)
-        self.depth_atm = self.depth.pressure(ms5837_lib.UNITS_atm) # Request atm
-        self.depth_Pa = self.depth.pressure(ms5837_lib.UNITS_Pa) # Request Pa
+        self.depth_mbar = self.depth.pressure(ms5837_lib.UNITS_mbar)  # Default is mbar (no arguments)
+        self.depth_atm = self.depth.pressure(ms5837_lib.UNITS_atm)  # Request atm
+        self.depth_Pa = self.depth.pressure(ms5837_lib.UNITS_Pa)  # Request Pa
     # Temperature
-        self.depth_Centigrade = self.depth.temperature(ms5837_lib.UNITS_Centigrade) # Default is degrees C (no arguments)
-        self.depth_Farenheit = self.depth.temperature(ms5837_lib.UNITS_Farenheit) # Request Farenheit
+        self.depth_Centigrade = self.depth.temperature(ms5837_lib.UNITS_Centigrade)  # Default is degrees C (no arguments)
+        self.depth_Farenheit = self.depth.temperature(ms5837_lib.UNITS_Farenheit)  # Request Farenheit
         self.depth_Kelvin = self.depth.temperature(ms5837_lib.UNITS_Kelvin)
     # Depth
         self.depth_FreshWater = self.depth.depth(ms5837_lib.DENSITY_FRESHWATER)
@@ -108,8 +114,9 @@ class DepthPublisherNode(BagPathClass):
 # ==================================================
 #                                           Update_Msg
 # ==================================================
+
     def update_msg(self):
-    # Header
+        # Header
         self.depth_msg.header.stamp = rospy.Time.now()
         self.depth_msg.header.frame_id = self.frame_name
         # self.depth_msg.header.seq = self.seq
@@ -131,11 +138,13 @@ class DepthPublisherNode(BagPathClass):
         self.depth_pub.publish(self.depth_msg)
     # Bag
         self.bag.write(PublisherNameDepth, self.depth_msg)
+
     def bag_close(self):
         self.bag.close()
 # ==================================================
 #                                           @main
 # ==================================================
+
     def spin(self):
         rospy.loginfo('# Start::%s::%s #', NodeName, time.asctime())
         rate = rospy.Rate(self.rate)
@@ -145,15 +154,19 @@ class DepthPublisherNode(BagPathClass):
             self.update_msg()
             rate.sleep()
         rospy.spin()
+
     def shutdown_node(self):
         rospy.loginfo('# Stop::%s::%s #', NodeName, time.asctime())
         self.bag_close()
         rospy.sleep(1)
 
 # %%
+
+
 def main():
     depth_sensor = DepthPublisherNode()
     depth_sensor.spin()
+
 
 if __name__ == '__main__':
     main()

@@ -1,7 +1,8 @@
 # -*- coding:utf-8 -*-
 
 # %% import
-import time, os
+import time
+import os
 # Math
 # import pandas as pd
 import numpy as np
@@ -43,7 +44,7 @@ class Trajectory_Tracking_SMC(ControllerPositionClass, ControllerHeadingClass,
             [cos(phi - theta), 0],
             [-(1 / rho) * sin(phi - theta), 0],
             [0, 1],
-        ])  #@式(12)
+        ])  # @式(12)
         dot_q = S_q * z
         q = q_prev + dot_q * delta_t
         return q, dot_q
@@ -54,8 +55,10 @@ class Trajectory_Tracking_SMC(ControllerPositionClass, ControllerHeadingClass,
         '''
         u_init = self.Position(q_c, dot_q_c, q_r, dot_q_r, delta_t)
         self.z_c = self.z_r + u_init  # @式(21)
-        if self.z_c[0, 0] > .6: self.z_c[0, 0] = .6
-        if self.z_c[0, 0] <= -.6: self.z_c[0, 0] = -.6
+        if self.z_c[0, 0] > .6:
+            self.z_c[0, 0] = .6
+        if self.z_c[0, 0] <= -.6:
+            self.z_c[0, 0] = -.6
 
     # %%
     def update(self, q_c, q_r):

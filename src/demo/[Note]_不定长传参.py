@@ -16,7 +16,7 @@ class demo():
         # a = 1
         # b = 2
         # args = (3, 4, 5)
-        # kwargs: 
+        # kwargs:
         # p = 8
         # m = 6
         # n = 7
@@ -27,7 +27,7 @@ class demo():
     # a = 1
     # b = 2
     # args = (3, 4, 5)
-    # kwargs: 
+    # kwargs:
     # p = 8
     # m = 6
     # n = 7
@@ -37,6 +37,7 @@ class demo():
     # b = 2
     # args = ((3, 4, 5), {'p': 8, 'm': 6, 'n': 7})
     # kwargs:
+
 
 if __name__ == '__main__':
     demo1 = demo()

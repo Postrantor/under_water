@@ -8,7 +8,7 @@ from numpy import sin, cos, matrix, diag, absolute, sign, tanh, exp
 Q = diag([10., 10.])
 P = diag([1., 1.])
 k_0 = 1.1
-K_pos = diag([1.8, 1.8, 2.])  #line
+K_pos = diag([1.8, 1.8, 2.])  # line
 # K_pos = diag([1., 1., .002])  #point
 # K_pos = diag([2., 2., .5])  #curve
 # K_pos = diag([4., 4., 1.])  #circle
@@ -38,8 +38,10 @@ class ControllerPositionClass(object):
 
     def matrix_S_inv(self, dev, q):
         q_1, q_2, q_3 = q[0, 0], q[1, 0], q[2, 0]
-        if dev >= 0: sgn = diag([1, 1])
-        if dev < 0: sgn = diag([1, -1])
+        if dev >= 0:
+            sgn = diag([1, 1])
+        if dev < 0:
+            sgn = diag([1, -1])
         S_inv = matrix([
             [(cos(q_2 - q_3)), (-q_1 * sin(q_2 - q_3)), (0)],
             [(sin(q_2 - q_3)), (q_1 * cos(q_2 - q_3)), (1)],
@@ -48,9 +50,9 @@ class ControllerPositionClass(object):
 
     def sliding_func(self, S_inv_c, k_0, q_c, q_e, dot_q_e):
         s_q = dot_q_e + K_pos * q_e  # @式(14)
-        s_sgn = diag([k_0,(k_0/q_c[0,0]),0]) * \
-                self.sgn(q_e) * \
-                fabs(s_q[2,0]) # s_theta
+        s_sgn = diag([k_0, (k_0 / q_c[0, 0]), 0]) * \
+            self.sgn(q_e) * \
+            fabs(s_q[2, 0])  # s_theta
         s = S_inv_c * (s_q + s_sgn)  # @式(17)
         s_temp = S_inv_c * s_sgn
         # d_s_temp = (s_temp - s_temp_prev) / delta_t
@@ -60,7 +62,7 @@ class ControllerPositionClass(object):
                             s_temp, delta_t):
         '''已经积分'''
         u_init =\
-        S_inv_c * (dot_q_r - K_pos * q_e) * 2
+            S_inv_c * (dot_q_r - K_pos * q_e) * 2
         # +S_inv_c * (dot_q_r - K * q_e)
         -S_inv_r * dot_q_r * 2
         # -S_inv_r * dot_q_r
@@ -91,6 +93,7 @@ class ControllerHeadingClass(object):
         # return sign(x)
         # return (x)/(2.+absolute(x))
         # return 1./(1.+exp(-x))
+
     def Heading(self, q_c, q_r, dot_q_c, dot_q_r, delta_t):
         """
         航向控制器：在位置跟踪误差足够小且参考轨迹不移动的情况下保证渐近航向方向跟踪。
@@ -103,7 +106,7 @@ class ControllerHeadingClass(object):
         s = dot_q_e + K_head * q_e  # s = s_q
         print(q_e)
         u_init = \
-        -K_head * q_e
+            -K_head * q_e
         -Q * s * delta_t
         -P * self.sgn(s) * delta_t
 

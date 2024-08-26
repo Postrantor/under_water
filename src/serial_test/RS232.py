@@ -14,51 +14,59 @@ from methods_lib.kalman_filter import SingleStateKalmanFilter
 from constant_lib.Constant_Serial import *
 
 # %% class
+
+
 class Port():
     def __init__(self):
         self.NodeID = 0
         self.PortID = PortID_UCR
         self.connectSerial()
         self.inits_AlgKalmanFilter()
+
     def inits_AlgKalmanFilter(self):
         # Initialise the Kalman Filter to Current
-        x = 0 # Initial estimate
-        P = 1.0 # Initial covariance
-        A = 1.0 # No process innovation
-        C = 1.0 # Measurement
-        B = 0.0 # No control input
-        Q = 0.001 # Process covariance
-        R = 10.0 # Measurement covariance
+        x = 0  # Initial estimate
+        P = 1.0  # Initial covariance
+        A = 1.0  # No process innovation
+        C = 1.0  # Measurement
+        B = 0.0  # No control input
+        Q = 0.001  # Process covariance
+        R = 10.0  # Measurement covariance
         self.kf_current = SingleStateKalmanFilter(x, P, A, B, C, Q, R)
+
     def connectSerial(self, baud=defaultBaud, timeout=defaultTimeout):
-        self.dev_serial=serial.Serial()
-        self.dev_serial.port=self.PortID # 获取当前usb端口: `python -m serial.tools.list_ports`
-        self.dev_serial.timeout=timeout # 超时设置，None=永远等待操作；0=立即返回请求结果；Num(其他数值)=等待时间(s)
-        self.dev_serial.baudrate=baud # serial port baud rate: 9600(9615) ~ 115200(113636)
+        self.dev_serial = serial.Serial()
+        self.dev_serial.port = self.PortID  # 获取当前usb端口: `python -m serial.tools.list_ports`
+        self.dev_serial.timeout = timeout  # 超时设置，None=永远等待操作；0=立即返回请求结果；Num(其他数值)=等待时间(s)
+        self.dev_serial.baudrate = baud  # serial port baud rate: 9600(9615) ~ 115200(113636)
         self.openSerialPort()
+
     def openSerialPort(self):
         try:
             self.dev_serial.open()
         except Exception as result:
             print(result)
             # pass # not need print
+
     def RxD(self, cmd):
         '''
             调用该函数，写入要传送的ASCII给驱动器
             并使用read_until读取返回的一行数据，以'\r'为终止符
         '''
         self.dev_serial.write(cmd)
-        result = self.dev_serial.read_until('\r')#[0:-1]
+        result = self.dev_serial.read_until('\r')  # [0:-1]
         print('RxD: {}\t{}'.format(cmd[:-1], result))
         return result
+
     def print_log(self, log='time_msg'):
-        if log=='full_msg':
+        if log == 'full_msg':
             msg = '\n\t- PortID: {}\n\t- NodeID: {}\n\t- Buad: {}\n\t- Timeout: {}\n\t- Time: {}'.format(self.dev_serial.port, self.NodeID, self.dev_serial.baudrate, self.dev_serial.timeout, time.asctime())
-        elif log=='time_msg':
+        elif log == 'time_msg':
             msg = '\n\t- PortID: {}\n\t- NodeID: {}\n\t- Time: {}'.format(self.dev_serial.port, self.NodeID, time.asctime())
         else:
-            msg = '\n\t- PortID: {}'.format(self.dev_serial.port)            
+            msg = '\n\t- PortID: {}'.format(self.dev_serial.port)
         return msg
+
     def OutputResult(self):
         num = 0
         while True:
@@ -66,22 +74,23 @@ class Port():
             # num += 1
             # print(num)
             # time.sleep(0.1)
-            self.RxD('g r0x18\r') # Actual Velocity. Units: 0.1 encoder counts/s.
-            self.RxD('g r0x17\r') # Actual Position. Units: Counts.
+            self.RxD('g r0x18\r')  # Actual Velocity. Units: 0.1 encoder counts/s.
+            self.RxD('g r0x17\r')  # Actual Position. Units: Counts.
             # self.RxD('g r0x2d \r')
 
             # self.RxD('g r0x02\r') # Current loop programmed value. Units: 0.01 A.
-            self.RxD('g r0x38 \r') # Actual Motor Current. Units: 0.01 A.
+            self.RxD('g r0x38 \r')  # Actual Motor Current. Units: 0.01 A.
             # self.RxD('g r0x0c\r') # Actual Current, Q axis of rotor space. Units: 0.01 A.
 
             # a0 = self.RxD('g r0xa0\r') # Event Status Register(0xA0). Bits: 0~31
             # print('A0: {}\n'.format(BitsMapped_ES('0xA0', a0[2:])))
             print('--- --- ---')
             time.sleep(0.1)
+
     def Write(self):
         # if(self.port.isOpen() and self.port.readable()):
         # self.RxD('ok\r'.encode('hex')) # 以hex发送数据('\x6f\x6b\x0d\x0a')
-    # 电流模式
+        # 电流模式
         # 在编程的当前模式下启用驱动器。在0.5秒内将输出电流斜坡上升至2A。控制器监视输出电流，达到2 A后，电流将在2秒钟内下降到1A。
         # self.RxD('s r0x6a 1000\r') # Current ramp limit. Units: mA/second.将斜坡速率设置为4 A/s。
         # self.RxD('s r0x02 -20\r') # Programmed current value. Units: 0.01 A. 将输出电平设置为2A。
@@ -97,14 +106,14 @@ class Port():
         # self.RxD('g r0x04\r') # Winding B Current. Units: 0.01 A. Actual current measured at winding B.
         # self.RxD('g r0x0b\r') # Actual Current, D axis of rotor space. Units: 0.01 A.
         # self.RxD('g r0x0c\r') # Actual Current, Q axis of rotor space. Units: 0.01 A.
-    # 速度模式
+        # 速度模式
         # self.RxD('1 s r0x24 11\r')
         # self.RxD('1 s r0x36 100000\r')
         # self.RxD('1 s r0x37 100000\r')
         # self.RxD('1 s r0x2f 2004858\r') # 58709 # 15333 # 15333 # 1rpm # 6048585/5511281
         # self.RxD('g r0x18\r') # Actual Velocity. Units: 0.1 encoder counts/s.
-        self.RxD('0 s r0x24 0\r')# 所需的状态参数（0x24）定义了驱动器的操作模式和输入源控制。
-        self.RxD('1 s r0x24 0\r')# 所需的状态参数（0x24）定义了驱动器的操作模式和输入源控制。
+        self.RxD('0 s r0x24 0\r')  # 所需的状态参数（0x24）定义了驱动器的操作模式和输入源控制。
+        self.RxD('1 s r0x24 0\r')  # 所需的状态参数（0x24）定义了驱动器的操作模式和输入源控制。
     # 位置模式
         # self.RxD('s r0xc8 256\r') # Give trajectory profile mode(0xc8).
         #     # 0     /0 0000 0000 = Absolute move, trapezoidal profile.
@@ -142,13 +151,13 @@ class Port():
         # self.RxD('g r0x3d \r') # Trajectory Destination Position. Units: encoder counts.
     # Encoder
         # self.RxD('0 s r0x32 0\r') # Motor position. Units: counts.
-        # self.RxD('0 g r0x32\r') # Motor position. Units: counts. 
-        # self.RxD('1 g r0x32\r') # Motor position. Units: counts. 
+        # self.RxD('0 g r0x32\r') # Motor position. Units: counts.
+        # self.RxD('1 g r0x32\r') # Motor position. Units: counts.
         # self.RxD('g r0x2d \r') # R*_Commanded Position. Units: counts. / 位置模式下设置编码器的位置
         # self.RxD('g r0x17\r') # Motor position. Units: counts. For single feedback systems, this value is same as Actual Motor Position (0x32).
         # self.RxD('s r0x17 0\r') # 设置编码器的实际位置，区别于0x2d
     # 归位
-        # self.RxD('g r0xc6\r') # Home Offset(0xc6_RF). Units: counts. 
+        # self.RxD('g r0xc6\r') # Home Offset(0xc6_RF). Units: counts.
         # self.RxD('g r0xc2 \r') # Homing Method Configuration. Bits: 0~15
 
         # self.RxD('s r0x24 21\r') # Desired State(0x24). Bits: 0~42(P19)
@@ -156,13 +165,13 @@ class Port():
         # self.RxD('s r0xc3 \r') # Homing Velocity (fast moves)(0xc3). Units: 0.1 counts/s.
         # self.RxD('s r0xc4 \r') # Homing Velocity (slow moves)(0xc4). Units: 0.1 counts/s.
         # self.RxD('s r0xc5 \r') # Homing Acceleration/Deceleration(0xc5). Units: 10 counts/s2.
-        # self.RxD('s r0xc6 \r') # Home Offset(0xc6). Units: counts. 
+        # self.RxD('s r0xc6 \r') # Home Offset(0xc6). Units: counts.
         # self.RxD('s r0xc7 \r') # Homing Current Limit(0xc7). Units: 0.01 A.
 
         # self.RxD('s r0xbf \r') # Home to Hard Stop Delay Time. Units: ms.
 
         # self.RxD('s r0xb8 352256\r') # Positive Software Limit value(0xb8). Units: counts.
-        # self.RxD('s r0xb9 352256\r') # Negative Software Limit(0xb9). Units: counts. 
+        # self.RxD('s r0xb9 352256\r') # Negative Software Limit(0xb9). Units: counts.
         # self.RxD('t 1\r')
     # Baud
         # self.RxD('0 g r0x90\r') # Serial Port Baud Rate. Units: bits/s.
@@ -171,9 +180,12 @@ class Port():
         # self.OutputResult()
 
 # %%
+
+
 def main():
-    ports = Port() # 创建Port()类
-    ports.Write() # 写入ASCII
+    ports = Port()  # 创建Port()类
+    ports.Write()  # 写入ASCII
+
 
 # Program start from here
 if __name__ == '__main__':

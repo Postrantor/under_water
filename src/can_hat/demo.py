@@ -9,9 +9,9 @@
 
 # %%
 # OS
-import os # 加载os模块，调用shell命令
+import os  # 加载os模块，调用shell命令
 # Lib
-import can # pip install python-can
+import can  # pip install python-can
 
 
 # %%
@@ -19,18 +19,19 @@ class CANClass():
     """
     docstring
     """
+
     def __init__(self):
         self.inits_start()
         self.inits_param()
 
     def inits_start(self, defname='can0'):
-        setup_cmd = 'sudo ip link set ' + defname + ' type can bitrate 100000' # bits/s
+        setup_cmd = 'sudo ip link set ' + defname + ' type can bitrate 100000'  # bits/s
         start_cmd = 'sudo ifconfig ' + defname + ' up'
         os.system(setup_cmd)
         os.system(start_cmd)
 
     def inits_param(self):
-        self.can0 = can.interface.Bus(bustype ='socketcan_native', channel='can0')  # socketcan_native
+        self.can0 = can.interface.Bus(bustype='socketcan_native', channel='can0')  # socketcan_native
 
     def stop(self, defname='can0'):
         stop_cmd = 'sudo ifconfig ' + defname + ' down'
@@ -64,11 +65,13 @@ class CANClass():
         '''
         notidier = can.Notifier(self.can0, [can.Logger('recorded.log'), can.Printer()])
 
+
 def main():
     can = CANClass()
     # can.send()
     can.receive()
     can.stop()
+
 
 # %%
 if __name__ == "__main__":

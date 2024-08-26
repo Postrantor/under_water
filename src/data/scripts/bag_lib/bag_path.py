@@ -1,8 +1,9 @@
-#!/usr/bin/python  
-# -*- coding:utf-8 -*-  
+#!/usr/bin/python
+# -*- coding:utf-8 -*-
 
 # %% import
-import os, time
+import os
+import time
 import rosbag
 import getpass
 
@@ -10,10 +11,13 @@ import getpass
 BagPath = 'catkin_ws/bag'
 
 # %% class
+
+
 class BagPathClass():
     """
     根据期望的存储路径和话题名称，将对应的话题存入指定名称的bag包内
     """
+
     def bag_time(self):
         '''
         更具当前计算机的时间，为bag包名添加时间戳
@@ -29,7 +33,7 @@ class BagPathClass():
         # 路径拼接：获取话题名
         name = publisher_name
         for idx, target_str in enumerate(name):
-            if target_str=='/':
+            if target_str == '/':
                 dir_path = name[:idx]
         # 路径拼接：获取用户名
         usr_name = getpass.getuser()
@@ -41,12 +45,12 @@ class BagPathClass():
             os.makedirs(self.path_topic)
         except OSError as e:
             # print(e)
-            pass # 也可以把这个写在ros日志中
+            pass  # 也可以把这个写在ros日志中
         # [issue]:
         # 这里需要加一个容错，判断是否真的创建了路径，然后再给bag使用
         # 不然的话，bag使用的时候会出错
         # 判断路径参数最后是/还是没有，需要统一
-        
+
     # @main
     def bag_path(self, publisher_name):
         '''

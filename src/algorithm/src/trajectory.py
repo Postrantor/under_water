@@ -19,6 +19,7 @@ class TrajectoryClass(object):
         5) a path toward the origin; and
         6) a straight line with initial robot position at origin.
     '''
+
     def postrure_select(self, pos='line'):
         '''参考轨迹'''
         if pos == 'line':
@@ -88,7 +89,7 @@ class TrajectoryClass(object):
         q_c = [35, pi / 4, -pi / 4]
         z_c = [0., 0.]
         q_r = [35., pi / 4, -pi / 4]
-        z_r = [12./20., 0.8/20.]
+        z_r = [12. / 20., 0.8 / 20.]
         self.q_c, self.z_c = self.state_variable(q_c, z_c)
         self.q_r, self.z_r = self.state_variable(q_r, z_r)
 

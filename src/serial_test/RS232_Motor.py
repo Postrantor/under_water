@@ -16,11 +16,14 @@ import motor_lib.Motor as Motor
 from constant_lib.Constant_Serial import *
 
 # %% main
+
+
 def main():
-        Motor_UCR_L = Motor.MotorClass(PortID=PortID_UCR, NodeID=0, Mode='Speed', 
-                                                                            vel=0 ,acc=1000000, dec=1000000)
-        argout = Motor_UCR_L.dev_status()
-        print(argout)
+    Motor_UCR_L = Motor.MotorClass(PortID=PortID_UCR, NodeID=0, Mode='Speed',
+                                   vel=0, acc=1000000, dec=1000000)
+    argout = Motor_UCR_L.dev_status()
+    print(argout)
+
 
 if __name__ == '__main__':
     main()

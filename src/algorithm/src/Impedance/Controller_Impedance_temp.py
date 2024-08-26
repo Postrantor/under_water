@@ -115,7 +115,7 @@ from copley.msg import cmd2drive_msg, ucr_msg
 import motor_lib.Motor as Motor
 # Algorithm
 # from methods_lib.impedance_control import AlgorithmImpedanceClass
-from methods_lib.impedance_control_temp import AlgorithmImpedanceClass # 去除所有的运动学建模，直接驱动电机进行测试
+from methods_lib.impedance_control_temp import AlgorithmImpedanceClass  # 去除所有的运动学建模，直接驱动电机进行测试
 from methods_lib.kalman_filter import SingleStateKalmanFilter
 # Tools
 from tools_lib.debug_stream import DebugSteam
@@ -125,7 +125,7 @@ from bag_lib.bag_path import BagPathClass
 from constant_lib.Constant_Serial import *
 from constant_lib.Constant_Motor import Maxon_266761, Maxon_305474, Maxon_306090
 # 负极限值
-CcwLimit_Wing = (-Maxon_305474.Stroke/10*5)
+CcwLimit_Wing = (-Maxon_305474.Stroke / 10 * 5)
 # NodeInfo
 NodeName = 'Controller_Impedance'
 # [issue]: 所订阅的话题将取消，替换为阻抗控制算法
@@ -134,6 +134,8 @@ PublisherNameControlDrive = 'control/drive'
 PublisherNameFeedbackDrive = 'feedback/drive'
 
 # %%
+
+
 class MethodsClass(object):
     '''
         [README]:
@@ -149,7 +151,7 @@ class MethodsClass(object):
     '''
     # 定义`Counts`方便后面对其进行替换为其他电机的参数
     # 在def函数中可以通过`self.Counts`的方式进行调用
-    Counts = Maxon_306090.Counts_per_Reduction # 352256
+    Counts = Maxon_306090.Counts_per_Reduction  # 352256
 
     def rad2count(self, rad):
         """
@@ -168,26 +170,30 @@ class MethodsClass(object):
             :param count: 编码器数值
             :param rad: 角度数值
         """
-        count = self.Counts * (rad/(2*pi))
+        count = self.Counts * (rad / (2 * pi))
         return count
+
     def count2rad(self, count):
         """
         将编码器(count、count/s)转换成对应的角度(rad、rad/s)
         """
-        rad = (count * (2*pi)) / self.Counts
+        rad = (count * (2 * pi)) / self.Counts
         return rad
-class ControlsToMotors(DebugSteam,BagPathClass,MethodsClass):
-# ==================================================
-#                                        Initial_Parameters
-# ==================================================
+
+
+class ControlsToMotors(DebugSteam, BagPathClass, MethodsClass):
+    # ==================================================
+    #                                        Initial_Parameters
+    # ==================================================
     def __init__(self):
         self.inits_Node()
         self.inits_Parameter()
         self.inits_Motor()
         self.inits_AlgImpedance()
         self.inits_AlgKalmanFilter()
+
     def inits_Node(self):
-    # Initial Node
+        # Initial Node
         rospy.init_node(NodeName, anonymous=False, log_level=rospy.INFO, disable_signals=False)
     # Advertise Subscriber
         # rospy.Subscriber(SubscriberNameCmdVel, cmd2drive_msg, self.callback_msg)
@@ -197,8 +203,9 @@ class ControlsToMotors(DebugSteam,BagPathClass,MethodsClass):
     # Bag
         self.bag_control = self.bag_path(PublisherNameControlDrive)
         self.bag_feedback = self.bag_path(PublisherNameFeedbackDrive)
+
     def inits_Parameter(self):
-    # Sample
+        # Sample
         self.rate = rospy.get_param('/control/diff_drive/rate', 10)
         # 5Hz - 163 - 3
         # 7Hz - 211 - 2
@@ -215,6 +222,7 @@ class ControlsToMotors(DebugSteam,BagPathClass,MethodsClass):
         self.amp_vel = 0
         self.amp_pos = 0
     # Parameter
+
     def inits_Motor(self):
         '''推拉机构
             电机转动：46°，对应钩刺履带摆动14°，这个是最大摆角
@@ -227,20 +235,21 @@ class ControlsToMotors(DebugSteam,BagPathClass,MethodsClass):
             编码器：1000
         '''
         # [issue]: 使用速度模式
-        # self.Motor_Wing = Motor.MotorClass(PortID=PortID_UCR, 
-        #                                                                 NodeID=0, 
-        #                                                                 Mode='Speed', 
-        #                                                                 vel=0, 
-        #                                                                 acc=1000000, 
+        # self.Motor_Wing = Motor.MotorClass(PortID=PortID_UCR,
+        #                                                                 NodeID=0,
+        #                                                                 Mode='Speed',
+        #                                                                 vel=0,
+        #                                                                 acc=1000000,
         #                                                                 dec=1000000)
         # [issue]: 使用位置模式
-        self.Motor_Wing = Motor.MotorClass(PortID=PortID_UCR, # PortID_Wing, 
-                                                                        NodeID=0, 
-                                                                        Mode='Position', 
-                                                                        profile=0, 
-                                                                        pos=0, 
-                                                                        vel=0, #Maxon_305474.Max_Vel, 
-                                                                        acc=0, dec=0)
+        self.Motor_Wing = Motor.MotorClass(PortID=PortID_UCR,  # PortID_Wing,
+                                           NodeID=0,
+                                           Mode='Position',
+                                           profile=0,
+                                           pos=0,
+                                           vel=0,  # Maxon_305474.Max_Vel,
+                                           acc=0, dec=0)
+
     def inits_AlgImpedance(self):
         '''
             # impedance: 
@@ -256,6 +265,7 @@ class ControlsToMotors(DebugSteam,BagPathClass,MethodsClass):
         # self.Alg_Impedance.alpha = rospy.get_param('~alpha', 5.0) # > 0，为常数；
         # self.Alg_Impedance.H = rospy.get_param('~H', 5.0) # > 0，为闭环动力学的惯量，可取为常数；
         # self.Alg_Impedance.varepsilon = rospy.get_param('~varepsilon', 0.1) # > 0，为小常数；
+
     def inits_AlgKalmanFilter(self):
         '''
             Initialise the Kalman Filter to Current
@@ -279,6 +289,7 @@ class ControlsToMotors(DebugSteam,BagPathClass,MethodsClass):
 # ==================================================
 #                                           Callback_Msg
 # ==================================================
+
     def callback_msg(self, msg):
         # [issue]: 随着订阅话题替换为阻抗控制算法，这里的回调消息也将取消；
         # 回调消息本身的用途就是将接收的话题数据进行拆分，重新分配给新的变量，使其在本函数中进行处理；
@@ -290,6 +301,7 @@ class ControlsToMotors(DebugSteam,BagPathClass,MethodsClass):
 # ==================================================
 #                                            Callback_Func
 # ==================================================
+
     def update_callback(self):
         """
             [issue]:
@@ -314,7 +326,7 @@ class ControlsToMotors(DebugSteam,BagPathClass,MethodsClass):
         self.amp_vel = feedback['velocity_amp']
         self.amp_pos = feedback['position_amp']
         # get feedback from other senser
-        # 
+        #
     # 2.调用算法(若未经过算法调整，则直接返回订阅指令)
         # 1. 通过`Kalman Filter`对电流值进行滤波
         self.amp_cur = self.kf_current.step(0, self.amp_cur)
@@ -334,6 +346,7 @@ class ControlsToMotors(DebugSteam,BagPathClass,MethodsClass):
 # ==================================================
 #                                         Publisher_Msg
 # ==================================================
+
     def update_msg_control(self, stop=False):
         '''
             :param stop: 当该节点意外或故意终止时，将通过`shutdown()`函数对驱动指令进行“停止”。(default: `stop=False`)
@@ -345,12 +358,13 @@ class ControlsToMotors(DebugSteam,BagPathClass,MethodsClass):
     # Control Velocity
     # [issue]: 这行是否有必要
         if stop:
-            self.tar_val = 0 # stop motor's speed
+            self.tar_val = 0  # stop motor's speed
         self.control_msg.velocity.drive.motor_l = self.tar_val
     # Publish
         self.control_pub.publish(self.control_msg)
     # Bag
         self.bag_control.write(PublisherNameControlDrive, self.control_msg)
+
     def update_msg_feedback(self, stop=False):
         '''
             :param stop: 当该节点意外或故意终止时，将通过`shutdown()`函数对驱动指令进行“停止”。(default: `stop=False`)
@@ -372,15 +386,18 @@ class ControlsToMotors(DebugSteam,BagPathClass,MethodsClass):
         self.feedback_pub.publish(self.feedback_msg)
     # Bag
         self.bag_feedback.write(PublisherNameFeedbackDrive, self.feedback_msg)
+
     def update_msg(self, stop=False):
         self.update_msg_control(stop)
         self.update_msg_feedback(stop)
+
     def bag_close(self):
         self.bag_control.close()
         self.bag_feedback.close()
 # ==================================================
 #                                             @main
 # ==================================================
+
     def spin(self):
         rospy.loginfo('# Start::%s::%s #', NodeName, time.asctime())
         rate = rospy.Rate(self.rate)
@@ -390,6 +407,7 @@ class ControlsToMotors(DebugSteam,BagPathClass,MethodsClass):
             rate.sleep()
         rospy.on_shutdown(self.shutdown)
         rospy.spin()
+
     def shutdown(self):
         rospy.loginfo('# Stop::%s::%s #', NodeName, time.asctime())
         # [issue]:
@@ -397,15 +415,19 @@ class ControlsToMotors(DebugSteam,BagPathClass,MethodsClass):
         self.update_msg(stop=True)
         self.update_callback()
         # [issue]:
-        # 这里在发布控制速度为零后，应该需要再调用一下callback函数来执行一下才可以 
+        # 这里在发布控制速度为零后，应该需要再调用一下callback函数来执行一下才可以
         # 同时需要修改update中的stop，不光是对外发布的数值是0，对内执行的数值也要是0
         # 还有一些问题，在程序结束的这个过程，有一些报错需要解决
         self.bag_close()
         rospy.sleep(1)
 
 # %%
+
+
 def main():
     controls_to_motors = ControlsToMotors()
     controls_to_motors.spin()
+
+
 if __name__ == '__main__':
     main()

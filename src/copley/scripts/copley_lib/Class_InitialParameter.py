@@ -12,6 +12,8 @@ from constant_lib.Constant_Unit import *
 from constant_lib.Constant_Serial import *
 
 # %% class
+
+
 class InitialDeviceClass(object):
     '''
         Initial with the pyserial device.
@@ -26,9 +28,10 @@ class InitialDeviceClass(object):
         :@param NodeID->(int): canopen node ID. 暂时先留着吧
         :@param Mode->(str): sets programmed mode.
     '''
+
     def initialParameter(self, PortID='/dev/ttyUSB0', NodeID=0, Mode='Position'):
-        #----- PROTECTED REGION ID(CopleyControl.__init__) ENABLED START -----#
-        if isinstance(PortID,str):
+        # ----- PROTECTED REGION ID(CopleyControl.__init__) ENABLED START -----#
+        if isinstance(PortID, str):
             self.PortID = PortID
         else:
             print('NodeID is not string: {}'.format(PortID))
@@ -39,32 +42,33 @@ class InitialDeviceClass(object):
             self.NodeID = str(int(NodeID))
         except Exception:
             print('NodeID is not number: {}'.format(NodeID))
-        if isinstance(Mode,str) and (Mode=='Position' or Mode=='Speed' or Mode=='Current'):
+        if isinstance(Mode, str) and (Mode == 'Position' or Mode == 'Speed' or Mode == 'Current'):
             self.Mode = Mode
         else:
             print('NodeID is not defined string(Position, Speed, Current): {}'.format(Mode))
         # [issue]: 放在这里不太完美
         self.connectSerial()
     # ------------------------
+
     def connectSerial(self, baud=defaultBaud, timeout=defaultTimeout):
         '''
             connects with the pyserial device and make the pyserial state be open.
         '''
         # self.debug_stream('connectSerial')
-        #----- PROTECTED REGION ID(InitialDeviceClass.connectSerial) ENABLED START -----#
+        # ----- PROTECTED REGION ID(InitialDeviceClass.connectSerial) ENABLED START -----#
         self.dev_serial = serial.Serial()
-        self.dev_serial.port = self.PortID # 获取当前usb端口: `python -m serial.tools.list_ports`
-        self.dev_serial.baudrate = baud # serial port baud rate: 9600 ~ 115200
-        self.dev_serial.timeout = timeout # 超时设置，None=永远等待操作；0=立即返回请求结果；Num(其他数值)=等待时间(s)
+        self.dev_serial.port = self.PortID  # 获取当前usb端口: `python -m serial.tools.list_ports`
+        self.dev_serial.baudrate = baud  # serial port baud rate: 9600 ~ 115200
+        self.dev_serial.timeout = timeout  # 超时设置，None=永远等待操作；0=立即返回请求结果；Num(其他数值)=等待时间(s)
         # self.dev_serial.parity=PARITY_EVEN,
         # self.dev_serial.stopbits=STOPBITS_ONE,
         # self.dev_serial.bytesize=SEVENBITS, # 该处会使编码发生变化，需要注释
         # self.dev_serial.xonxoff=0 # 软件流控
         self.openSerialPort()
         # [issue]: 在每次重启系统的时候，是否需要重置编码器的位置
-            # 有些参数需要重置，比如编码器位置，如果不是断电重启的话，是不会复位的；
-            # 但是如果是在运行途中系统问题，仅仅需要重启系统，而且不方便调整机械机构的话，就不能要这行代码，不然编码器的位置会被清除
-            # 可以折中，使用日志文件的方式来记录，最后时刻的位置
+        # 有些参数需要重置，比如编码器位置，如果不是断电重启的话，是不会复位的；
+        # 但是如果是在运行途中系统问题，仅仅需要重启系统，而且不方便调整机械机构的话，就不能要这行代码，不然编码器的位置会被清除
+        # 可以折中，使用日志文件的方式来记录，最后时刻的位置
         # 判断上位机端口是否打开
         if self.dev_serial.isOpen() and self.dev_serial.readable():
             # 尝试以9600发送0x90指令，并获取返回值；若返回值存在，且为9600， 则执行changeSerialSpeed()
@@ -72,7 +76,7 @@ class InitialDeviceClass(object):
                 self.changeSerialBaud()
             # 若返回值为None，则尝试以115200发送0x90指令，并获取返回值；若返回值存在,且为115200，则退出
             elif self.getSerialBaud(baud=highBaud):
-                    print('Successful connect the port: {}'.format(self.print_log('full_msg')))
+                print('Successful connect the port: {}'.format(self.print_log('full_msg')))
             # 实在没办法了，试试呗
             else:
                 # self.dev_serial.close()
@@ -85,17 +89,18 @@ class InitialDeviceClass(object):
                 print('Serial Port is ERROR.{}'.format(self.print_log('full_msg')))
         else:
             print('Serial Port is Close.{}'.format(self.print_log('full_msg')))
-        #----- PROTECTED REGION END -----#	//	CopleyControl.connectSerial
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.connectSerial
+
     def getSerialBaud(self, node_id=0, baud=defaultBaud):
         '''
             match the current port baudrate
         '''
-        #----- PROTECTED REGION ID(InitialDeviceClass.getSerialBaud) ENABLED START -----#
+        # ----- PROTECTED REGION ID(InitialDeviceClass.getSerialBaud) ENABLED START -----#
         self.dev_serial.close()
-        self.dev_serial.baudrate=baud
+        self.dev_serial.baudrate = baud
         time.sleep(1)
         self.openSerialPort()
-        self.dev_serial.write('{} g r0x90\n'.format(node_id)) # serial port baud rate. Units: bits/s.
+        self.dev_serial.write('{} g r0x90\n'.format(node_id))  # serial port baud rate. Units: bits/s.
         current_baud = self.dev_serial.read_until('\r')[2:-1]
         if current_baud.isdigit():
             print('The port baud rate: {}'.format(self.dev_serial.baudrate))
@@ -103,25 +108,27 @@ class InitialDeviceClass(object):
         else:
             print('Current Baudrates do not match: {}'.format(self.dev_serial.baudrate))
             return False
-        #----- PROTECTED REGION END -----#	//	CopleyControl.getSerialBaud
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.getSerialBaud
+
     def changeSerialBaud(self, node_id=0, baud=highBaud):
         '''
             change the serial port baudrate
         '''
-        #----- PROTECTED REGION ID(InitialDeviceClass.changeSerialSpeed) ENABLED START -----#
+        # ----- PROTECTED REGION ID(InitialDeviceClass.changeSerialSpeed) ENABLED START -----#
         self.openSerialPort()
-        self.dev_serial.write('{} s r0x90 {}\n'.format(node_id, baud)) # serial port baud rate. Units: bits/s.
+        self.dev_serial.write('{} s r0x90 {}\n'.format(node_id, baud))  # serial port baud rate. Units: bits/s.
         self.dev_serial.close()
-        self.dev_serial.baudrate=baud
+        self.dev_serial.baudrate = baud
         time.sleep(1)
         self.openSerialPort()
-        self.dev_serial.write('{} g r0x90\n'.format(node_id)) # serial port baud rate. Units: bits/s.
+        self.dev_serial.write('{} g r0x90\n'.format(node_id))  # serial port baud rate. Units: bits/s.
         current_baud = self.dev_serial.read_until('\r')[2:-1]
         if current_baud.isdigit():
             print('Successful change the port baud rate: {}'.format(self.dev_serial.baudrate))
         else:
             print('Failure change the port baud rate: {}'.format(self.dev_serial.baudrate))
-        #----- PROTECTED REGION END -----#	//	CopleyControl.changeSerialSpeed
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.changeSerialSpeed
+
     def openSerialPort(self):
         '''
             open serial port and catch exceptions
@@ -131,63 +138,68 @@ class InitialDeviceClass(object):
             self.dev_serial.close()
             self.dev_serial.open()
         '''
-        #----- PROTECTED REGION ID(InitialDeviceClass.openSerialPort) ENABLED START -----#
+        # ----- PROTECTED REGION ID(InitialDeviceClass.openSerialPort) ENABLED START -----#
         try:
             self.dev_serial.open()
         except Exception as result:
             # print('{}{}'.format(result, self.print_log()))
-            pass # not need print
+            pass  # not need print
         # flushInput = self.dev_serial.flushInput() # 丢弃接收缓存中的所有数据
         # flushOutput = self.dev_serial.flushOutput() # 终止当前写操作，并丢弃发送缓存中的数据。
-        #----- PROTECTED REGION END -----#	//	CopleyControl.openSerialPort
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.openSerialPort
     # ------------------------
+
     def is_number(self, num):
         '''
             str.isdigit()
         '''
-        #----- PROTECTED REGION ID(InitialDeviceClass.is_number) ENABLED START -----#
+        # ----- PROTECTED REGION ID(InitialDeviceClass.is_number) ENABLED START -----#
         try:
             float(num)
             return True
         except ValueError:
             print('Input is not numbers: {}'.format(num))
         return False
-        #----- PROTECTED REGION END -----#	//	CopleyControl.is_number
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.is_number
+
     def print_log(self, log='time_msg', node_id=0):
         '''
             print('Serial Port is OK{}'.format(self.print_log('time_msg')))
         '''
-        #----- PROTECTED REGION ID(InitialDeviceClass.print_log) ENABLED START -----#
-        if log=='full_msg':
+        # ----- PROTECTED REGION ID(InitialDeviceClass.print_log) ENABLED START -----#
+        if log == 'full_msg':
             msg = '\n\t- PortID: {}\n\t- NodeID: {}\n\t- Buad: {}\n\t- Timeout: {}\n\t- Time: {}'.format(self.dev_serial.port, node_id, self.dev_serial.baudrate, self.dev_serial.timeout, time.asctime())
-        elif log=='time_msg':
+        elif log == 'time_msg':
             msg = '\n\t- PortID: {}\n\t- NodeID: {}\n\t- Time: {}'.format(self.dev_serial.port, node_id, time.asctime())
         else:
-            msg = '\n\t- PortID: {}'.format(self.dev_serial.port)            
+            msg = '\n\t- PortID: {}'.format(self.dev_serial.port)
         return msg
-        #----- PROTECTED REGION END -----#	//	CopleyControl.print_log
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.print_log
+
     def debug_stream(self, *msg):
         '''
             output debug info
             [issue]:
             目前没办法把node_id加进来
         '''
-        #----- PROTECTED REGION ID(InitialDeviceClass.debug_stream) ENABLED START -----#
+        # ----- PROTECTED REGION ID(InitialDeviceClass.debug_stream) ENABLED START -----#
         strs = ''
         for target_tuple in reversed(msg):
             strs = str(target_tuple) + '\t' + strs
-        print(strs+'{}'.format(self.print_log('time_msg', node_id='debug')))
-        #----- PROTECTED REGION END -----#	//	CopleyControl.debug_stream
+        print(strs + '{}'.format(self.print_log('time_msg', node_id='debug')))
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.debug_stream
+
     def debug_log(self, msg, node_id=0):
         '''
             output debug info
-            
+
             退而求其次，再写一个调试的函数，相比之下，这个可以添加node_id
         '''
-        #----- PROTECTED REGION ID(InitialDeviceClass.debug_stream) ENABLED START -----#
+        # ----- PROTECTED REGION ID(InitialDeviceClass.debug_stream) ENABLED START -----#
         strs = str(msg)
-        print(strs+'{}'.format(self.print_log('time_msg', node_id)))
-        #----- PROTECTED REGION END -----#	//	CopleyControl.debug_stream
+        print(strs + '{}'.format(self.print_log('time_msg', node_id)))
+        # ----- PROTECTED REGION END -----#	//	CopleyControl.debug_stream
+
     def is_int(self, input, output=0):
         """
         若read方法中为attribute值，则在write方法中不能使用is_int直接将返回值给attribute
@@ -195,7 +207,7 @@ class InitialDeviceClass(object):
         try:
             result = int(input)
         except Exception:
-            if output=='No Power':
+            if output == 'No Power':
                 result = output
             else:
                 # 这行可以避免在单位转换的时候出现float小数
@@ -204,7 +216,9 @@ class InitialDeviceClass(object):
         return result
 
 # %%
-class FormatCmdClass(InitialDeviceClass): # InitialParametersClass
+
+
+class FormatCmdClass(InitialDeviceClass):  # InitialParametersClass
     '''
         :def write: write command to the serial line.\n
         :def WriteRead: writes a command to the serial line and gets the result of this command from the amplifier.\n
@@ -226,15 +240,17 @@ class FormatCmdClass(InitialDeviceClass): # InitialParametersClass
         <CR>: 
             # A carriage return is used to indicate the end of the command to the drive.
     '''
+
     def write(self, cmd):
         '''
             write command to the serial line.\n
         '''
         # self.debug_stream('write()')
-        #----- PROTECTED REGION ID(FormatCmdClass.write) ENABLED START -----#
+        # ----- PROTECTED REGION ID(FormatCmdClass.write) ENABLED START -----#
         self.openSerialPort()
         self.dev_serial.write(cmd)
-        #----- PROTECTED REGION END -----#	//	FormatCmdClass.write
+        # ----- PROTECTED REGION END -----#	//	FormatCmdClass.write
+
     def WriteRead(self, argin):
         '''
             writes a command to the serial line and gets the result of this command from the amplifier.
@@ -244,30 +260,32 @@ class FormatCmdClass(InitialDeviceClass): # InitialParametersClass
         '''
         # self.debug_stream('WriteRead()')
         argout = ''
-        #----- PROTECTED REGION ID(FormatCmdClass.WriteRead) ENABLED START -----#
+        # ----- PROTECTED REGION ID(FormatCmdClass.WriteRead) ENABLED START -----#
         raw_result = ''
         self.openSerialPort()
         self.dev_serial.write(argin)
         raw_result = self.dev_serial.read_until('\r')
         try:
-            if (raw_result[-1]=='\r' or raw_result[-1]=='\n'):
+            if (raw_result[-1] == '\r' or raw_result[-1] == '\n'):
                 argout = raw_result[0:-1]
         except Exception as e:
             argout = None
             self.debug_stream(e)
-        #----- PROTECTED REGION END -----#	//	FormatCmdClass.WriteRead
+        # ----- PROTECTED REGION END -----#	//	FormatCmdClass.WriteRead
         return argout
+
     def handShake(self, reply):
         '''
             1. check the reply to confirm whether the command is sent successfully or not.\n
             2. find error code\n
         '''
-        #----- PROTECTED REGION ID(FormatCmdClass.handShake) ENABLED START -----#
+        # ----- PROTECTED REGION ID(FormatCmdClass.handShake) ENABLED START -----#
         if reply == 'No power' or 'ok' or reply[0:1] == 'e' or reply[0:1] == 'v':
             return True
         else:
             return False
-        #----- PROTECTED REGION END -----#	//	FormatCmdClass.handShake
+        # ----- PROTECTED REGION END -----#	//	FormatCmdClass.handShake
+
     def setParamCmd(self, ascii, data=0, node_id=0):
         ''' 
             Return the Set Command with NodeID, command and data for copley control.
@@ -279,36 +297,38 @@ class FormatCmdClass(InitialDeviceClass): # InitialParametersClass
                 Syntax: [optional node ID] r<CR>
                 Example: `3 r` # response: none, The drive with CAN node ID of 3 is reset.
         '''
-        #----- PROTECTED REGION ID(FormatCmdClass.setParamCmd) ENABLED START -----#
+        # ----- PROTECTED REGION ID(FormatCmdClass.setParamCmd) ENABLED START -----#
         try:
             data = int(data)
-            if ascii[:2]=='0x':
+            if ascii[:2] == '0x':
                 cmd = '{} s r{} {}\n'.format(node_id, ascii, data)
-            elif ascii=='t':
+            elif ascii == 't':
                 cmd = '{} {} {}\n'.format(node_id, ascii, data)
-            elif ascii=='r':
+            elif ascii == 'r':
                 cmd = '{} {}\n'.format(node_id, ascii)
             else:
                 cmd = 'command error.\nformat command: [node ID][<.>axis letter] [cmd code] [cmd parameters] <CR>'
         except Exception:
             print('the input value is not numbers.{}'.format(self.print_log('time_msg')))
         return cmd
-        #----- PROTECTED REGION END -----#	//	FormatCmdClass.setParamCmd
+        # ----- PROTECTED REGION END -----#	//	FormatCmdClass.setParamCmd
+
     def getParamCmd(self, cmd, node_id=0):
         '''
             Return the Get Command with NodeID, command for copley control.\n
         '''
-        #----- PROTECTED REGION ID(FormatCmdClass.getParamCmd) ENABLED START -----#
+        # ----- PROTECTED REGION ID(FormatCmdClass.getParamCmd) ENABLED START -----#
         return '{} g r{}\n'.format(node_id, cmd)
-        #----- PROTECTED REGION END -----#	//	FormatCmdClass.getParamCmd
+        # ----- PROTECTED REGION END -----#	//	FormatCmdClass.getParamCmd
+
     def setValue(self, result, new, old):
         '''
             Set the mathematical value of the answer to the attribute after sending the command.\n
             主要针对读取方法为属性类的参数，这样省了一步
         '''
-        #----- PROTECTED REGION ID(FormatCmdClass.setValue) ENABLED START -----#
+        # ----- PROTECTED REGION ID(FormatCmdClass.setValue) ENABLED START -----#
         try:
-            if result=='ok':
+            if result == 'ok':
                 return new
             else:
                 print('The result is ERROR: {} is not number, and return old value: {}.{}'.format(result[0:-1], old, self.print_log('time_msg')))
@@ -316,19 +336,20 @@ class FormatCmdClass(InitialDeviceClass): # InitialParametersClass
         except Exception:
             self.debug_stream(result, new, old)
             return old
-        #----- PROTECTED REGION END -----#	//	FormatCmdClass.setValue
+        # ----- PROTECTED REGION END -----#	//	FormatCmdClass.setValue
+
     def getValue(self, cmd):
         '''
             get the mathematical value of the answer after sending the command.\n
         '''
-        #----- PROTECTED REGION ID(FormatCmdClass.getValue) ENABLED START -----#
+        # ----- PROTECTED REGION ID(FormatCmdClass.getValue) ENABLED START -----#
         reply = self.WriteRead(cmd)
         if self.handShake(reply):
             try:
                 if reply[0:1] == 'v':
                     argout = str(reply[2:])
                     return argout
-                elif reply[0:1]=='e':
+                elif reply[0:1] == 'e':
                     idx, argout = CodesMapped(code=reply[2:])
                     return argout
                 else:
@@ -337,4 +358,4 @@ class FormatCmdClass(InitialDeviceClass): # InitialParametersClass
                 return None
         else:
             print('Handshake() ERROR.{}'.format(self.print_log('full_msg')))
-        #----- PROTECTED REGION END -----#	//	FormatCmdClass.getValue
+        # ----- PROTECTED REGION END -----#	//	FormatCmdClass.getValue

@@ -15,6 +15,8 @@
 
 # %% import
 # Lib
+from constant_lib.Constant_Motor import Maxon_266761, Maxon_305474
+from constant_lib.Constant_Serial import *
 import rospy
 import time
 # Messages
@@ -34,27 +36,28 @@ SubscriberNameCmdSwitch = 'cmd/switch'
 PublisherNameControlSwitch = 'control/sting'
 PublisherNameFeedbackSwitch = 'feedback/sting'
 # Serial
-from constant_lib.Constant_Serial import *
-from constant_lib.Constant_Motor import Maxon_266761, Maxon_305474
 # 负极限值
 # CcwLimit_Wing = (-Maxon_305474.Stroke/2)
 # CcwLimit_Sting = (-Maxon_266761.Stroke/2)
 # 调试使用，由2倍改成8倍看看方向
-CcwLimit_Wing = (-Maxon_305474.Stroke/10*5)
-CcwLimit_Sting = (-Maxon_266761.Stroke/10*2)
+CcwLimit_Wing = (-Maxon_305474.Stroke / 10 * 5)
+CcwLimit_Sting = (-Maxon_266761.Stroke / 10 * 2)
 
 # %%
-class ControlsToMotors(DebugSteam,BagPathClass):
-# ==================================================
-#                                          Initial_Parameters
-# ==================================================
+
+
+class ControlsToMotors(DebugSteam, BagPathClass):
+    # ==================================================
+    #                                          Initial_Parameters
+    # ==================================================
     def __init__(self):
         self.inits_node()
         self.inits_Parameter()
         self.inits_Motor()
         self.inits_AlgorithmPID()
+
     def inits_node(self):
-    # Initial Node
+        # Initial Node
         rospy.init_node(NodeName, anonymous=False, log_level=rospy.INFO, disable_signals=False)
     # Advertise Subscriber
         rospy.Subscriber(SubscriberNameCmdSwitch, cmd2switch_msg, self.callback_msg)
@@ -64,8 +67,9 @@ class ControlsToMotors(DebugSteam,BagPathClass):
     # Bag
         self.bag_control = self.bag_path(PublisherNameControlSwitch)
         self.bag_feedback = self.bag_path(PublisherNameFeedbackSwitch)
+
     def inits_Parameter(self):
-    # Sample
+        # Sample
         self.rate = rospy.get_param('/control/switch_drive/rate', 5)
     # Msg_Subscriber
         self.adjust_left = 0
@@ -98,49 +102,52 @@ class ControlsToMotors(DebugSteam,BagPathClass):
         # self.amp_wing_pos_r = 0
         self.amp_sting_pos_l = 0
         self.amp_sting_pos_r = 0
+
     def inits_Motor(self):
         '''
             # Hardware
             设置为位置模式，需要同时指定运行的最大速度，以及位置
         '''
         # 推拉机构x2
-            # 电机转动：46°，对应钩刺履带摆动14°，这个是最大摆角
-            # 电机转动：58°，对应钩刺履带摆动10°，这个是最大转角
-            # 蜗轮蜗杆传动比：10:1
-            # 则，电机输出轴需要转动圈数：46/360*10 = 1.277(圈)
-            # 则，电机的编码计数：(46/360*10) * (1000*4*23) = 117555(counts)
-            # 额定转速：8330rpm
-            # 减速比：23:1
-            # 编码器：1000
-        # self.Motor_Wing = Motor.MotorClass(PortID=PortID_Wing, NodeID=0, Mode='Position', 
+        # 电机转动：46°，对应钩刺履带摆动14°，这个是最大摆角
+        # 电机转动：58°，对应钩刺履带摆动10°，这个是最大转角
+        # 蜗轮蜗杆传动比：10:1
+        # 则，电机输出轴需要转动圈数：46/360*10 = 1.277(圈)
+        # 则，电机的编码计数：(46/360*10) * (1000*4*23) = 117555(counts)
+        # 额定转速：8330rpm
+        # 减速比：23:1
+        # 编码器：1000
+        # self.Motor_Wing = Motor.MotorClass(PortID=PortID_Wing, NodeID=0, Mode='Position',
         #                                             profile=0, pos=0, vel=Maxon_305474.Max_Vel/5, acc=500000, dec=500000)
         # 钩刺机构x2
-            # 19.45°（修改35°），伸出5.5mm，总行程13.71-2mm
-            # 则，电机输出轴需要转动圈数：35/360 = 0.0972222222(圈)
-            # 则，电机的编码计数：(35/360) * (1000*4*128) = 49777.7777777778(counts)
-            # 额定转速：8330rpm
-            # 减速比：128:1
-            # 编码器：1000
+        # 19.45°（修改35°），伸出5.5mm，总行程13.71-2mm
+        # 则，电机输出轴需要转动圈数：35/360 = 0.0972222222(圈)
+        # 则，电机的编码计数：(35/360) * (1000*4*128) = 49777.7777777778(counts)
+        # 额定转速：8330rpm
+        # 减速比：128:1
+        # 编码器：1000
         self.Motor_Sting = Motor.MotorClass(PortID=PortID_Sting, NodeID=0, Mode='Position',
-                                                    profile=0, pos=0, vel=Maxon_266761.Max_Vel/5, acc=500000, dec=500000)
+                                            profile=0, pos=0, vel=Maxon_266761.Max_Vel / 5, acc=500000, dec=500000)
+
     def inits_AlgorithmPID(self):
         '''
             # PID: 
         '''
         self.Pid_Control = Pid.AlgorithmPIDClass()
-        self.Pid_Control.pid_on = rospy.get_param('~pid_on', False) # 开启PID算法/False
+        self.Pid_Control.pid_on = rospy.get_param('~pid_on', False)  # 开启PID算法/False
         self.Pid_Control.Kp = rospy.get_param('~Kp', 0.3)
         self.Pid_Control.Ki = rospy.get_param('~Ki', 1.0)
         self.Pid_Control.Kd = rospy.get_param('~Kd', 1.0)
 # ==================================================
 #                                           Callback_Msg
 # ==================================================
+
     def callback_msg(self, msg):
         self.adjust_left = msg.adjust_left
         self.adjust_right = msg.adjust_right
         # self.enc_wing = msg.enc_wing
         self.enc_sting = msg.enc_sting
-        
+
         # self.target_wing_l = msg.wing.motor_l
         # self.target_wing_r = msg.wing.motor_r
         self.target_sting_l = msg.sting.motor_l
@@ -153,7 +160,7 @@ class ControlsToMotors(DebugSteam,BagPathClass):
 # ==================================================
     # 这里面之后要加入算法
     def update_callback_wing(self):
-    # 1. 获取反馈值
+        # 1. 获取反馈值
         # get feedback from amplifier
         get_all_0 = self.Motor_Wing.feedback_motor(node_id=0)
         self.amp_wing_cur_l = get_all_0['current_amp']
@@ -164,13 +171,14 @@ class ControlsToMotors(DebugSteam,BagPathClass):
         self.amp_wing_vel_r = get_all_1['velocity_amp']
         self.amp_wing_pos_r = get_all_1['position_amp']
         # get feedback from other senser
-        # 
+        #
     # 2. 调用PID算法，若未经过PID，则直接返回订阅指令
     # 3. 控制量
         self.Motor_Wing.control_motor_pos(self.adjust_left, self.enc_wing, CcwLimit_Wing, target=self.target_wing_l, node_id=0)
         self.Motor_Wing.control_motor_pos(self.adjust_right, self.enc_wing, CcwLimit_Wing, target=self.target_wing_r, node_id=1)
+
     def update_callback_sting(self):
-    # 1. 获取反馈值
+        # 1. 获取反馈值
         # get feedback from motor
         get_all_0 = self.Motor_Sting.feedback_motor(node_id=0)
         self.amp_sting_cur_l = get_all_0['current_amp']
@@ -181,19 +189,21 @@ class ControlsToMotors(DebugSteam,BagPathClass):
         self.amp_sting_vel_r = get_all_1['velocity_amp']
         self.amp_sting_pos_r = get_all_1['position_amp']
         # get feedback from other senser
-        # 
+        #
     # 2.调用PID算法，若未经过PID，则直接返回订阅指令
     # 3. 控制量
         self.Motor_Sting.control_motor_pos(self.adjust_left, self.enc_sting, CcwLimit_Sting, target=self.target_sting_l, node_id=0)
         self.Motor_Sting.control_motor_pos(self.adjust_right, self.enc_sting, CcwLimit_Sting, target=self.target_sting_r, node_id=1)
+
     def update_callback(self):
         # self.update_callback_wing()
         self.update_callback_sting()
 # ==================================================
 #                                          Publisher_Msg
 # ==================================================
+
     def update_msg_control(self, stop=False):
-    # Header
+        # Header
         self.control_msg.header.stamp = rospy.Time.now()
         self.control_msg.header.frame_id = self.frame_control
         # self.control_msg.header.seq = self.seq
@@ -213,8 +223,9 @@ class ControlsToMotors(DebugSteam,BagPathClass):
         self.control_pub.publish(self.control_msg)
     # Bag
         self.bag_control.write(PublisherNameControlSwitch, self.control_msg)
+
     def update_msg_feedback(self, stop=False):
-    # Header
+        # Header
         self.feedback_msg.header.stamp = rospy.Time.now()
         self.feedback_msg.header.frame_id = self.frame_feedback
         # self.feedback_msg.header.seq = self.seq
@@ -250,15 +261,18 @@ class ControlsToMotors(DebugSteam,BagPathClass):
         self.feedback_pub.publish(self.feedback_msg)
     # Bag
         self.bag_feedback.write(PublisherNameFeedbackSwitch, self.feedback_msg)
+
     def update_msg(self, stop=False):
         self.update_msg_control(stop)
         self.update_msg_feedback(stop=False)
+
     def bag_close(self):
         self.bag_control.close()
         self.bag_feedback.close()
 # ==================================================
 #                                             @main
 # ==================================================
+
     def spin(self):
         rospy.loginfo('# Start::%s::%s #', NodeName, time.asctime())
         rate = rospy.Rate(self.rate)
@@ -268,6 +282,7 @@ class ControlsToMotors(DebugSteam,BagPathClass):
             rate.sleep()
         rospy.on_shutdown(self.shutdown)
         rospy.spin()
+
     def shutdown(self):
         rospy.loginfo('# Stop::%s::%s #', NodeName, time.asctime())
         self.update_msg(stop=True)
@@ -277,9 +292,12 @@ class ControlsToMotors(DebugSteam,BagPathClass):
         rospy.sleep(1)
 
 # %%
+
+
 def main():
     controls_to_motors = ControlsToMotors()
     controls_to_motors.spin()
+
 
 if __name__ == '__main__':
     main()

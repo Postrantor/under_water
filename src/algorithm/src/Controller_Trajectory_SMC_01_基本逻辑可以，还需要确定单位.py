@@ -46,7 +46,8 @@
 
 # %% import
 # Lib
-import rospy, time
+import rospy
+import time
 # Math
 from numpy import sin, cos, matrix
 # Algorithm
@@ -90,26 +91,26 @@ class Trajectory_Tracking_SMC(ControllerPositionClass, ControllerHeadingClass,
         self.inits_Motor()
 
     def inits_node(self):
-        ## Initial Node
+        # Initial Node
         rospy.init_node(NodeName,
                         anonymous=False,
                         log_level=rospy.INFO,
                         disable_signals=False)
-        ## Advertise Publisher
+        # Advertise Publisher
         self.traj_pub = rospy.Publisher(PublisherNameTrajVel,
                                         cmd2drive_msg,
                                         queue_size=1)
-        ## Bag
+        # Bag
         self.bag = self.bag_path(PublisherNameTrajVel)
 
     def inits_parameter(self):
-        ## Sample
+        # Sample
         self.rate = rospy.get_param('traj/rate', 60)
         self.time_prev = rospy.Time.now()  # 机器人的时间状态
-        ## Msg_Publisher
+        # Msg_Publisher
         self.linear_x = 0.
         self.angular_z = 0.
-        ## Parameters
+        # Parameters
         self.postrure_select(pos_type)
         self.q_c_prev = self.q_c
         self.q_r_prev = self.q_r
@@ -158,7 +159,7 @@ class Trajectory_Tracking_SMC(ControllerPositionClass, ControllerHeadingClass,
             [cos(phi - theta), 0],
             [-(1 / rho) * sin(phi - theta), 0],
             [0, 1],
-        ])  #@式(12)
+        ])  # @式(12)
         dot_q = S_q * z
         q = q_prev + dot_q * delta_t
         return q, dot_q
@@ -190,11 +191,11 @@ class Trajectory_Tracking_SMC(ControllerPositionClass, ControllerHeadingClass,
     #                      Publisher_Msg
     # ==================================================
     def update_msg(self, stop=False):
-        ## Header
+        # Header
         self.feedback_msg.header.stamp = rospy.Time.now()
         self.feedback_msg.header.frame_id = self.frame_feedback
         # self.feedback_msg.header.seq = self.seq
-        ## Feedback Position
+        # Feedback Position
         if stop:
             self.feedback_msg.velocity.drive.motor_l = 0.
             self.feedback_msg.velocity.drive.motor_r = 0.
@@ -205,9 +206,9 @@ class Trajectory_Tracking_SMC(ControllerPositionClass, ControllerHeadingClass,
             self.feedback_msg.velocity.drive.motor_r = self.amp_vel_r
             self.feedback_msg.position.drive.motor_l = self.amp_pos_l
             self.feedback_msg.position.drive.motor_r = self.amp_pos_r
-        ## Publish
+        # Publish
         self.feedback_pub.publish(self.feedback_msg)
-        ## Bag
+        # Bag
         self.bag_feedback.write(PublisherNameTrajVel, self.feedback_msg)
 
     def bag_close(self):

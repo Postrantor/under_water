@@ -20,9 +20,9 @@ import ms5837_lib
 
 
 class DepthPublisherNode:
-# ==================================================
-#                                                Initial
-# ==================================================
+    # ==================================================
+    #                                                Initial
+    # ==================================================
     def __init__(self):
         self.inits_node()
         self.inits_object()
@@ -38,12 +38,12 @@ class DepthPublisherNode:
         # self.seq = 0
 
     def inits_object(self):
-    # Object
-        self.depth = ms5837_lib.MS5837_30BA() # Default I2C bus is 1 (Raspberry Pi 3)
-        #sensor = ms5837.MS5837_30BA(0) # Specify I2C bus
-        #sensor = ms5837.MS5837_02BA()
-        #sensor = ms5837.MS5837_02BA(0)
-        #sensor = ms5837.MS5837(model=ms5837.MS5837_MODEL_30BA, bus=0) # Specify model and bus
+        # Object
+        self.depth = ms5837_lib.MS5837_30BA()  # Default I2C bus is 1 (Raspberry Pi 3)
+        # sensor = ms5837.MS5837_30BA(0) # Specify I2C bus
+        # sensor = ms5837.MS5837_02BA()
+        # sensor = ms5837.MS5837_02BA(0)
+        # sensor = ms5837.MS5837(model=ms5837.MS5837_MODEL_30BA, bus=0) # Specify model and bus
     # Covariance
         # self.depth_msg.orientation_covariance[0] = -1
         # self.depth_msg.angular_velocity_covariance[0] = -1
@@ -53,6 +53,7 @@ class DepthPublisherNode:
 # ==================================================
 #                                                Publish Node
 # ==================================================
+
     def update_depth(self):
         self.depth.read()
         self.depth_msg = ms5837_msg()
@@ -62,12 +63,12 @@ class DepthPublisherNode:
         # self.depth_msg.header.seq = self.seq
         # self.seq += 1
     # Pressure
-        self.depth_msg.psr_atm = self.depth.pressure(ms5837_lib.UNITS_atm) # Default is mbar (no arguments)
-        self.depth_msg.psr_psi = self.depth.pressure(ms5837_lib.UNITS_psi) # Request psi
+        self.depth_msg.psr_atm = self.depth.pressure(ms5837_lib.UNITS_atm)  # Default is mbar (no arguments)
+        self.depth_msg.psr_psi = self.depth.pressure(ms5837_lib.UNITS_psi)  # Request psi
         self.depth_msg.psr_Torr = self.depth.pressure(ms5837_lib.UNITS_Torr)
     # Temperature
-        self.depth_msg.temp_C = self.depth.temperature(ms5837_lib.UNITS_Centigrade) # Default is degrees C (no arguments)
-        self.depth_msg.temp_F = self.depth.temperature(ms5837_lib.UNITS_Farenheit) # Request Farenheit
+        self.depth_msg.temp_C = self.depth.temperature(ms5837_lib.UNITS_Centigrade)  # Default is degrees C (no arguments)
+        self.depth_msg.temp_F = self.depth.temperature(ms5837_lib.UNITS_Farenheit)  # Request Farenheit
         self.depth_msg.temp_K = self.depth.temperature(ms5837_lib.UNITS_Kelvin)
     # Depth
         self.depth_msg.depth_fresh = self.depth.depth(ms5837_lib.DENSITY_FRESHWATER)
@@ -81,8 +82,9 @@ class DepthPublisherNode:
 # ==================================================
 #                                           Main
 # ==================================================
+
     def spin(self):
-        rospy.loginfo('# Start Sensor_Depth_Publisher #' )
+        rospy.loginfo('# Start Sensor_Depth_Publisher #')
         rate = rospy.Rate(self.rate)
         rospy.on_shutdown(self.shutdown_node)
         while not rospy.is_shutdown():

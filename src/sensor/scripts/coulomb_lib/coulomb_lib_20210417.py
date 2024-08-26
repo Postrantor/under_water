@@ -47,6 +47,8 @@ defaultBaud = 115200
 defaultTimeout = .1
 
 # %% class
+
+
 class CoulombClass():
     '''
         defined coulomb class
@@ -54,18 +56,21 @@ class CoulombClass():
 # ==================================================
 #                                                Initial
 # ==================================================
+
     def __init__(self):
         self.inits_serial()
         self.inits_parameter()
-    def inits_serial(self,baud=defaultBaud,serialPort=defaultPortID,timeout=defaultTimeout):
+
+    def inits_serial(self, baud=defaultBaud, serialPort=defaultPortID, timeout=defaultTimeout):
         '''
             initial serial port, incloud timeout, port, baudrate
         '''
         self.CoulombSerial = serial.Serial()
-        self.CoulombSerial.timeout=timeout
-        self.CoulombSerial.port=serialPort
-        self.CoulombSerial.baudrate=baud
+        self.CoulombSerial.timeout = timeout
+        self.CoulombSerial.port = serialPort
+        self.CoulombSerial.baudrate = baud
         self.CoulombSerial.open()
+
     def inits_parameter(self):
         '''
             initial parameter
@@ -75,6 +80,7 @@ class CoulombClass():
 # ==================================================
 #                                                Callback
 # ==================================================
+
     def get_result(self, cmd):
         '''
             # 获取相应命令的返回值，此处无法使用read_until，因为在结尾不是固定的字符；
@@ -84,8 +90,9 @@ class CoulombClass():
         '''
         self.CoulombSerial.write(cmd)
         # 将获取的编码结果以hex方式编码，并返回；
-        result = self.CoulombSerial.read_until('\r').encode("hex") # 注意区分encode、decode
+        result = self.CoulombSerial.read_until('\r').encode("hex")  # 注意区分encode、decode
         return result
+
     def voltage(self):
         '''
             # 0x0003  当前电压值50V以内3位小数，超过50V切换为2位小数`6E 4A`
@@ -94,16 +101,17 @@ class CoulombClass():
         sign = self.sign[1]
         split = self.seam[3]
 
-        if sign=='3': # 3位小数
-            voltage = int(split)/1000.0
-        elif sign=='2': # 2位小数
-            voltage = int(split)/100.0
-        else: # 容错处理
+        if sign == '3':  # 3位小数
+            voltage = int(split) / 1000.0
+        elif sign == '2':  # 2位小数
+            voltage = int(split) / 100.0
+        else:  # 容错处理
             # [issue]:
             # 将变量设置为全局变量，保留上一次的数值
             # 若这次读取数值发生错误，则直接引用上次不为空的数值
             print('Error Voltage')
         return voltage
+
     def current(self):
         '''
             # 0x0004  当前电流值50A以内3位小数，超过50A切换为2位小数`00 01`
@@ -111,32 +119,34 @@ class CoulombClass():
         '''
         current = self.seam[4]
         # 判断符号
-        sign = self.sign[2] # 符号位
-        if sign == '1': # 负数
+        sign = self.sign[2]  # 符号位
+        if sign == '1':  # 负数
             current = -int(current)
-        elif sign == '0': # 正数
+        elif sign == '0':  # 正数
             current = int(current)
         else:
             print('Error Current Sign')
         # 判断小数位置
-        dot = self.sign[3] # 小数位
-        if dot=='4': # 4位小数
-            current = current/10000.0
-        elif dot=='3': # 3位小数
-            current = current/1000.0
-        elif dot=='2': # 2位小数
-            current = current/100.0
+        dot = self.sign[3]  # 小数位
+        if dot == '4':  # 4位小数
+            current = current / 10000.0
+        elif dot == '3':  # 3位小数
+            current = current / 1000.0
+        elif dot == '2':  # 2位小数
+            current = current / 100.0
         else:
             print('Error Current')
         return current
+
     def watt(self):
         '''
             # 0x0006  当前功率值，2位小数位`00 00`
             负载功率：0.0000---9999.9W(不同功率时小数位自动切换)
         '''
-        watt = int(self.seam[6])/100.0
+        watt = int(self.seam[6]) / 100.0
 
         return watt
+
     def resistance(self):
         '''
             这个没有地址位，直接是电压/电流=负载电阻
@@ -150,6 +160,7 @@ class CoulombClass():
             resistance = voltage / current
 
         return resistance
+
     def power(self):
         '''
             - 0x0007  当前剩余Ah电量，1位小数`00 03`
@@ -158,14 +169,15 @@ class CoulombClass():
             - 0x000B  剩余电量百分比，2位小数`00 00`
             输出容量：0000mAh---9999.99Ah(可切换成Wh 统计，容量可断电记忆，正负双向容量可抵消)
         '''
-        remaining = int(self.seam[7])/10.0
+        remaining = int(self.seam[7]) / 10.0
         consumed = int(self.seam[8])
-        capacity = int(self.seam[9])/10.0
-        percentage = int(self.seam[11])/100.0
-        return {'remaining':remaining, 'consumed':consumed, 'capacity':capacity, 'percentage':percentage}
+        capacity = int(self.seam[9]) / 10.0
+        percentage = int(self.seam[11]) / 100.0
+        return {'remaining': remaining, 'consumed': consumed, 'capacity': capacity, 'percentage': percentage}
 # ==================================================
 #                                                Split
 # ==================================================
+
     def split(self):
         '''
             将获得的返回值从第6位起始，按步长4进行拆分，前6位不知道是啥；
@@ -174,18 +186,19 @@ class CoulombClass():
             - 0x0001  当前设置界面步骤`00 00`
             - 0x0002  高位:副电压+主电压小数位；低位:电流正负及小数位`03 04`
         '''
-        value = self.value_all # 0x0000~0x000B
-        for i in range(6, len(value), 4): # Starting from the `6` position, split in steps of `4`
-            block = str(int(value[i:i+4], 16))
+        value = self.value_all  # 0x0000~0x000B
+        for i in range(6, len(value), 4):  # Starting from the `6` position, split in steps of `4`
+            block = str(int(value[i:i + 4], 16))
             self.seam.append(block)
 
-        sign = value[14:18] # 0x0002
-        for j in range(0, len(sign), 1): # Starting from the `0` position, split in steps of `1`
-            block = str(int(sign[j:j+1]))
+        sign = value[14:18]  # 0x0002
+        for j in range(0, len(sign), 1):  # Starting from the `0` position, split in steps of `1`
+            block = str(int(sign[j:j + 1]))
             self.sign.append(block)
 # ==================================================
 #                                                Update
 # ==================================================
+
     def update(self):
         '''
             调用RxD()函数，写入HEX；
@@ -194,18 +207,21 @@ class CoulombClass():
             # https://www.jb51.net/article/119202.htm
             # print ''.join([str(int(b, 16))+' ' for b in [result[i:i+4] for i in range(6, len(result[6:]), 4)]])
         '''
-        address_all = [0x01, 0x03, 0x00, 0x00, 0x00, 0x0C, 0x45, 0xCF] # 从第0个地址开始读取，连续读取12个地址位的数据
+        address_all = [0x01, 0x03, 0x00, 0x00, 0x00, 0x0C, 0x45, 0xCF]  # 从第0个地址开始读取，连续读取12个地址位的数据
         self.value_all = self.get_result(address_all)
         # print(self.value_all)
-        self.inits_parameter() # 因为是对元组追加，所以每次运算前，需要清空
+        self.inits_parameter()  # 因为是对元组追加，所以每次运算前，需要清空
         self.split()
         # 0x0005  当前温度值首位为1时为负温，1位小数位`10 01`
         # 0x000A  电压超过设定值自动重置电量为满电状态，1位小数`00 00`
 
 # %%
+
+
 def main():
     coulomb = CoulombClass()
     coulomb.update()
+
 
 # Program start from here
 if __name__ == '__main__':

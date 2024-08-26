@@ -47,7 +47,8 @@
 
 # %% import
 # Lib
-import rospy, time
+import rospy
+import time
 # Math
 from numpy import sin, cos, matrix, pi
 # Algorithm
@@ -82,9 +83,9 @@ max_count = Maxon_306090.Max_Vel  # 549547
 l = .2  # wheel separation distance (m)
 r = .065  # wheel radius (m)
 J_inv = matrix([[1., -(l / 2.)], [1., (l / 2.)]]) \
-            * (1. / r) * (max_count / max_rad)
+    * (1. / r) * (max_count / max_rad)
 J_for = matrix([[(1. / 2.), (1. / 2.)], [-(1. / l), (1. / l)]]) \
-            * (r) * (max_rad / max_count)
+    * (r) * (max_rad / max_count)
 
 
 # %%
@@ -97,26 +98,26 @@ class Trajectory_Tracking_SMC(ControllerPositionClass, ControllerHeadingClass,
         self.inits_Motor()
 
     def inits_Node(self):
-        ## Initial Node
+        # Initial Node
         rospy.init_node(NodeName,
                         anonymous=False,
                         log_level=rospy.INFO,
                         disable_signals=False)
-        ## Advertise Publisher
+        # Advertise Publisher
         # 这里想要发布的就不再是单纯的电机的速度或者位置了
         # 而是相应的在笛卡尔坐标系内的坐标信息
         self.traj_pub = rospy.Publisher(PublisherNameTrajVel,
                                         cmd2drive_msg,
                                         queue_size=1)
-        ## Bag
+        # Bag
         self.bag = self.bag_path(PublisherNameTrajVel)
 
     def inits_Parameter(self):
-        ## Sample
+        # Sample
         self.rate = rospy.get_param('traj/rate', 20)  # max = 20(Hz) = 0.05(s)
         self.time_prev = rospy.Time.now()  # 机器人的时间状态
-        ## Msg_Publisher
-        ## Parameters
+        # Msg_Publisher
+        # Parameters
         self.postrure_select(pos_type)
         self.q_c_prev = self.q_c
         self.q_r_prev = self.q_r
@@ -125,7 +126,7 @@ class Trajectory_Tracking_SMC(ControllerPositionClass, ControllerHeadingClass,
         self.Motor_UCR = Motor.MotorClass(PortID=PortID_UCR,
                                           NodeID=0,
                                           Mode='Speed',
-                                          vel=0, # Maxon_306090.Max_Vel,
+                                          vel=0,  # Maxon_306090.Max_Vel,
                                           acc=500000,
                                           dec=500000)
 
@@ -147,7 +148,7 @@ class Trajectory_Tracking_SMC(ControllerPositionClass, ControllerHeadingClass,
         dot_theta = matrix([[dot_theta_l], [dot_theta_r]])
         self.z_c = J_for * dot_theta
         # print("dot_theta = {}\n".format(dot_theta)) # 550000 (count)
-        print("z_c = {}\n".format(self.z_c)) # z_c = [[6.37e-01], [-2.14e-05]] (m)
+        print("z_c = {}\n".format(self.z_c))  # z_c = [[6.37e-01], [-2.14e-05]] (m)
 
         # time_curr = rospy.Time.now()
         # delta_t = (time_curr - self.time_prev).to_sec()
@@ -171,7 +172,7 @@ class Trajectory_Tracking_SMC(ControllerPositionClass, ControllerHeadingClass,
             [cos(phi - theta), 0],
             [-(1 / rho) * sin(phi - theta), 0],
             [0, 1],
-        ])  #@式(12)
+        ])  # @式(12)
         dot_q = S_q * z
         q = q_prev + dot_q * delta_t
         return q, dot_q
@@ -204,11 +205,11 @@ class Trajectory_Tracking_SMC(ControllerPositionClass, ControllerHeadingClass,
     #                      Publisher_Msg
     # ==================================================
     def update_msg(self, stop=False):
-        ## Header
+        # Header
         self.feedback_msg.header.stamp = rospy.Time.now()
         self.feedback_msg.header.frame_id = self.frame_feedback
         # self.feedback_msg.header.seq = self.seq
-        ## Feedback Position
+        # Feedback Position
         if stop:
             self.feedback_msg.velocity.drive.motor_l = 0.
             self.feedback_msg.velocity.drive.motor_r = 0.
@@ -219,9 +220,9 @@ class Trajectory_Tracking_SMC(ControllerPositionClass, ControllerHeadingClass,
             self.feedback_msg.velocity.drive.motor_r = self.amp_vel_r
             self.feedback_msg.position.drive.motor_l = self.amp_pos_l
             self.feedback_msg.position.drive.motor_r = self.amp_pos_r
-        ## Publish
+        # Publish
         self.feedback_pub.publish(self.feedback_msg)
-        ## Bag
+        # Bag
         self.bag_feedback.write(PublisherNameTrajVel, self.feedback_msg)
 
     def bag_close(self):

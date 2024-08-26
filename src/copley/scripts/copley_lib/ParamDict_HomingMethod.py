@@ -2,14 +2,17 @@
 # -*- coding:utf-8 -*-
 
 # %% doc
-__all__ = ['BitsMapped'] # 可用于模块导入时限制，只有__all__内指定的属性、方法、类可被导入
-__docformat__ = 'restructuredtext' # 允许诸如 epydoc之类的python文档生成器工具知道如何正确解析模块文档
+__all__ = ['BitsMapped']  # 可用于模块导入时限制，只有__all__内指定的属性、方法、类可被导入
+__docformat__ = 'restructuredtext'  # 允许诸如 epydoc之类的python文档生成器工具知道如何正确解析模块文档
 
 # %%
+
+
 class HomingMethod(object):
     """
     0xC2、0xC9
     """
+
     def __init__(self):
         # self.ascii = ascii
         # self.data = data
@@ -19,15 +22,17 @@ class HomingMethod(object):
         msg = 'from copley.scripts.copley_lib.ParamDict_HomingMethod import BitsMapped'
         return msg
 
+
 def BitsMapped(ascii='0xC2', data=0):
     """
     docstring
     """
-    if ascii=='0xC2':
+    if ascii == '0xC2':
         argout = BitsMapped_0xC2(int(data))
-    elif ascii=='0xC9':
+    elif ascii == '0xC9':
         argout = BitsMapped_0xC9(int(data))
     return argout
+
 
 def BitsMapped_0xC2(idx):
     '''
@@ -98,132 +103,133 @@ def BitsMapped_0xC2(idx):
             b. N 627 = 001001110011
         16. Immediate Home
             a. N/A 15
-    
+
         # CME2 用户指南 - 原文.pdf
         P198 - APPENDIX B
     '''
-    if idx==512: # 0010,0000,0000
+    if idx == 512:  # 0010,0000,0000
         argout = '''Set Current Position as Home.
                         The current position is the home position.'''
-                        # 当前位置是主位置。
-    elif idx==544: # 0010,0010,0000
+        # 当前位置是主位置。
+    elif idx == 544:  # 0010,0010,0000
         argout = '''Positive: Next Index.
                         Home is the first index pulse found in the positive direction. Direction of motion is positive. If a positive limit switch is activated before the index pulse, an error is generated.'''
-                        # 家是第一个指数脉冲发现的积极方向。运动的方向是正的。如果一个正的限位开关在指数脉冲之前被激活，就会产生一个错误。
-    elif idx==560: # 0010,0011,0000
+        # 家是第一个指数脉冲发现的积极方向。运动的方向是正的。如果一个正的限位开关在指数脉冲之前被激活，就会产生一个错误。
+    elif idx == 560:  # 0010,0011,0000
         argout = '''Negative: Next Index.
                         Home is the first index pulse found in negative direction. Direction of motion is negative. If a negative limit switch is activated before the index pulse, an error is generated.'''
-                        # Home是第一个在负方向发现的指数脉冲。运动方向是负的。如果在指数脉冲之前激活负限位开关，就会产生错误。
-    elif idx==513: # 0010,0000,0001
+        # Home是第一个在负方向发现的指数脉冲。运动方向是负的。如果在指数脉冲之前激活负限位开关，就会产生错误。
+    elif idx == 513:  # 0010,0000,0001
         argout = '''Positive: Limit Switch.
                         Home is the transition of the positive limit switch. Initial direction of motion is positive if the positive limit switch is inactive.'''
-                        # Home是正向限位开关的过渡。如果正限位开关不活跃，运动的初始方向为正。
-    elif idx==529: # 0010,0001,0001
+        # Home是正向限位开关的过渡。如果正限位开关不活跃，运动的初始方向为正。
+    elif idx == 529:  # 0010,0001,0001
         argout = '''Negative: Limit Switch.
                         Home is the transition of negative limit switch. Initial direction of motion is negative if the negative limit switch is inactive.'''
-                        # 家是过渡负限位开关。如果负限位开关不活动，运动的初始方向为负。
-    elif idx==545: # 0010,0010,0001
+        # 家是过渡负限位开关。如果负限位开关不活动，运动的初始方向为负。
+    elif idx == 545:  # 0010,0010,0001
         argout = '''Positive: Limit Switch Out to Index.
                         Home is the first index pulse to the negative side of the positive limit switch transition. Initial direction of motion is positive if the positive limit switch is inactive (shown here as low).'''
-                        # 首个指数脉冲是Home向负侧的正限位开关过渡。初始运动方向是正的，如果正的限位开关是不活跃的(在这里显示为低)。
-    elif idx==561: # 0010,0011,0001
+        # 首个指数脉冲是Home向负侧的正限位开关过渡。初始运动方向是正的，如果正的限位开关是不活跃的(在这里显示为低)。
+    elif idx == 561:  # 0010,0011,0001
         argout = '''Negative: Limit Switch Out to Index.
                         Home is the first index pulse to the positive side of the negative limit switch transition. Initial direction of motion is negative if the negative limit switch is inactive (shown here as low).'''
-                        # 首阶指数脉冲是向正向一侧的负极限开关过渡。初始运动方向是负的，如果负限位开关是不活跃的(在这里显示为低)。
-    elif idx==514: # 0010,0000,0010
+        # 首阶指数脉冲是向正向一侧的负极限开关过渡。初始运动方向是负的，如果负限位开关是不活跃的(在这里显示为低)。
+    elif idx == 514:  # 0010,0000,0010
         argout = '''Positive: Home Switch.
                         Home is the home switch transition. Initial direction of motion is positive if the home switch is inactive. If a limit switch is activated before the home switch transition, an error is generated.'''
-                        # Home是Home开关的转换。如果home开关处于非活动状态，初始运动方向为正。如果限位开关在主开关转换之前被激活，则会产生错误。
-    elif idx==530: # 0010,0001,0010
+        # Home是Home开关的转换。如果home开关处于非活动状态，初始运动方向为正。如果限位开关在主开关转换之前被激活，则会产生错误。
+    elif idx == 530:  # 0010,0001,0010
         argout = '''Negative: Home Switch.
                         Home is the home switch transition. Initial direction of motion is negative if the home switch is inactive. If a limit switch is activated before the home switch transition, an error is generated.'''
-                        # Home是Home开关的转换。如果home开关处于非活动状态，则初始运动方向为负。如果限位开关在主开关转换之前被激活，则会产生错误。
-    elif idx==546: # 0010,0010,0010
+        # Home是Home开关的转换。如果home开关处于非活动状态，则初始运动方向为负。如果限位开关在主开关转换之前被激活，则会产生错误。
+    elif idx == 546:  # 0010,0010,0010
         argout = '''Positive: Home Switch Out to Index.
                         Home is the first index pulse to the negative side of the home switch transition. Initial direction of motion is positive if the home switch is inactive. If a limit switch is activated before the home switch transition, an error is generated.'''
-                        # Home是第一个指数脉冲到负侧Home开关的过渡。如果home开关处于非活动状态，初始运动方向为正。如果限位开关在主开关转换之前被激活，则会产生错误。
-    elif idx==562: # 0010,0011,0010
+        # Home是第一个指数脉冲到负侧Home开关的过渡。如果home开关处于非活动状态，初始运动方向为正。如果限位开关在主开关转换之前被激活，则会产生错误。
+    elif idx == 562:  # 0010,0011,0010
         argout = '''Negative: Home Switch Out to Index.
                         Home is the first index pulse to the positive side of the home switch transition. Initial direction of motion is negative if the home switch is inactive. If a limit switch is activated before the home switch transition, an error is generated.'''
-                        # 归位是归位开关转换正端的第一个索引脉冲。 如果归零开关未激活，则初始运动方向为负。 如果在转换原点开关之前激活了限位开关，则会产生错误。
-    elif idx==610: # 0010,0110,0010
+        # 归位是归位开关转换正端的第一个索引脉冲。 如果归零开关未激活，则初始运动方向为负。 如果在转换原点开关之前激活了限位开关，则会产生错误。
+    elif idx == 610:  # 0010,0110,0010
         argout = '''Positive: Home Switch In to Index.
                         Home is the first index pulse to the positive side of the home switch transition. Initial direction of motion is positive if the home switch is inactive. If a limit switch is activated before the home switch transition, an error is generated.'''
-                        # 归位是归位开关转换正端的第一个索引脉冲。 如果归零开关未激活，则初始运动方向为正。 如果在转换原点开关之前激活了限位开关，则会产生错误。
-    elif idx==626: # 0010,0111,0010
+        # 归位是归位开关转换正端的第一个索引脉冲。 如果归零开关未激活，则初始运动方向为正。 如果在转换原点开关之前激活了限位开关，则会产生错误。
+    elif idx == 626:  # 0010,0111,0010
         argout = '''Negative: Home Switch In to Index.
                         Home is the first index pulse to the negative side of the home switch transition. Initial direction of motion is negative if the home switch is inactive. If a limit switch is activated before the home switch transition, an error is generated.'''
-                        # 归位是到归位开关转换的负侧的第一个索引脉冲。 如果归零开关未激活，则初始运动方向为负。 如果在转换原点开关之前激活了限位开关，则会产生错误。
-    elif idx==516: # 0010,0000,0100
+        # 归位是到归位开关转换的负侧的第一个索引脉冲。 如果归零开关未激活，则初始运动方向为负。 如果在转换原点开关之前激活了限位开关，则会产生错误。
+    elif idx == 516:  # 0010,0000,0100
         argout = '''Positive: Hard Stop.
                         Home is the positive hard stop. Direction of motion is positive. In servo modes, the hard stop is reached when the amplifier outputs the homing Current Limit continuously for the amount of time specified in the Delay Time.
                         If a positive limit switch is activated before the hard stop, an error is generated.'''
-                        # 家是积极的硬停。 运动方向为正。 在伺服模式下，当放大器在“延迟时间”中指定的时间范围内连续输出归位电流限制时，将达到硬停止。如果在硬停止之前激活了正限位开关，则会产生错误。
-    elif idx==532: # 0010,0001,0100
+        # 家是积极的硬停。 运动方向为正。 在伺服模式下，当放大器在“延迟时间”中指定的时间范围内连续输出归位电流限制时，将达到硬停止。如果在硬停止之前激活了正限位开关，则会产生错误。
+    elif idx == 532:  # 0010,0001,0100
         argout = '''Negative: Hard Stop.
                         Home is the negative hard stop. Direction of motion is negative. The hard stop is reached when the amplifier outputs the homing Current Limit continuously for the amount of time specified in the Delay Time. If a negative limit switch is activated before the hard stop, an error is generated.'''
-                        # 家是负面的硬停。 运动方向为负。 当放大器在“延迟时间”中指定的时间范围内连续输出归位电流限制时，将达到硬停止。 如果在硬停止之前激活了负限位开关，则会产生错误。
-    elif idx==548: # 0010,0010,0100
+        # 家是负面的硬停。 运动方向为负。 当放大器在“延迟时间”中指定的时间范围内连续输出归位电流限制时，将达到硬停止。 如果在硬停止之前激活了负限位开关，则会产生错误。
+    elif idx == 548:  # 0010,0010,0100
         argout = '''Positive: Hard Stop Out to Index.
                         Home is the first index pulse on the negative side of the positive hard stop. Initial direction of motion is positive. The hard stop is reached when the amplifier outputs the homing Current Limit continuously for the amount of time specified in the Delay Time. If a positive limit switch is activated before the hard stop, an error is generated.'''
-                        # 归位是正硬停止的负侧的第一个索引脉冲。 初始运动方向为正。 当放大器在“延迟时间”中指定的时间范围内连续输出归位电流限制时，将达到硬停止。 如果在硬停止之前激活了正限位开关，则会产生错误。
-    elif idx==564: # 0010,0011,0100
+        # 归位是正硬停止的负侧的第一个索引脉冲。 初始运动方向为正。 当放大器在“延迟时间”中指定的时间范围内连续输出归位电流限制时，将达到硬停止。 如果在硬停止之前激活了正限位开关，则会产生错误。
+    elif idx == 564:  # 0010,0011,0100
         argout = '''Negative: Hard Stop Out to Index.
                         Home is the first index pulse on the positive side of the negative hard stop. Initial direction of motion is negative. The hard stop is reached when the amplifier outputs the homing Current Limit continuously for the amount of time specified in the Delay Time. If a negative limit switch is activated before the hard stop, an error is generated.'''
-                        # 归位是负硬停止的正侧上的第一个索引脉冲。 初始运动方向为负。 当放大器在“延迟时间”中指定的时间范围内连续输出归位电流限制时，将达到硬停止。 如果在硬停止之前激活了负限位开关，则会产生错误。
-    elif idx==771: # 0011,0000,0011
+        # 归位是负硬停止的正侧上的第一个索引脉冲。 初始运动方向为负。 当放大器在“延迟时间”中指定的时间范围内连续输出归位电流限制时，将达到硬停止。 如果在硬停止之前激活了负限位开关，则会产生错误。
+    elif idx == 771:  # 0011,0000,0011
         argout = '''Positive: Lower Home.
                         Home is the negative edge of a momentary home switch. Initial direction of motion is positive if the home switch is inactive. Motion will reverse if a positive limit switch is activated before the home switch; then, if a negative limit switch is activated before the home switch, an error is generated.'''
-                        # 归位是瞬时归位开关的下降沿。 如果归零开关未激活，则初始运动方向为正。 如果在回零开关之前激活了正限位开关，则运动会反向； 然后，如果在回零开关之前激活了负限位开关，则会产生错误。
-    elif idx==787: # 0011,0001,0011
+        # 归位是瞬时归位开关的下降沿。 如果归零开关未激活，则初始运动方向为正。 如果在回零开关之前激活了正限位开关，则运动会反向； 然后，如果在回零开关之前激活了负限位开关，则会产生错误。
+    elif idx == 787:  # 0011,0001,0011
         argout = '''Negative: Lower Home.
                         Home is the negative edge of a momentary home switch. Initial direction of motion is negative. If the initial motion leads away from the home switch, the axis reverses on encountering the negative limit switch; then, if a positive limit switch is activated before the home switch, an error is generated.'''
-                        # 归位是瞬时归位开关的下降沿。 初始运动方向为负。 如果初始运动远离原点开关，则轴在遇到负限位开关时会反转；否则，轴将反转。 然后，如果在回零开关之前激活了正限位开关，则会产生错误。
-    elif idx==515: # 0010,0000,0011
+        # 归位是瞬时归位开关的下降沿。 初始运动方向为负。 如果初始运动远离原点开关，则轴在遇到负限位开关时会反转；否则，轴将反转。 然后，如果在回零开关之前激活了正限位开关，则会产生错误。
+    elif idx == 515:  # 0010,0000,0011
         argout = '''Positive: Upper Home.
                         Home is the positive edge of a momentary home switch. Initial direction of motion is positive. If the initial motion leads away from the home switch, the axis reverses on encountering the positive limit switch; then, if a negative limit switch is activated before the home switch, an error is generated.'''
-                        # 归位是瞬时归位切换的上升沿。 初始运动方向为正。 如果初始运动远离原点开关，则在遇到正向限位开关时轴将反转；否则，轴将反向运动。 然后，如果在回零开关之前激活了负限位开关，则会产生错误。
-    elif idx==531: # 0010,0001,0011
+        # 归位是瞬时归位切换的上升沿。 初始运动方向为正。 如果初始运动远离原点开关，则在遇到正向限位开关时轴将反转；否则，轴将反向运动。 然后，如果在回零开关之前激活了负限位开关，则会产生错误。
+    elif idx == 531:  # 0010,0001,0011
         argout = '''Negative: Upper Home.
                         Home is the positive edge of momentary home switch. Initial direction of motion is negative if the home switch is inactive. If the initial motion leads away from the home switch, the axis reverses on encountering the negative limit switch; then, if a positive limit switch is activated before the home switch, an error is generated.'''
-                        # 归位是瞬时归位切换的上升沿。 如果归零开关未激活，则初始运动方向为负。 如果初始运动远离原点开关，则轴在遇到负限位开关时会反转；否则，轴将反转。 然后，如果在回零开关之前激活了正限位开关，则会产生错误。
-    elif idx==803: #0011,0010,0011
+        # 归位是瞬时归位切换的上升沿。 如果归零开关未激活，则初始运动方向为负。 如果初始运动远离原点开关，则轴在遇到负限位开关时会反转；否则，轴将反转。 然后，如果在回零开关之前激活了正限位开关，则会产生错误。
+    elif idx == 803:  # 0011,0010,0011
         argout = '''Positive: Lower Home Outside Index.
                         Home is the first index pulse on the negative side of the negative edge of a momentary home switch. Initial direction of motion is positive if the home switch is inactive. If the initial motion leads away from the home switch, the axis reverses on encountering the positive limit switch; then, if a negative limit switch is activated before the home switch, an error is generated.'''
-                        # 归位是瞬时归位开关负沿负侧的第一个索引脉冲。 如果归零开关未激活，则初始运动方向为正。 如果初始运动远离原点开关，则在遇到正向限位开关时轴将反转；否则，轴将反向运动。 然后，如果在回零开关之前激活了负限位开关，则会产生错误。
-    elif idx==819: # 0011,0011,0011
+        # 归位是瞬时归位开关负沿负侧的第一个索引脉冲。 如果归零开关未激活，则初始运动方向为正。 如果初始运动远离原点开关，则在遇到正向限位开关时轴将反转；否则，轴将反向运动。 然后，如果在回零开关之前激活了负限位开关，则会产生错误。
+    elif idx == 819:  # 0011,0011,0011
         argout = '''Negative: Lower Home Outside Index.
                         Home is the first index pulse on the negative side of the negative edge of a momentary home switch. Initial direction of motion is negative. If the initial motion leads away from the home switch, the axis reverses on encountering the negative limit switch; then, if a negative limit switch is activated before the home switch, an error is generated.'''
-                        # 归位是瞬时归位开关负沿负侧的第一个索引脉冲。 初始运动方向为负。 如果初始运动远离原点开关，则轴在遇到负限位开关时会反转；否则，轴将反转。 然后，如果在回零开关之前激活了负限位开关，则会产生错误。
-    elif idx==867: # 0011,0110,0011
+        # 归位是瞬时归位开关负沿负侧的第一个索引脉冲。 初始运动方向为负。 如果初始运动远离原点开关，则轴在遇到负限位开关时会反转；否则，轴将反转。 然后，如果在回零开关之前激活了负限位开关，则会产生错误。
+    elif idx == 867:  # 0011,0110,0011
         argout = '''Positive: Lower Home Inside Index.
                         Home is the first index pulse on the positive side of the negative edge of a momentary home switch. Initial direction of motion is positive if the home switch is inactive. If the initial motion leads away from the home switch, the axis reverses on encountering the positive limit switch; then, if a negative limit switch is activated before the home switch, an error is generated.'''
-                        # 归零是瞬时归零开关负沿的正侧的第一个索引脉冲。 如果归零开关未激活，则初始运动方向为正。 如果初始运动远离原点开关，则在遇到正向限位开关时轴将反转；否则，轴将反向运动。 然后，如果在回零开关之前激活了负限位开关，则会产生错误。
-    elif idx==883: # 0011,0111,0011
+        # 归零是瞬时归零开关负沿的正侧的第一个索引脉冲。 如果归零开关未激活，则初始运动方向为正。 如果初始运动远离原点开关，则在遇到正向限位开关时轴将反转；否则，轴将反向运动。 然后，如果在回零开关之前激活了负限位开关，则会产生错误。
+    elif idx == 883:  # 0011,0111,0011
         argout = '''Negative: Lower Home Inside Index.
                         Home is the first index pulse on the positive side of the negative edge of a momentary home switch. Initial direction of motion is negative. If the initial motion leads away from the home switch, the axis reverses on encountering the negative limit switch; then, if a negative limit switch is activated before the home switch, an error is generated.'''
-                        # 归零是瞬时归零开关负沿的正侧的第一个索引脉冲。 初始运动方向为负。 如果初始运动远离原点开关，则轴在遇到负限位开关时会反转；否则，轴将反转。 然后，如果在回零开关之前激活了负限位开关，则会产生错误。
-    elif idx==547: # 0010,0010,0011
+        # 归零是瞬时归零开关负沿的正侧的第一个索引脉冲。 初始运动方向为负。 如果初始运动远离原点开关，则轴在遇到负限位开关时会反转；否则，轴将反转。 然后，如果在回零开关之前激活了负限位开关，则会产生错误。
+    elif idx == 547:  # 0010,0010,0011
         argout = '''Positive: Upper Home Outside Index.
                         Home is the first index pulse on the positive side of the positive edge of a momentary home switch. Initial direction of motion is positive. If the initial motion leads away from the home switch, the axis reverses on encountering the positive limit switch; then, if a negative limit switch is activated before the home switch, an error is generated.'''
-                        # Home是瞬时Home开关正边缘正侧的第一个索引脉冲。初始运动方向为正。如果初始运动远离主开关，则轴在遇到正限位开关时反转；然后，如果在主开关之前激活负限位开关，则产生错误。
-    elif idx==563: # 0010,0011,0011
+        # Home是瞬时Home开关正边缘正侧的第一个索引脉冲。初始运动方向为正。如果初始运动远离主开关，则轴在遇到正限位开关时反转；然后，如果在主开关之前激活负限位开关，则产生错误。
+    elif idx == 563:  # 0010,0011,0011
         argout = '''Negative: Upper Home Outside Index.
                         Home is the first index pulse on the positive side of the positive edge of a momentary home switch. Initial direction of motion is negative if the home switch is inactive. If the initial position is right of the home position, the axis reverses on encountering the home switch.'''
-                        # Home是瞬时Home开关正边缘正侧的第一个索引脉冲。如果原点开关处于非活动状态，则初始运动方向为负。如果初始位置在起始位置的右侧，则轴在遇到起始开关时反转。
-    elif idx==611: # 0010,0110,0011
+        # Home是瞬时Home开关正边缘正侧的第一个索引脉冲。如果原点开关处于非活动状态，则初始运动方向为负。如果初始位置在起始位置的右侧，则轴在遇到起始开关时反转。
+    elif idx == 611:  # 0010,0110,0011
         argout = '''Positive: Upper Home Inside Index.
                         Home is the first index pulse on the negative side of the positive edge of momentary home switch. Initial direction of motion is positive. If initial motion leads away from the home switch, the axis reverses on encountering the positive limit switch; then, if a negative limit switch is activated before the home switch, an error is generated.'''
-                        # Home是瞬时Home开关正边缘负侧的第一个索引脉冲。初始运动方向为正。如果初始运动远离原点开关，则轴在遇到正限位开关时反转；然后，如果在原点开关之前激活负限位开关，则产生错误。
-    elif idx==627: # 0010,0111,0011
+        # Home是瞬时Home开关正边缘负侧的第一个索引脉冲。初始运动方向为正。如果初始运动远离原点开关，则轴在遇到正限位开关时反转；然后，如果在原点开关之前激活负限位开关，则产生错误。
+    elif idx == 627:  # 0010,0111,0011
         argout = '''Negative: Upper Home Inside Index.
                         Home is the first index pulse on the negative side of the positive edge of a momentary home switch. Initial direction of motion is negative if the home switch is inactive. If initial motion leads away from the home switch, the axis reverses on encountering the negative limit; then, if a negative limit switch is activated before the home switch, an error is generated.'''
-                        # Home是瞬时Home开关正边缘负侧的第一个索引脉冲。如果原点开关处于非活动状态，则初始运动方向为负。如果初始运动远离原点开关，轴在遇到负限位时反转；然后，如果在原点开关之前激活负限位开关，则产生错误。
-    elif idx==15: # 0000,0000,1111
+        # Home是瞬时Home开关正边缘负侧的第一个索引脉冲。如果原点开关处于非活动状态，则初始运动方向为负。如果初始运动远离原点开关，轴在遇到负限位时反转；然后，如果在原点开关之前激活负限位开关，则产生错误。
+    elif idx == 15:  # 0000,0000,1111
         argout = '''Bit_15: Immediate Home.
                         Immediate home. This value causes the amp to be referenced immediately on power-up. Once encoder is initialized, home offset value is added to encoder position and result is set as current referenced position. This is primarily useful with absolute encoders.'''
-                        # 直接回家。此值使放大器在通电时立即被引用。一旦编码器初始化，原点偏移值被添加到编码器位置，结果被设置为当前参考位置。这主要适用于绝对编码器。
+        # 直接回家。此值使放大器在通电时立即被引用。一旦编码器初始化，原点偏移值被添加到编码器位置，结果被设置为当前参考位置。这主要适用于绝对编码器。
     return argout
+
 
 def BitsMapped_0xC9(idx):
     '''
@@ -240,21 +246,21 @@ def BitsMapped_0xC9(idx):
             15  In-Motion Bit. If set, the trajectory generator is presently generating a profile.
     '''
     argout = ''
-    if idx in [0,1,2,4,8,16,32,64,128,256]: # 0~8
+    if idx in [0, 1, 2, 4, 8, 16, 32, 64, 128, 256]:  # 0~8
         argout = '''Bit_00-08: Reserved for future use.'''
-    elif idx==512: # 9
+    elif idx == 512:  # 9
         argout = '''Bit_09: Cam table underflow.'''
-    elif idx==1024: # 10
+    elif idx == 1024:  # 10
         argout = '''Bit_10: Reserved for future use'''
-    elif idx==2048: # 11
+    elif idx == 2048:  # 11
         argout = '''Bit_11: Homing error. If set, an error occurred in the last home attempt. Cleared by a home command.'''
-    elif idx==4096: # 12
+    elif idx == 4096:  # 12
         argout = '''Bit_12: Referenced. Set when a homing command has been successfully executed. Cleared by a home command.'''
-    elif idx==8192: # 13
+    elif idx == 8192:  # 13
         argout = '''Bit_13: Homing. If set, the drive is running a home command.'''
-    elif idx==16384: # 14
+    elif idx == 16384:  # 14
         argout = '''Bit_14: Set when a move is aborted. Cleared at the start of the next move.'''
-    elif idx==32758: # 15
+    elif idx == 32758:  # 15
         argout = '''Bit_15: In-Motion Bit. If set, the trajectory generator is presently generating a profile.'''
-    
+
     return argout
