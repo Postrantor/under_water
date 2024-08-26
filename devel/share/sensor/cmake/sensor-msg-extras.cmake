@@ -1,0 +1,2 @@
+set(sensor_MESSAGE_FILES "/home/ubuntu/catkin_ws/src/sensor/msg/bme280_msg.msg;/home/ubuntu/catkin_ws/src/sensor/msg/sht30_msg.msg;/home/ubuntu/catkin_ws/src/sensor/msg/ms5837_msg.msg;/home/ubuntu/catkin_ws/src/sensor/msg/coulomb_msg.msg;/home/ubuntu/catkin_ws/src/sensor/msg/power_msg.msg;/home/ubuntu/catkin_ws/src/sensor/msg/watt_msg.msg;/home/ubuntu/catkin_ws/src/sensor/msg/pca9685_msg.msg")
+set(sensor_SERVICE_FILES "")

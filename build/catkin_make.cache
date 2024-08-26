@@ -1,0 +1,2 @@
+algorithm:basic:copley:data:motor:raspberry:sensor:start
+-DCATKIN_DEVEL_PREFIX=/home/ubuntu/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/home/ubuntu/catkin_ws/install -G Unix Makefiles

@@ -1,0 +1,31 @@
+<launch>
+    <!-- <node>标签：
+        pkg:节点所在的包名；
+        type:启动的程序的名称；
+        name:节点启动后的名称；
+        output:将节点的输出显示在终端（缺省则将输出定向至日志文件）；
+        output="screen"：将节点的标准输出打印到终端屏幕，默认输出为日志文档。
+        respawn="true"：复位属性，该节点停止时，会自动重启，默认为false。
+        required="true"：必要节点，当该节点终止时，launch文件中的其他节点也被终止。
+        ns="namespace"：命名空间，为节点内的相对名称添加命名空间前缀。
+        args="arguments"：节点需要的输入参数。
+            argument是另外一个概念，类似于launch文件内部的局部变量，仅限于launch文件使用，便于launch文件的重构，与ROS节点内部的实现没有关系。
+            设置argument使用<arg>标签元素，语法如下：
+            <arg name="arg-name" default= "arg-value"/>
+            launch文件中需要使用到argument时，可以使用如下方式调用：
+            <param name="foo" value="$(arg arg-name)" />
+            <node name="node" pkg="package" type="type " args="$(arg arg-name)" />
+        -->
+    <!-- 库仑计 -->
+    <node pkg='sensor' type='Sensor_Coulomb_Publisher.py' name='Sensor_Coulomb_Publisher' />
+    <!-- 水深传感器 -->
+    <node pkg='sensor' type='Sensor_Depth_Publisher.py' name='Sensor_Depth_Publisher' />
+    <!-- 环境传感器 -->
+    <!-- <node pkg='sensor' type='Sensor_Env_Publisher_BME280.py' name='Sensor_Env_Publisher' /> -->
+    <node pkg='sensor' type='Sensor_Env_Publisher_SHT30.py' name='Sensor_Env_Publisher' />
+    <!-- 温度传感器 - 风扇 -->
+    <node pkg='sensor' type='Sensor_Fan_Publisher_PCA9685.py' name='Sensor_Fan_Publisher' />
+    <!-- 姿态传感器 -->
+    <node pkg='sensor' type='Sensor_IMU_Publisher_JY901b.py' name='Sensor_IMU_Publisher' />
+    <!-- <node pkg='sensor' type='Sensor_IMU_Publisher_MPU6050.py' name='Sensor_IMU_Publisher' /> -->
+</launch>

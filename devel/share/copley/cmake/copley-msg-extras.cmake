@@ -1,0 +1,2 @@
+set(copley_MESSAGE_FILES "/home/ubuntu/catkin_ws/src/copley/msg/joy2start_msg.msg;/home/ubuntu/catkin_ws/src/copley/msg/cmd2start_msg.msg;/home/ubuntu/catkin_ws/src/copley/msg/joy2switch_msg.msg;/home/ubuntu/catkin_ws/src/copley/msg/cmd2switch_msg.msg;/home/ubuntu/catkin_ws/src/copley/msg/cmd2drive_msg.msg;/home/ubuntu/catkin_ws/src/copley/msg/motor_msg.msg;/home/ubuntu/catkin_ws/src/copley/msg/motors_msg.msg;/home/ubuntu/catkin_ws/src/copley/msg/ucr_msg.msg")
+set(copley_SERVICE_FILES "")

@@ -1,0 +1,16 @@
+{
+    "python.pythonPath": "/usr/bin/python",
+    "python.autoComplete.extraPaths": [
+        "/home/ubuntu/catkin_ws/devel/lib/python2.7/dist-packages",
+        "/opt/ros/melodic/lib/python2.7/dist-packages",
+        "/home/ubuntu/.local/lib/python2.7/site-packages/",
+        "/home/ubuntu/catkin_ws/src/"
+    ],
+    "python.analysis.extraPaths": [
+        "/home/ubuntu/catkin_ws/devel/lib/python2.7/dist-packages",
+        "/opt/ros/melodic/lib/python2.7/dist-packages",
+        "/home/ubuntu/.local/lib/python2.7/site-packages/",
+        "/home/ubuntu/catkin_ws/src/"
+    ],
+    "cmake.configureOnOpen": false
+}

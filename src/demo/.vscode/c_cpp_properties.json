@@ -1,0 +1,23 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "",
+        "limitSymbolsToIncludedHeaders": true
+      },
+      "includePath": [
+        "/home/ubuntu/catkin_ws/devel/include/**",
+        "/opt/ros/melodic/include/**",
+        "/home/ubuntu/catkin_ws/src/basic/include/**",
+        "/home/ubuntu/catkin_ws/src/copley/include/**",
+        "/home/ubuntu/catkin_ws/src/motor/include/**",
+        "/home/ubuntu/catkin_ws/src/raspberry/include/**",
+        "/home/ubuntu/catkin_ws/src/sensor/include/**",
+        "/home/ubuntu/catkin_ws/src/start/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS"
+    }
+  ],
+  "version": 4
+}

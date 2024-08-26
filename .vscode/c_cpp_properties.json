@@ -1,0 +1,28 @@
+{
+    "configurations": [
+        {
+            "browse": {
+                "databaseFilename": "",
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "includePath": [
+                "/opt/ros/melodic/include/**",
+                "/home/ubuntu/catkin_ws/src/basic/include/**",
+                "/home/ubuntu/catkin_ws/src/copley/include/**",
+                "/home/ubuntu/catkin_ws/src/imu/include/**",
+                "/home/ubuntu/catkin_ws/src/motor/include/**",
+                "/home/ubuntu/catkin_ws/src/raspberry/include/**",
+                "/home/ubuntu/catkin_ws/src/rosserial/rosserial_server/include/**",
+                "/home/ubuntu/catkin_ws/src/rosserial/rosserial_test/include/**",
+                "/usr/include/**"
+            ],
+            "name": "ROS",
+            "intelliSenseMode": "gcc-x64",
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "gnu11",
+            "cppStandard": "gnu++14",
+            "configurationProvider": "ms-vscode.cmake-tools"
+        }
+    ],
+    "version": 4
+}

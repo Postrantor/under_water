@@ -1,0 +1,25 @@
+{
+    "python.pythonPath": "/usr/bin/python",
+    "cmake.configureOnOpen": true,
+    "python.autoComplete.extraPaths": [
+        "/opt/ros/melodic/lib/python2.7/dist-packages",
+        // 该路径是自定义添加的，需要和bashrc中的路径相互配合
+        "/home/ubuntu/catkin_ws/devel/lib/python2.7/dist-packages",
+        "/home/ubuntu/catkin_ws/src/copley/scripts/",
+        "/home/ubuntu/catkin_ws/src/sensor/scripts/",
+        "/home/ubuntu/catkin_ws/src/data/scripts/",
+        "/home/ubuntu/catkin_ws/src/algorithm/scripts/",
+    ],
+    "python.analysis.extraPaths": [
+        "/opt/ros/melodic/lib/python2.7/dist-packages",
+        // 该路径是自定义添加的，需要和bashrc中的路径相互配合
+        // 不能用~来代替/home/ubuntu
+        "/home/ubuntu/catkin_ws/devel/lib/python2.7/dist-packages",
+        "/home/ubuntu/catkin_ws/src/copley/scripts/",
+        "/home/ubuntu/catkin_ws/src/sensor/scripts/",
+        "/home/ubuntu/catkin_ws/src/data/scripts/",
+        "/home/ubuntu/catkin_ws/src/algorithm/scripts/",
+    ],
+    "jupyter.jupyterServerType": "local",
+    "ros.distro": "melodic"
+}
