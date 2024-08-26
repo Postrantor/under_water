@@ -1,119 +1,146 @@
-# lsusb
+---
+title: set serial port
+date: 2024-08-26 20:47:17
+url:
+  [](https://blog.csdn.net/xinmei4275/article/details/88620984)
+  [](https://blog.csdn.net/IT8343/article/details/106325866/)
+---
+
+## 查看串口信息
 
 ```bash
-    Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
-    Bus 001 Device 007: ID 0403:6011 Future Technology Devices International, Ltd FT4232H Quad HS USB-UART/FIFO IC
-    Bus 001 Device 005: ID 0403:6011 Future Technology Devices International, Ltd FT4232H Quad HS USB-UART/FIFO IC
-    Bus 001 Device 004: ID 0bda:8812 Realtek Semiconductor Corp. RTL8812AU 802.11a/b/g/n/ac WLAN Adapter
-    Bus 001 Device 003: ID 1a86:7523 QinHeng Electronics HL-340 USB-Serial adapter
-    Bus 001 Device 002: ID 2109:3431 VIA Labs, Inc. Hub
-    Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+pip install serial
+python -m serial.tools.list_ports
 ```
-
-# ubuntu@ubuntu:~$ udevadm info /dev/ttyUSB0
 
 ```bash
-    P: /devices/platform/scb/fd500000.pcie/pci0000:00/0000:00:00.0/0000:01:00.0/usb1/1-1/1-1.3/1-1.3:1.0/ttyUSB0/tty/ttyUSB0
-    N: ttyUSB0
-    S: serial/by-id/usb-FTDI_Quad_RS232-HS-if00-port0
-    S: serial/by-path/platform-fd500000.pcie-pci-0000:01:00.0-usb-0:1.3:1.0-port0
-    E: DEVLINKS=/dev/serial/by-id/usb-FTDI_Quad_RS232-HS-if00-port0 /dev/serial/by-path/platform-fd500000.pcie-pci-0000:01:00.0-usb-0:1.3:1.0-port0
-    E: DEVNAME=/dev/ttyUSB0
-    E: DEVPATH=/devices/platform/scb/fd500000.pcie/pci0000:00/0000:00:00.0/0000:01:00.0/usb1/1-1/1-1.3/1-1.3:1.0/ttyUSB0/tty/ttyUSB0
-    E: ID_BUS=usb
-    E: ID_MM_CANDIDATE=1
-    E: ID_MODEL=Quad_RS232-HS
-    E: ID_MODEL_ENC=Quad\x20RS232-HS
-    E: ID_MODEL_FROM_DATABASE=FT4232H Quad HS USB-UART/FIFO IC
-    E: ID_MODEL_ID=6011
-    E: ID_PATH=platform-fd500000.pcie-pci-0000:01:00.0-usb-0:1.3:1.0
-    E: ID_PATH_TAG=platform-fd500000_pcie-pci-0000_01_00_0-usb-0_1_3_1_0
-    E: ID_PCI_CLASS_FROM_DATABASE=Serial bus controller
-    E: ID_PCI_INTERFACE_FROM_DATABASE=XHCI
-    E: ID_PCI_SUBCLASS_FROM_DATABASE=USB controller
-    E: ID_REVISION=0800
-    `E: ID_SERIAL=FTDI_Quad_RS232-HS`
-    E: ID_TYPE=generic
-    E: ID_USB_DRIVER=ftdi_sio
-    E: ID_USB_INTERFACES=:ffffff:
-    E: ID_USB_INTERFACE_NUM=00
-    E: ID_VENDOR=FTDI
-    E: ID_VENDOR_ENC=FTDI
-    E: ID_VENDOR_FROM_DATABASE=Future Technology Devices International, Ltd
-    E: ID_VENDOR_ID=0403
-    E: MAJOR=188
-    E: MINOR=0
-    `E: SUBSYSTEM=tty`
-    E: TAGS=:systemd:
-    E: USEC_INITIALIZED=13633694
-    E: net.ifnames=0
+lsusb
+udevadm info /dev/ttyUSB0
+ll /dev | grep ttyUSB
 ```
 
-# ubuntu@ubuntu:~$ udevadm info /dev/ttyUSB8
+## 设置串口映射规则
 
-ci0000:00/0000:00:00.0/0000:01:00.0/usb1/1-1/1-10/0000:00:00.0/0000:01:00.0/usb1/1-1/1-1.4/1-1.4:1.3/ttyUSB8/tty/ttyUSB8
-.4/1-1.4:1.3/ttyUSB8/tty/ttyUSB8
-E: ID_BUS=usb 0E: ID_MM_CANDIDATE=1 0:01:00.0-usb-0:1.4:1.3-port0
-E: ID_MODEL=Quad_RS232-HS 0.pcie-pci-0000:01:00.0-usb-0:1.4:1.3-port0 /dev/serial/by-id/usb-FTDI_Quad_RS232-HS-if03-port0
-E: ID_MODEL_ENC=Quad\x20RS232-HS
-E: ID_MODEL_FROM_DATABASE=FT4232H Quad HS USB-UAci0000:00/0000:00:00.0/0000:01:00.0/usb1/1-1/1-1.4/1-1.4:1.3/ttyUSB8/tty/ttyUSB8
-RT/FIFO IC
-E: ID_MODEL_ID=6011
-E: ID_PATH=platform-fd500000.pcie-pci-0000:01:00.0-usb-0:1.4:1.3
-E: ID_PATH_TAG=platform-fd500000_pcie-pci-0000_0RT/FIFO IC
-1_00_0-usb-0_1_4_1_3
-E: ID_PCI_CLASS_FROM_DATABASE=Serial bus control.0-usb-0:1.4:1.3
-ler 1_00_0-usb-0_1_4_1_3
-E: ID_PCI_INTERFACE_FROM_DATABASE=XHCI ler
-E: ID_PCI_SUBCLASS_FROM_DATABASE=USB controller
-E: ID_REVISION=0800
-`E: ID_SERIAL=FTDI_Quad_RS232-HS`
-E: ID_TYPE=generic
-E: ID_USB_DRIVER=ftdi_sio
-E: ID_USB_INTERFACES=:ffffff:
-E: ID_USB_INTERFACE_NUM=03
-E: ID_VENDOR=FTDI
-E: ID_VENDOR_ENC=FTDI
-E: ID_VENDOR_FROM_DATABASE=Future Technology Devices International, Ltd ices International, Ltd
-E: ID_VENDOR_ID=0403
-E: MAJOR=188
-E: MINOR=8
-`E: SUBSYSTEM=tty`
-E: TAGS=:systemd:
-E: USEC_INITIALIZED=1292105053
-E: net.ifnames=0
+在 "/etc/udev/rules.d" 内创建规则文件，固定端口号。
 
-ubuntu@ubuntu:~$
+创建文件 "/etc/udev/rules.d/20-usb-serial.rules" 并添加
 
-# ubuntu@ubuntu:~$ udevadm info /dev/ttyUSB1
+```bash
+KERNEL=="ttyUSB*", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", MODE:="0777", SYMLINK+="rplidar"
+```
 
-P: /devices/platform/scb/fd500000.pcie/pci0000:00/0000:00:00.0/0000:01:00.0/usb1/1-1/1-1.1/1-1.1:1.0/ttyUSB1/tty/ttyUSB1
-.1/1-1.1:1.0/ttyUSB1/tty/ttyUSB1
-E: ID_BUS=usb
-E: ID_MM_CANDIDATE=1 0:01:00.0-usb-0:1.1:1.0-port0
-E: ID_MODEL=USB_Serial l-if00-port0 /dev/serial/by-path/platform-fd500000.pcie-pci-0000:01:00.0-usb-0:1.1:1.0-port0
-E: ID_MODEL_ENC=USB\x20Serial
-E: ID_MODEL_FROM_DATABASE=HL-340 USB-Serial adapci0000:00/0000:00:00.0/0000:01:00.0/usb1/1-1/1-1.1/1-1.1:1.0/ttyUSB1/tty/ttyUSB1ter
-E: ID_MODEL_ID=7523
-E: ID_PATH=platform-fd500000.pcie-pci-0000:01:00.0-usb-0:1.1:1.0
-E: ID_PATH_TAG=platform-fd500000_pcie-pci-0000_0ter1_00_0-usb-0_1_1_1_0
-E: ID_PCI_CLASS_FROM_DATABASE=Serial bus control.0-usb-0:1.1:1.0 ler 1_00_0-usb-0_1_1_1_0
-E: ID_PCI_INTERFACE_FROM_DATABASE=XHCI ler
-E: ID_PCI_SUBCLASS_FROM_DATABASE=USB controller
-E: ID_REVISION=0264
-`E: ID_SERIAL=1a86_USB_Serial`
-E: ID_TYPE=generic
-E: ID_USB_CLASS_FROM_DATABASE=Vendor Specific Class ass
-E: ID_USB_DRIVER=ch341
-E: ID_USB_INTERFACES=:ff0102:
-E: ID_USB_INTERFACE_NUM=00
-E: ID_VENDOR=1a86
-E: ID_VENDOR_ENC=1a86
-E: ID_VENDOR_FROM_DATABASE=QinHeng Electronics
-E: ID_VENDOR_ID=1a86
-E: MAJOR=188
-E: MINOR=1
-`E: SUBSYSTEM=tty`
-E: TAGS=:systemd:
-E: USEC_INITIALIZED=13627373
-E: net.ifnames=0
+其中，`idVendor` 和 `idProduct` 通过 `lsusb` 可查询（ID 字段）：
+
+```log
+> lsusb
+
+  Bus 001 Device 002: ID 0403:6001 Future Technology Devices International, Ltd FT232 USB-Serial (UART) IC
+  Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+```
+
+`rplidar` 为固定名
+
+重新加载配置文件：
+
+```bash
+service udev reload
+service udev restart
+```
+
+设置之后重新拔插外设即可
+
+## 设置串口可执行权限
+
+修改 "/etc/udev/rules.d/20-usb-serial.rules"：
+
+```bash
+KERNEL=="ttyUSB*"MODE="0777"
+KERNEL=="ttyS*"MODE="0777"
+```
+
+需重新加载配置文件
+
+## 示例 2
+
+```
+ACTION=="add",KERNELS=="1-1.1:1.0",SUBSYSTEMS=="usb",MODE:="0777",SYMLINK+="unitree_fl_legged"
+```
+
+## 示例 1
+
+> [Note]:
+> 内容, KERNELS 表示硬件的 usb 接口名,不同编号,表示不同的 usb 接口.
+> 下面是添加修改了三个 USB 端口
+
+```
+> lsusb
+
+/1-1.4:1.0/ttyUSB0
+/1-1.4:1.1/ttyUSB1
+/1-1.4:1.2/ttyUSB2
+/1-1.4:1.3/ttyUSB3
+
+/1-1.3:1.0/ttyUSB5
+/1-1.3:1.1/ttyUSB6
+/1-1.3:1.2/ttyUSB7
+/1-1.3:1.3/ttyUSB8
+```
+
+```bash
+# 这个是树莓派 USB2.0 上面端口
+ACTION=="add",KERNELS=="1-1.3:1.0",SUBSYSTEMS=="usb",MODE:="0777",SYMLINK+="UCR_Drive_L"
+ACTION=="add",KERNELS=="1-1.3:1.1",SUBSYSTEMS=="usb",MODE:="0777",SYMLINK+="UCR_Drive_R"
+ACTION=="add",KERNELS=="1-1.3:1.2",SUBSYSTEMS=="usb",MODE:="0777",SYMLINK+="UCR_Sting_L"
+ACTION=="add",KERNELS=="1-1.3:1.3",SUBSYSTEMS=="usb",MODE:="0777",SYMLINK+="UCR_Coulomb"
+
+# 这个是树莓派 USB2.0 下面端口
+ACTION=="add",KERNELS=="1-1.4:1.0",SUBSYSTEMS=="usb",MODE:="0777",SYMLINK+="UCR_Wing_L"
+ACTION=="add",KERNELS=="1-1.4:1.1",SUBSYSTEMS=="usb",MODE:="0777",SYMLINK+="UCR_Wing_R"
+ACTION=="add",KERNELS=="1-1.4:1.2",SUBSYSTEMS=="usb",MODE:="0777",SYMLINK+="UCR_Sting_R"
+ACTION=="add",KERNELS=="1-1.4:1.3",SUBSYSTEMS=="usb",MODE:="0777",SYMLINK+="UCR_Retain02"
+```
+
+# 创建文件`Port_HL-340.rules`，具体内容如下
+
+```bash
+# 这个是树莓派 USB3.0 端口上面
+# 暂时使用吧，等 RS232 转 TTL 小板到了，就添加到 USB2.0 端口中
+ACTION=="add",KERNELS=="1-1.1:1.0",SUBSYSTEMS=="usb",MODE:="0777",SYMLINK+="Coulomb"
+```
+
+然后执行：
+
+```bash
+service udev reload
+service udev restart
+```
+
+"/etc/udev/rules.d/20-usb-serial.rules"：
+
+```bash
+KERNEL=="ttyUSB*"MODE="0777"
+KERNEL=="ttyS*"MODE="0777"
+```
+
+### 成功，结果如下
+
+```bash
+$ ll /dev | grep ttyUSB
+
+lrwxrwxrwx 1 root root 7 Nov 30 03:30 Sting_L -> ttyUSB2
+lrwxrwxrwx 1 root root 7 Nov 30 03:30 Sting_R -> ttyUSB6
+lrwxrwxrwx 1 root root 7 Nov 30 03:30 UCR_L -> ttyUSB0
+lrwxrwxrwx 1 root root 7 Nov 30 03:30 UCR_R -> ttyUSB1
+lrwxrwxrwx 1 root root 7 Nov 30 03:30 UCR_Retain01 -> ttyUSB3
+lrwxrwxrwx 1 root root 7 Nov 30 03:30 UCR_Retain02 -> ttyUSB7
+lrwxrwxrwx 1 root root 7 Nov 30 03:30 Wing_L -> ttyUSB4
+lrwxrwxrwx 1 root root 7 Nov 30 03:30 Wing_R -> ttyUSB5
+crwxrwxrwx 1 root dialout 188, 0 Nov 30 03:30 ttyUSB0
+crwxrwxrwx 1 root dialout 188, 1 Nov 30 03:30 ttyUSB1
+crwxrwxrwx 1 root dialout 188, 2 Nov 30 03:30 ttyUSB2
+crwxrwxrwx 1 root dialout 188, 3 Nov 30 03:30 ttyUSB3
+crwxrwxrwx 1 root dialout 188, 4 Nov 30 03:30 ttyUSB4
+crwxrwxrwx 1 root dialout 188, 5 Nov 30 03:30 ttyUSB5
+crwxrwxrwx 1 root dialout 188, 6 Nov 30 03:30 ttyUSB6
+crwxrwxrwx 1 root dialout 188, 7 Nov 30 03:30 ttyUSB7
+```
